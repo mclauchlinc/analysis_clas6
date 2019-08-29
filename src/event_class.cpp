@@ -1,6 +1,6 @@
 #include "event_class.hpp"
 
-Event::Event(std::shared_ptr<Branches> data, std::shared_ptr<Histogram> hists, int run_type){ 
+Event::Event(std::shared_ptr<Branches> data, std::shared_ptr<Histogram> _hists, int run_type){ 
 		//Pre ID Filling
 		_W = 10; 
 
