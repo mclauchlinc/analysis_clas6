@@ -3,11 +3,12 @@
 
 #include "TLorentzVector.h"
 #include <iostream>
-#include "Branches.hpp"
 #include "histogram.hpp"
+#include "constants.hpp"
+#include "branches.hpp"
 
 
-
+/*
 class Particle{
 private:
 	int _pid = 0; //final particle ID
@@ -27,7 +28,7 @@ public:
 		return _pidn; 
 	}
 
-};
+};*/
 
 class Event{
 private:
@@ -59,11 +60,45 @@ private:
 
 	float _W = -99;
 	float _Q2 = -99; 
+
+	int _helicity = 0; 
 	
 public:
-	Event(std::shared_ptr<Branches> data, std::shared_ptr<Histogram> hists, int run_type);
+	Event(std::shared_ptr<Branches> data, std::shared_ptr<Histogram> _hists, int run_type);
+	//~Event();
+
+	float Get_px(int i);
+	float Get_py(int i);
+	float Get_pz(int i);
+	float Get_p0(int i);
+	float Get_hel();
+	float Get_top();
+	float Get_pid(int i);
 
 };
+
+/*
+//Overall reaction with information from all the given events
+class Reaction{
+private:
+	size_t _total_yield = 0;//total number of measured events 
+	size_t _top_yield[4] = {0,0,0,0};//yields for the various topologies
+
+	/*
+	What I want bins for
+	alpha[3]
+	theta[3]
+
+
+	//
+
+public:
+	//Constructor that adds yields to the overall reaction 
+	Reaction(std::unique_ptr<Event> event);
+	size_t Get_total_yield();
+	size_t Get_top_yield(int i);
+
+};*/
 
 
 #endif

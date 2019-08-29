@@ -1,8 +1,7 @@
 #include "histogram.hpp"
 
 
-
-Histogram:Histogram(const std::string& output_file){
+Histogram::Histogram(const std::string& output_file){
 	RootOutputFile = Name_File(output_file);
 	def = new TCanvas("def");
 
@@ -19,3 +18,4 @@ void Histogram::WQ2_Write(){
 	dir_WQ2->cd();
 
 }
+

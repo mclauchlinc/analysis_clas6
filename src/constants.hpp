@@ -6,7 +6,7 @@
 
 
 static const int MAX_PARTS = 100; 
-static const int NUM_THREADS = 2;
+static const int NUM_THREADS = 4;
 
 
 //Fun names for file lists
@@ -19,13 +19,13 @@ static const std::string list3n = "three-";
 
 //Paths for file names
 static const std::string path1 = "/home/mclauchlinc/Desktop/analysis/nick_convert_e16.txt";
-static const std::string path2 = "e16_10_18_17_ntple.txt";
-static const std::string path3 = "Nick_skim_e16.txt";
-static const std::string path4 = "arjun_sim.txt";
-static const std::string path3p = "NickSkim_e16_PlateIN.txt";
-static const std::string path3n = "NickSkim_e16_PlateOUT.txt";
+static const std::string path2 = "/Users/cmc/Desktop/analysis/e16_10_18_17_ntple.txt";
+static const std::string path3 = "/Users/cmc/Desktop/analysis/Nick_skim_e16.txt";
+static const std::string path4 = "/Users/cmc/Desktop/analysis/arjun_sim.txt";
+static const std::string path3p = "/Users/cmc/Desktop/analysis/NickSkim_e16_PlateIN.txt";
+static const std::string path3n = "/Users/cmc/Desktop/analysis/NickSkim_e16_PlateOUT.txt";
 
-//Run type for file lists
+//Run type for file lists {e16,e1f,e16sim,e1fsim} -> {1,2,3,4}
 static const int type1 = 1;
 static const int type2 = 1;
 static const int type3 = 1;

@@ -4,11 +4,16 @@ INCLUDE		= $(shell root-config --incdir)
 ROOTSYS		= $(shell root-config --exec-prefix)
 #Tell which compiler to use
 CXX = g++
-CXXFLAGS =      -O2 -fPIC -w -g $(shell root-config --cflags)
+CXXFLAGS =      -O2 -fPIC -w -g -pthread -stdlib=libc++ -std=c++14 -m64 -I/usr/local/root/include
 #Target is the name of the output executable
 TARGET =	analysis
 #The name of the file you want to comilie usually something like main.cpp 
 FILENAME =	main
+
+SRC = $(wildcard src/*.cpp)
+OBJ = $(patsubst src/%.cpp, obj/%.o, $(SRC))
+
+
 
 #When you don't specifiy anything i.e. $ make the function all is called
 #If you only want to clean the you can call the function clean with $ make clean
@@ -29,11 +34,12 @@ FILENAME =	main
 #make -f <name of make file>
 all: clean analysis
 
-analysis: main.o
-	g++ main.o -L. $(CXXFLAGS) $(ROOTLIBS) -o analysis 
+analysis: $(OBJ)
+	$(CXX) $(CXXFLAGS)  $(ROOTLIBS) $(OBJ) -o bin/analysis
 
-main.o: main.cpp
-	g++ $(CXXFLAGS) -c main.cpp -o main.o
+obj/%.o: src/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(TARGET) $(FILENAME).o 
+	rm -f $(TARGET) $(OBJ)
+
