@@ -9,6 +9,7 @@
 #include "constants.hpp"
 #include "functions.hpp"
 #include "branches.hpp"
+#include "ntuple.hpp"
 
 std::string comp; //Variable for choosing which data set will be used
 char* output_name;//Variable for the output file name. This is reassigned through input parameters
@@ -69,6 +70,7 @@ size_t run_files(std::vector<std::string> inputs, std::string list_file, std::sh
 	}else{
 		std::cout<<"Not a proper case" <<std::endl; 
 	}
+	
 	
 	//Run the function over each thread
 	return run(chain,hists,thread_id,run_type);

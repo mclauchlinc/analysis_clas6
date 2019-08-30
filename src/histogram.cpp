@@ -16,6 +16,7 @@ void Histogram::Write(){
 void Histogram::WQ2_Write(){
 	TDirectory* dir_WQ2 = RootOutputFile->mkdir("W vs. Q2");
 	dir_WQ2->cd();
+	
 
 }
 

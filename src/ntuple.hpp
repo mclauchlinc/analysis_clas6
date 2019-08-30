@@ -4,12 +4,13 @@
 
 #include "TFile.h"
 #include "TTree.h"
+#include "TList.h"
 #include "TDirectory.h"
 #include "event_class.hpp"
 #include "functions.hpp"
 #include "constants.hpp"
 
-//Making these TTrees
+//Output Event files which will contain event selected information 
 class forest{
 private:
 	Int_t _evnt; //The #event for the given file
@@ -24,14 +25,19 @@ private:
 
 	std::shared_ptr<TFile> _tree_file; 
 	std::shared_ptr<TTree> _the_tree;
+	TTree _a_tree; 
+	TList* _the_forest;
+	//std::shared_ptr<TDirectory> _almanac; 
 
 public:
-	forest(std::string tree_file_name);
+	forest();
 	~forest();
 
 	void mktree(int thread_id);
-	void Fill_Tree(std::shared_ptr<Event> event_friend, int event_n, int thread_id);
-
+	void mkfile(std::string tree_file_name);
+	void Fill_Tree(std::shared_ptr<Event> event_friend, int event_n, int thread_id);//For multithreading there need to be separate trees for each thread
+	//void Grow_Forest(std::shared_ptr<TTree> a_tree);
+	//void mkforest();
 };
 
 
