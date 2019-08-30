@@ -2,7 +2,7 @@
 
 
 Histogram::Histogram(const std::string& output_file){
-	RootOutputFile = fun::Name_File(output_file);
+	RootOutputFile = Name_File(output_file);
 	def = new TCanvas("def");
 
 }

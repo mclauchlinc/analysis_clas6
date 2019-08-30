@@ -63,7 +63,7 @@ size_t run_files(std::vector<std::string> inputs, std::string list_file, std::sh
 	auto chain = std::make_shared<TChain>("h10");
 	//Add every file to the chain
 	if(_case==1){
-		fun::loadChain(chain,list_file,thread_id,max);
+		loadChain(chain,list_file,thread_id,max);
 	}else if(_case==2){
 		for(auto in:inputs) chain->Add(in.c_str());
 	}else{

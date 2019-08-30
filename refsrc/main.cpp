@@ -33,7 +33,7 @@ int main(int argc, char **argv){
         std::cout<<"Argument assignment complete" <<std::endl;
        	//Should make a mapping of input paths to data types
         for(int i = 0; i <NUM_THREADS; i++){
-       		infilenames[i] = fun::read_file_list(filepath_map[argv[1]],i);//constants.hpp for map, functions.hpp for function
+       		infilenames[i] = read_file_list(filepath_map[argv[1]],i);//constants.hpp for map, functions.hpp for function
        	}
        _case = 1; 
 	}

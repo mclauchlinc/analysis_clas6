@@ -1,6 +1,6 @@
 #include "functions.hpp"
 
-bool replace(std::string& str, const std::string& from, const std::string& to) {
+bool fun::replace(std::string& str, const std::string& from, const std::string& to) {
     size_t start_pos = str.find(from);
     if(start_pos == std::string::npos)
         return false;
@@ -8,7 +8,7 @@ bool replace(std::string& str, const std::string& from, const std::string& to) {
     return true;
 }
 
-std::shared_ptr<TFile> Name_File(std::string a_file_name)
+std::shared_ptr<TFile> fun::Name_File(std::string a_file_name)
 {
 	std::string file_name = "$name.root";
 	replace(file_name, "$name", a_file_name);
@@ -16,7 +16,7 @@ std::shared_ptr<TFile> Name_File(std::string a_file_name)
 }
 
 
-std::vector<std::string> read_file_list(std::string path, int thread_num){
+std::vector<std::string> fun::read_file_list(std::string path, int thread_num){
   std::ifstream infile(path.c_str()); // in file stream
   std::vector<std::string> result;
   std::string line;
@@ -30,9 +30,9 @@ std::vector<std::string> read_file_list(std::string path, int thread_num){
   return result;
 }
 
-void loadChain(std::shared_ptr<TChain> c, std::string file, int thread_id, int max)
+void fun::loadChain(std::shared_ptr<TChain> c, std::string file, int thread_id, int max)
 {
-  std::vector<std::string> filelist = read_file_list(file,thread_id);//read_file_list(file); //creates a vector of file names
+  std::vector<std::string> filelist = fun::read_file_list(file,thread_id);//read_file_list(file); //creates a vector of file names
   //If not specified will take in all the files in the text file
   int test = filelist.size();
   if(max > test)
@@ -48,45 +48,16 @@ void loadChain(std::shared_ptr<TChain> c, std::string file, int thread_id, int m
   }
 }
 
-//Making a tree to contain all selected events
-void mkttree(std::string tree_file_name, std::string tree_desc){
-	Int_t evnt; //The #event for the given file
-	Int_t apart;//The particle in each event  
-	Float_t px; 
-	Float_t py; 
-	Float_t pz;
-	Float_t p0;//Energy of the particle 
-	Int_t pid;//particle ID 
-	Int_t hel; //helicity
-	Int_t top; //Topology {pmiss,pipmiss,pimmiss,zero} -> {1,2,3,4}
-
-	std::make_shared<TFile> event_file(tree_file_name,"RECREATE");//The output rootfile containng the tree
-	std::make_shared<TTree> event_tree = new TTree("t1",tree_desc);//
-	t1->Branch("evnt",&evnt,"evnt/I");
-	t1->Branch("apart",&apart"apart/I");
-	t1->Branch("px",&evnt,"px[apart]/F");
-	t1->Branch("py",&evnt,"py[apart]/F");
-	t1->Branch("pz",&evnt,"pz[apart]/F");
-	t1->Branch("p0",&evnt,"p0[apart]/F");
-	t1->Branch("pid",&evnt,"pid[apart]/F");
-	t1->Branch("hel",&hel,"hel/I");
-	t1->Branch("top",&top,"top/I");
-}
-
-void output_event(std::shared_ptr<TTree> the_tree, std::unique_ptr<Event> _event, int event_n)
+char* fun::appendCharToCharArray(char* array, char a)
 {
-	//create a Tree file tree1.root
-	//create the file, the Tree and a few branches
-	evnt = event_n; 
-	for(int i; i<4; i++){
-		apart = i; 
-		px[i] = _event.Get_px(i);
-		py[i] = _event.Get_py(i);
-		pz[i] = _event.Get_pz(i);
-		p0[i] = _event.Get_p0(i);
-		pid[i] = _event.Get_pid(i);
-	}
-	hel = _event.Get_hel();
-	top = _event.Get_top();
-	the_tree->Fill();
+    size_t len = strlen(array);
+
+    char* ret = new char[len+2];
+
+    strcpy(ret, array);    
+    ret[len] = a;
+    ret[len+1] = '\0';
+
+    return ret;
 }
+
