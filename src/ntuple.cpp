@@ -30,19 +30,59 @@ void forest::mkfile(std::string tree_file_name){
 	_almanac->cd();
 }
 
+
 void forest::Fill_Tree(std::shared_ptr<Event> event_friend, int event_n, int thread_id){
 	_evnt = event_n; 
 	for(int i; i<4; i++){
 		_apart = i; 
-		_px[i] = event_friend->Get_px(i);
-		_py[i] = event_friend->Get_py(i);
-		_pz[i] = event_friend->Get_pz(i);
-		_p0[i] = event_friend->Get_p0(i);
-		_pid[i] = event_friend->Get_pid(i);
+		_px[i] = event_friend->Event::Get_px(i);
+		_py[i] = event_friend->Event::Get_py(i);
+		_pz[i] = event_friend->Event::Get_pz(i);
+		_p0[i] = event_friend->Event::Get_p0(i);
+		_pid[i] = event_friend->Event::Get_pid(i);
 	}
-	_hel = event_friend->Get_hel();
-	_top = event_friend->Get_top();
+	_hel = event_friend->Event::Get_hel();
+	_top = event_friend->Event::Get_top();
 	_the_tree->TTree::Fill();	
+}
+
+void forest::fill_evnt(int event_n){
+	_evnt = event_n;
+	_the_tree->TTree::Fill();
+}
+
+void forest::fill_apart(int apart_n){
+	_apart = apart_n;
+	_the_tree->TTree::Fill();
+}
+void forest::fill_px(float px_n, int i){
+	_px[i] = px_n; 
+	_the_tree->TTree::Fill();
+}
+void forest::fill_py(float py_n, int i){
+	_py[i] = py_n;
+	_the_tree->TTree::Fill();
+}
+
+void forest::fill_pz(float pz_n, int i){
+	_pz[i] = pz_n;
+	_the_tree->TTree::Fill();
+}
+void forest::fill_p0(float p0_n, int i){
+	_py[i] = p0_n;
+	_the_tree->TTree::Fill();
+}
+void forest::fill_pid(int pid_n, int i){
+	_pid[i] = pid_n;
+	_the_tree->TTree::Fill();
+}
+void forest::fill_hel(int hel_n){
+	_hel = hel_n;
+	_the_tree->TTree::Fill();
+}
+void forest::fill_top(int top_n){
+	_top = top_n; 
+	_the_tree->TTree::Fill();
 }
 /*
 void forest::Grow_Forest(std::shared_ptr<TTree> a_tree){

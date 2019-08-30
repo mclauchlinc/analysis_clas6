@@ -36,6 +36,16 @@ public:
 	void mktree(int thread_id);
 	void mkfile(std::string tree_file_name);
 	void Fill_Tree(std::shared_ptr<Event> event_friend, int event_n, int thread_id);//For multithreading there need to be separate trees for each thread
+	void fill_evnt(int event_);
+	void fill_apart(int apart_);
+	void fill_px(float px_n, int i);
+	void fill_py(float py_n, int i);
+	void fill_pz(float pz_n, int i);
+	void fill_p0(float p0_n, int i);
+	void fill_pid(int pid_n, int i);
+	void fill_hel(int hel_n);
+	void fill_top(int top_n);
+
 	//void Grow_Forest(std::shared_ptr<TTree> a_tree);
 	//void mkforest();
 };

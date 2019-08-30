@@ -123,3 +123,43 @@ float Event::Get_pid(int i){
 	}
 	return _pid; 
 }
+
+/*
+void Fill_Tree(forest tree, int event_n){
+	tree.forest::fill_evnt(event_n);
+	tree.forest::fill_apart(4);//Four particles
+	for(int i = 0; i<4; i++){
+		switch(i){
+		case 0:
+			tree.forest::fill_px(_elec[0], i);
+			tree.forest::fill_py(_elec[1], i);
+			tree.forest::fill_pz(_elec[2], i);
+			tree.forest::fill_p0(_elec[3], i);
+			tree.forest::fill_pid(ELECTRON, i);
+		break;
+		case 1:
+			tree.forest::fill_px(_prot[0], i);
+			tree.forest::fill_py(_prot[1], i);
+			tree.forest::fill_pz(_prot[2], i);
+			tree.forest::fill_p0(_prot[3], i);
+			tree.forest::fill_pid(PROTON, i);
+		break;
+		case 2:
+			tree.forest::fill_px(_pip[0], i);
+			tree.forest::fill_py(_pip[1], i);
+			tree.forest::fill_pz(_pip[2], i);
+			tree.forest::fill_p0(_pip[3], i);
+			tree.forest::fill_pid(PION, i);
+		break;
+		case 3:
+			tree.forest::fill_px(_pim[0], i);
+			tree.forest::fill_py(_pim[1], i);
+			tree.forest::fill_pz(_pim[2], i);
+			tree.forest::fill_p0(_pim[3], i);
+			tree.forest::fill_pid(-PION, i);
+		break;
+		}	
+	}
+	tree.forest::fill_hel(_hel);
+	tree.forest::fill_top(_top);
+}*/
