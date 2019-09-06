@@ -94,6 +94,7 @@ void forest::Fill_Thread_Tree(std::shared_ptr<Event_Class> event_friend, int eve
 void forest::fill_evnt(int event_n, int thread_id){
 	_evnt = event_n;
 	_a_tree[thread_id]->TTree::Fill();
+	//_a_tree[thread_id]->TTree::Scan();
 }
 
 void forest::fill_apart(int apart_n, int thread_id){
@@ -150,11 +151,14 @@ void forest::move_forest_indoors(){
 void forest::Grow_Forest(){
 	TList* the_forest; 
 	for(int i = 0; i<NUM_THREADS ; i++){
+		//_a_tree[i]->TTree::Scan();
 		the_forest->TList::Add(_a_tree[i]);
 	}
 	_the_tree = TTree::MergeTrees(the_forest,"");
-	_the_tree->Write(); 
-	std::cout<<"This is the number of events in it: " <<_the_tree->GetEntries();
+	_the_tree->TTree::Scan();
+
+	_the_tree->TTree::Write(); 
+	//std::cout<<"This is the number of events in it: " <<_the_tree->GetEntries();
 }
 	/*
 void forest::mkforest(){
