@@ -57,17 +57,23 @@ int main(int argc, char **argv){
 	//Make histograms objects as a shared pointer that all threads will have
 	auto hists = std::make_shared<Histogram>(output_name);//Check on this
 
+	//Make relevant TTrees and Event Rootfile
+	auto a_good_forest = std::make_shared<forest>(1); 
+	a_good_forest->forest::mkfile(output_name); 
+	//a_forest->forest::mktree(NUM_THREADS+1);
+
 	//For each thread
 	for(int i = 0; i<NUM_THREADS; i++){
 		//Set the thread to run asynchronously
 		//The function running is the first argument
 		//The functions arguments are all remaining arguments
-		threads[i] = std::async(run_files, infilenames.at(i), filepath_map[argv[1]], hists, i, data_set, file_num, _case); //This is running the analysis 
+		threads[i] = std::async(run_files, infilenames.at(i), filepath_map[argv[1]], hists, a_good_forest, i, data_set, file_num, _case); //This is running the analysis 
 	}
 
 	//For each thread to see how many events each thread successfully analyized
 	for(int i = 0; i<NUM_THREADS; i++){
 		events += threads[i].get();
+
 	}
 
 	//Timer and Efficiency Counters

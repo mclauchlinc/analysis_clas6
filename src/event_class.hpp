@@ -33,7 +33,7 @@ public:
 class Event{
 private:
 	//int _gpart = 0; //Number of tagged particles in the event
-	bool _valid = 0; //Valid trigger electron from eid 
+	bool _valid = false; //Valid trigger electron from eid 
 	int _top = 0; //Topology this fits under {bad, pmiss, pipmiss,pimmiss,zeromiss }->{0,1,2,3,4}
 
 	//All four vectors in the center of mass frame 
@@ -74,6 +74,7 @@ public:
 	float Get_hel();
 	float Get_top();
 	float Get_pid(int i);
+	bool is_valid();
 	//void Fill_Tree(forest tree, int event_n);
 
 };

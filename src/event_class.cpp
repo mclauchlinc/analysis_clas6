@@ -124,6 +124,10 @@ float Event::Get_pid(int i){
 	return _pid; 
 }
 
+bool Event::is_valid(){
+	return _valid; 
+}
+
 /*
 void Fill_Tree(forest tree, int event_n){
 	tree.forest::fill_evnt(event_n);

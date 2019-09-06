@@ -18,7 +18,7 @@ int file_num = -1;//The initial assignment for the number of files in the progra
 
 
 
-size_t run(std::shared_ptr<TChain> _chain, std::shared_ptr<Histogram> _hists, int thread_id, int run_type){
+size_t run(std::shared_ptr<TChain> _chain, std::shared_ptr<Histogram> _hists, std::shared_ptr<forest> a_forest, int thread_id, int run_type){
 	//Number of events in this thread
 	size_t num_of_events = (int) _chain->GetEntries();
 	//Print out information about the thread
@@ -47,7 +47,11 @@ size_t run(std::shared_ptr<TChain> _chain, std::shared_ptr<Histogram> _hists, in
 
 		//Make a reaction class from the data given
 		//std::unique_ptr<Event> 
-		auto event = std::make_unique<Event>(data,_hists,run_type);
+		auto event = std::make_shared<Event>(data,_hists,run_type);
+		if(event->Event::is_valid()){
+			good_event++;
+			a_forest->forest::Fill_Thread_Tree(event,good_event,thread_id);
+		}
 		/*
 		for(int part = 1; part < data->gpart(); part++){
 			//Check Particle ID's and fill the reaction class
@@ -58,7 +62,7 @@ size_t run(std::shared_ptr<TChain> _chain, std::shared_ptr<Histogram> _hists, in
 }
 
 
-size_t run_files(std::vector<std::string> inputs, std::string list_file, std::shared_ptr<Histogram> hists, int thread_id, int run_type, int max, int _case){
+size_t run_files(std::vector<std::string> inputs, std::string list_file, std::shared_ptr<Histogram> hists, std::shared_ptr<forest> bforest, int thread_id, int run_type, int max, int _case){
 	//Called once per thread
 	//Make a new chain to process for this thread
 	auto chain = std::make_shared<TChain>("h10");
@@ -70,10 +74,10 @@ size_t run_files(std::vector<std::string> inputs, std::string list_file, std::sh
 	}else{
 		std::cout<<"Not a proper case" <<std::endl; 
 	}
-	
+
 	
 	//Run the function over each thread
-	return run(chain,hists,thread_id,run_type);
+	return run(chain,hists,bforest,thread_id,run_type);
 }
 
 #endif
