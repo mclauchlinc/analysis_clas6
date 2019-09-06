@@ -3,7 +3,9 @@
 
 forest::forest(int is_alive){
 	//The main Tree that will be made into a root file
+	
 	_the_tree = new TTree("TREEE","Tree to hold Event Fourvectors");//
+	//_the_tree->Branch("EventBranch",&the_event,"evnt/I:apart/I:px/F:py/F:pz/F:p0/F:pid/I:hel/I:top/I");
 	_the_tree->Branch("evnt",&_evnt,"evnt/I");
 	_the_tree->Branch("apart",&_apart,"apart/I");
 	_the_tree->Branch("px",&_px,"px[apart]/F");
@@ -16,6 +18,7 @@ forest::forest(int is_alive){
 	//The individual thread trees that will be merged
 	for(int thread_id = 0; thread_id < NUM_THREADS; thread_id++){
 		_a_tree[thread_id] = new TTree("TREEs","Tree to hold Thread Event Fourvectors");//
+		//_a_tree[thread_id]->Branch("EventBranch",&the_eventb,"evntb/I:apartb/I:pxb/F:pyb/F:pzb/F:p0b/F:pidb/I:helb/I:topb/I");
 		_a_tree[thread_id]->Branch("evnt",&_evntb[thread_id],"evnt/I");
 		_a_tree[thread_id]->Branch("apart",&_apartb[thread_id],"apart/I");
 		_a_tree[thread_id]->Branch("px",&_pxb[thread_id],"px[apart]/F");
@@ -66,21 +69,25 @@ void forest::mkfile(std::string tree_file_name){
 	_tree_file = fun::Name_Tree_File(tree_file_name);//The output rootfile containng the tree
 	TDirectory* _almanac = _tree_file->mkdir("physics_phorest");
 	_almanac->cd();
+	_the_tree->Write();
+	_tree_file->Write();
 }
 
 
-void forest::Fill_Thread_Tree(std::shared_ptr<Event> event_friend, int event_n, int thread_id){
+void forest::Fill_Thread_Tree(std::shared_ptr<Event_Class> event_friend, int event_n, int thread_id){
+	//the_eventb[thread_id] = new Event();
+
 	_evntb[thread_id] = event_n; 
 	for(int i; i<4; i++){
 		_apartb[thread_id] = i; 
-		_pxb[thread_id][i] = event_friend->Event::Get_px(i);
-		_pyb[thread_id][i] = event_friend->Event::Get_py(i);
-		_pzb[thread_id][i] = event_friend->Event::Get_pz(i);
-		_p0b[thread_id][i] = event_friend->Event::Get_p0(i);
-		_pidb[thread_id][i] = event_friend->Event::Get_pid(i);
+		_pxb[thread_id][i] = event_friend->Event_Class::Get_px(i);
+		_pyb[thread_id][i] = event_friend->Event_Class::Get_py(i);
+		_pzb[thread_id][i] = event_friend->Event_Class::Get_pz(i);
+		_p0b[thread_id][i] = event_friend->Event_Class::Get_p0(i);
+		_pidb[thread_id][i] = event_friend->Event_Class::Get_pid(i);
 	}
-	_helb[thread_id] = event_friend->Event::Get_hel();
-	_topb[thread_id] = event_friend->Event::Get_top();
+	_helb[thread_id] = event_friend->Event_Class::Get_hel();
+	_topb[thread_id] = event_friend->Event_Class::Get_top();
 	_a_tree[thread_id]->TTree::Fill();	
 }
 
@@ -143,10 +150,11 @@ void forest::move_forest_indoors(){
 void forest::Grow_Forest(){
 	TList* the_forest; 
 	for(int i = 0; i<NUM_THREADS ; i++){
-		_a_tree[i] = _a_tree[i];
 		the_forest->TList::Add(_a_tree[i]);
 	}
 	_the_tree = TTree::MergeTrees(the_forest,"");
+	_the_tree->Write(); 
+	std::cout<<"This is the number of events in it: " <<_the_tree->GetEntries();
 }
 	/*
 void forest::mkforest(){

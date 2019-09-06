@@ -33,7 +33,7 @@ size_t run(std::shared_ptr<TChain> _chain, std::shared_ptr<Histogram> _hists, st
 	size_t good_event = 0; 
 
 	//Analysis loop
-	for(size_t curr_event = 0; curr_event<num_of_events; curr_event++){
+	for(size_t curr_event = 0; curr_event < num_of_events; curr_event++){
 		//Get singular event
 		_chain->GetEntry(curr_event);
 		//For Progress just look at the 0th thread
@@ -46,9 +46,8 @@ size_t run(std::shared_ptr<TChain> _chain, std::shared_ptr<Histogram> _hists, st
 		//if(sanity_elec()) continue; *come back to this*
 
 		//Make a reaction class from the data given
-		//std::unique_ptr<Event> 
-		auto event = std::make_shared<Event>(data,_hists,run_type);
-		if(event->Event::is_valid()){
+		auto event = std::make_shared<Event_Class>(data,_hists,run_type);
+		if(true){//event->Event::is_valid()){ //changed this out just to see if it will create the files
 			good_event++;
 			a_forest->forest::Fill_Thread_Tree(event,good_event,thread_id);
 		}

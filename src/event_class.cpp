@@ -1,7 +1,7 @@
 #include "event_class.hpp"
 
 
-Event::Event(std::shared_ptr<Branches> data, std::shared_ptr<Histogram> _hists, int run_type){ 
+Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogram> _hists, int run_type){ 
 		//Pre ID Filling
 		_W = 10; 
 
@@ -11,7 +11,7 @@ Event::Event(std::shared_ptr<Branches> data, std::shared_ptr<Histogram> _hists, 
 		//Hadron Loop
 
 
-		//Event Selection
+		//Event_Class Selection
 
 
 		//Variable Determination
@@ -19,7 +19,7 @@ Event::Event(std::shared_ptr<Branches> data, std::shared_ptr<Histogram> _hists, 
 
 }
 
-float Event::Get_px(int i){
+float Event_Class::Get_px(int i){
 	float _px = -99; 
 	switch(i){
 		case 0:
@@ -38,7 +38,7 @@ float Event::Get_px(int i){
 	return _px;
 }
 
-float Event::Get_py(int i){
+float Event_Class::Get_py(int i){
 	float _py = -99; 
 	switch(i){
 		case 0:
@@ -57,7 +57,7 @@ float Event::Get_py(int i){
 	return _py;
 }
 
-float Event::Get_pz(int i)
+float Event_Class::Get_pz(int i)
 {
 	float _pz = -99; 
 	switch(i){
@@ -77,7 +77,7 @@ float Event::Get_pz(int i)
 	return _pz;
 }
 
-float Event::Get_p0(int i)
+float Event_Class::Get_p0(int i)
 {
 	float _p0 = -99; 
 	switch(i){
@@ -97,15 +97,15 @@ float Event::Get_p0(int i)
 	return _p0;
 }
 
-float Event::Get_hel(){
+float Event_Class::Get_hel(){
 	return _helicity; 
 }
 
-float Event::Get_top(){
+float Event_Class::Get_top(){
 	return _top; 
 }
 
-float Event::Get_pid(int i){
+float Event_Class::Get_pid(int i){
 	int _pid = 0;
 	switch(i){
 		case 0:
@@ -124,13 +124,13 @@ float Event::Get_pid(int i){
 	return _pid; 
 }
 
-bool Event::is_valid(){
+bool Event_Class::is_valid(){
 	return _valid; 
 }
 
 /*
-void Fill_Tree(forest tree, int event_n){
-	tree.forest::fill_evnt(event_n);
+void Fill_Tree(forest tree, int Event_Class_n){
+	tree.forest::fill_evnt(Event_Class_n);
 	tree.forest::fill_apart(4);//Four particles
 	for(int i = 0; i<4; i++){
 		switch(i){

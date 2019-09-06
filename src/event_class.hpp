@@ -30,9 +30,9 @@ public:
 
 };*/
 
-class Event{
+class Event_Class{
 private:
-	//int _gpart = 0; //Number of tagged particles in the event
+	//int _gpart = 0; //Number of tagged particles in the Event_Class
 	bool _valid = false; //Valid trigger electron from eid 
 	int _top = 0; //Topology this fits under {bad, pmiss, pipmiss,pimmiss,zeromiss }->{0,1,2,3,4}
 
@@ -64,8 +64,8 @@ private:
 	int _helicity = 0; 
 	
 public:
-	Event(std::shared_ptr<Branches> data, std::shared_ptr<Histogram> _hists, int run_type);
-	//~Event();
+	Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogram> _hists, int run_type);
+	//~Event_Class();
 
 	float Get_px(int i);
 	float Get_py(int i);
