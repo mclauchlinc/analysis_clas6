@@ -1,6 +1,13 @@
 #include "physics.hpp"
 
 
+TLorentzVector physics::Make_4Vector(float p, float cx, float cy, float cz, float m){
+	TVector3 k_mu_3(p*cx, p*cy, p*cz);
+	TLorentzVector k_mu;
+	k_mu.SetVectM(k_mu_3,m);
+	return k_mu;
+}
+
 TLorentzVector physics::Set_k_mu(int set){
 	TLorentzVector k_mu;
 	switch(set){
@@ -14,7 +21,7 @@ TLorentzVector physics::Set_k_mu(int set){
 	return k_mu; 
 }
 
-physics::event_helicity(shared_ptr<TChain> data, int event_helicity){
+int physics::event_helicity(std::shared_ptr<Branches> data, int plate_stat){
 	int eh = 0; 
 	if(data->evntclas2() >= 1000) eh = 1; 
 	if(data->evntclas2() <= -1000) eh = -1; 
@@ -23,7 +30,7 @@ physics::event_helicity(shared_ptr<TChain> data, int event_helicity){
 	return plate_stat*eh; 
 }
 
-float physics::Qsquared(int set, shared_ptr<TChain> data){
+float physics::Qsquared(int set, std::shared_ptr<Branches> data){
 	TVector3 k_mu_3(data->p(0)*data->cx(0),data->p(0)*data->cy(0),data->p(0)*data->cz(0));
 	TLorentzVector k_mu = physics::Set_k_mu(set);
 	TLorentzVector k_mu_prime; 
@@ -31,7 +38,7 @@ float physics::Qsquared(int set, shared_ptr<TChain> data){
 	return -(k_mu - k_mu_prime).Mag2();
 }
 
-float physics::WP(int set, shared_ptr<TChain> data){
+float physics::WP(int set, std::shared_ptr<Branches> data){
 	TLorentzVector k_mu = physics::Set_k_mu(set);
 	TVector3 k_mu_3(data->p(0)*data->cx(0),data->p(0)*data->cy(0),data->p(0)*data->cz(0));
 	TLorentzVector k_mu_prime.SetVectM(k_mu_3,me);
@@ -40,7 +47,7 @@ float physics::WP(int set, shared_ptr<TChain> data){
 	return (p_mu + q_mu).Mag();
 }
 
-float physics::beta_calc(float m, shared_ptr<TChain> data, int i){
+float physics::beta_calc(float m, std::shared_ptr<Branches> data, int i){
 	return data->p(i)/TMath::Sqrt(m*m+data->p(i)*data->p(i));
 }
 
@@ -132,7 +139,8 @@ float physics::Sin_Vecs(TLorentzVector p1, TLorentzVector p2){
 	return Cross_Mag/(other1mag*other2mag);
 } //Get the Sin between two vectors 
 
-void physics::Get_phie(int set, TLorentzVector p0){
+float physics::Get_phie(int set, TLorentzVector p0){
+	TLorentzVector k_mu = physics::Get_k_mu(set);
 	TVector3 nE = (1/(Vec3_Mag(k_mu)*Vec3_Mag(p0)))*Cross_Product(k_mu,p0);
 	float phie = TMath::ATan2(nE[0],nE[1]);
 	return phie; 
@@ -150,24 +158,24 @@ void physics::Boost_4Vec(float beta, TLorentzVector &p1 ){
 }// Boost a four vector in the z direction 
 
 void physics::COM_gp(int set, TLorentzVector &p0, TLorentzVector &p1, TLorentzVector &p2, TLorentzVector &p3){
-	TLorentzVector k_mu = physics::Set_k_mu(set);
-	TLorentzVector q_mu = k_mu - p0;
-	TLorentzVector nstar_mu; //Combined photon-target system
-	float phigp = TMath::ATan2(nstar_mu[1],nstar_mu[0]);
-	floast pgp = sqrt(nstar_mu[0]*nstar_mu[0]+nstar_mu[1]*nstar_mu[1]+nstar_mu[2]*nstar_mu[2]);
+	TLorentzVector k_mu = physics::Set_k_mu(set);//Establish set
+	TLorentzVector q_mu = k_mu - p0;//Four vector for virtual particle
+	TLorentzVector nstar_mu = p_mu + q_mu; //Combined photon-target system
+	float phigp = TMath::ATan2(nstar_mu[1],nstar_mu[0]);//Phi angle out of the x-plane
 	nstar_mu.RotateZ(-phigp);//Get all horizontal momentum on x axis by roating around z axis
-	float thgp - TMath::ATan2(nstar_mu[0],nstar_mu[2]);
+	float thgp - TMath::ATan2(nstar_mu[0],nstar_mu[2]); //Theta angle away from z-axis
 	nstar_mu.RotateY(-thgp);//Rotate towards z-axis so all momentum is in the z direction
-	float b = nstar_mu.Beta();
+	float b = nstar_mu.Beta();//Get the beta to boost to the rest frame for the center of mass
 	nstar_mu.Boost(0.0,0.0,-b);
-	Rotate_4Vec(set, thgp,phigp,p0);
-	Rotate_4Vec(set, thgp,phigp,p1);
-	Rotate_4Vec(set, thgp,phigp,p2);
-	Rotate_4Vec(set, thgp,phigp,p3);
-	Boost_4Vec(-b,p0);
-	Boost_4Vec(-b,p1);
-	Boost_4Vec(-b,p2);
-	Boost_4Vec(-b,p3);
+	float phie = physis::Get_phie(set,p0);//Get the angle for the scattering plane of the electrons just to have a consistent definition of phi 
+	physics::Rotate_4Vec(set, thgp,phigp,phie,p0);
+	physics::Rotate_4Vec(set, thgp,phigp,phie,p1);
+	physics::Rotate_4Vec(set, thgp,phigp,phie,p2);
+	physics::Rotate_4Vec(set, thgp,phigp,phie,p3);
+	physics::Boost_4Vec(-b,p0);
+	physics::Boost_4Vec(-b,p1);
+	physics::Boost_4Vec(-b,p2);
+	physics::Boost_4Vec(-b,p3);
 } //Bring four vectors into the COM reference frame for excited nucleon 
 
 float physics::alpha(int top, TLorentzVector p1, TLorentzVector p2, TLorentzVector p3, TLorentzVector p4){
@@ -181,19 +189,19 @@ float physics::alpha(int top, TLorentzVector p1, TLorentzVector p2, TLorentzVect
 		//v2 = Paired particle for  scattering plane {p, pp, p}
 		// v3= First particle in other scattering plane {pp, pi+, pp}
 		// v4 = second particle in other scattering plane{pi+, pi-, pi-}
-		case 0:
+		case 0://{pi-,p},{pp,pi+}
 		v1 = physics::V4_to_V3(p3);
 		v2 = physics::V4_to_V3(p4);
 		v3 = physics::V4_to_V3(p1);
 		v4 = physics::V4_to_V3(p2);
 		break;
-		case 1:
+		case 1://{p,pp},{pi+,pi-}
 		v1 = physics::V4_to_V3(p4);
 		v2 = physics::V4_to_V3(p1);
 		v3 = physics::V4_to_V3(p2);
 		v4 = physics::V4_to_V3(p3);
 		break;
-		case 2:
+		case 2://{pi+,p},{pp,pi-}
 		v1 = physics::V4_to_V3(p2);
 		v2 = physics::V4_to_V3(p1);
 		v3 = physics::V4_to_V3(p4);

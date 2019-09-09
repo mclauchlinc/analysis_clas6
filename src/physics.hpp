@@ -6,15 +6,17 @@
 #include "TVector3.h"
 #include <cmath>
 #include "constants.hpp"
+#include "branches.hpp"
 
 namespace physics{
+	TLorentzVector Make_4Vector(float p, float cx, float cy, float cz, float m);
 	TLorentzVector Set_k_mu(int set);
-	int event_helicity(shared_ptr<TChain> data, int plate_stat);
-	float Qsquared(int set, shared_ptr<TChain> data);
-	float WP(int set, shared_ptr<TChain> data);
+	int event_helicity(std::shared_ptr<Branches> data, int plate_stat);
+	float Qsquared(int set, std::shared_ptr<Branches> data);
+	float WP(int set, std::shared_ptr<Branches> data);
 
-	float beta_calc(float m, shared_ptr<TChain> data, int i);
-	float MM_event(int set, TLorentzVector k1_mu, TLorentzVector k2_mu, TLorentzVector k3_mu, TLorentzVector k4_mu = {0.0,0.0,0.0,0.0}, int squared = 0);
+	float beta_calc(float m, std::shared_ptr<Branches> data, int i);
+	float MM_event(int set, TLorentzVector k1_mu, TLorentzVector k2_mu, TLorentzVector k3_mu, TLorentzVector k4_mu , int squared = 0);
 
 
 

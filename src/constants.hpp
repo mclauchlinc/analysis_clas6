@@ -33,9 +33,9 @@ static const double Q2maxAna = 5.0;
 
 //Initial Four Vectors
 
-TLorentzVector k_mu_e16 = Make_4Vector(energy_e16,0.0,0.0,1.0,me);
-TLorentzVector k_mu_e1f = Make_4Vector(energy_e1f,0.0,0.0,1.0,me);
-TLorentzVector p_mu = Make_4Vector(0.0,0.0,0.0,0.0,mp);
+TLorentzVector k_mu_e16(0.0,0.0,sqrt(energy_e16*energy_e16-me*me),energy_e16);
+TLorentzVector k_mu_e1f(0.0,0.0,sqrt(energy_e16*energy_e1f-me*me),energy_e1f);
+TLorentzVector p_mu(0.0,0.0,0.0,mp);
 
 //e1-6 Luminosity Values
 static const double lt_e16 = 5.0; //Target length in cm

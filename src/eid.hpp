@@ -7,8 +7,8 @@ private:
 
 
 public:
-	
-}
+
+};
 
 
 #endif
