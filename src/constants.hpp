@@ -33,9 +33,9 @@ static const double Q2maxAna = 5.0;
 
 //Initial Four Vectors
 
-//TLorentzVector k_mu_e16 = Make_4Vector(energy_e16,0.0,0.0,1.0,me);
-//TLorentzVector k_mu_e1f = Make_4Vector(energy_e1f,0.0,0.0,1.0,me);
-//TLorentzVector p_mu = Make_4Vector(0.0,0.0,0.0,0.0,mp);
+TLorentzVector k_mu_e16 = Make_4Vector(energy_e16,0.0,0.0,1.0,me);
+TLorentzVector k_mu_e1f = Make_4Vector(energy_e1f,0.0,0.0,1.0,me);
+TLorentzVector p_mu = Make_4Vector(0.0,0.0,0.0,0.0,mp);
 
 //e1-6 Luminosity Values
 static const double lt_e16 = 5.0; //Target length in cm
@@ -58,6 +58,96 @@ static const	int PION_0 = 111;
 static const double x_beam = 0.090;
 static const double y_beam = -0.345;
 
+//Fiducial Cut Parameters (electrons have e, hadrons have h)
+//Arjun's cut_fid_e1f.f
+const double c1e = 12.0;
+const double c2e = 18.5;
+const double c3e = 0.25;
+const double c4e = 15.0;
+const double factor_e = 0.416667;
+const double p_shift_e = 0.14;
+const double a0xh[6] = {24.0,24.0,23.0,23.5,24.5,24.5};
+const double a0mh[6] = {25.0,26.0,26.0,25.5,27.0,26.0};
+const double a1xh[6] = {0.22,0.23,0.20,0.20,0.22,0.22};
+const double a1mh[6] = {0.22,0.22,0.22,0.22,0.16,0.16};
+const double a2xh[6] = {8.0,8.0,8.0,8.0,8.0,8.0};
+const double a2mh[6] = {8.0,8.0,8.0,8.0,8.0,8.0};
+const double a3xh[6] = {1.0,1.0,1.0,1.0,1.0,1.0};
+const double a3mh[6] = {1.0,1.0,1.0,1.0,1.0,1.0};
+
+//Missing Mass Cuts
+const double pim_center = 0.164369;//These are all determined through fitting of b_wig fitting.h
+const double pim_sig = 0.0862474;
+const double pip_center = 0.157301;
+const double pip_sig = 0.0752388;
+const double p_center = 0.946847;
+const double p_sig = 0.0420984;
+const double pim_center2 = 0.022;
+const double pim_sig2 = 0.022;
+const double pip_center2 = 0.022;
+const double pip_sig2 = 0.022;
+const double p_center2 = 0.89;
+const double p_sig2 = 0.05;
+
+const double pim_bot_MM[11] = {0.0781216,0.0781216,0.0781216,0.0781216,0.0781216,0.0781216,0.0781216,0.0781216,0.083,0.109,0.109};
+const double pim_top_MM[11] = {0.2506164,0.2506164,0.2506164,0.2506164,0.2506164,0.2506164,0.2506164,0.2506164,0.34,0.415,0.415};
+
+
+//For Project
+const double MM_n_center = 0.944;
+const double MM_n_sigma = 0.07;
+const double MM_piz_center = 0.140;
+const double MM_piz_sigma = 0.1;
+const double MM_D_center = 1.232;
+const double MM_D_sigma = 0.08;
+
+//My Own MM cut parameters
+const double MM_zero_center = 0.0;
+const double MM_zero_sigma = 0.02;
+const double MM_zero_center2 = 0.0;
+const double MM_zero_sigma2 = 0.004;
+
+//Arjun's cut parameters: 3rd order polynomial
+const double DTL[4] = {-0.778903, 0.027350, 0.047947, -0.009641};
+const double DTH[4] = {0.758057, -0.147383, 0.034343, -0.002367};
+
+//attempt to remove slice of electrons from Pi- delta t
+const double dt_e_sig = 0.05;
+const double dt_e_A = 20.0;
+const double dt_e_a = 8.55;
+const double dt_e_b = 0.31;
+
+
+//Kinematic Cuts
+// Margin of error allowed for kinematic fitting 
+const double px_dev = 0.02;
+const double py_dev = 0.02;
+const double pz_dev = 0.02;
+
+//Electron EC cut parameters
+//currently from Arjun and not verified
+//High and Low functions are third order polynomials separtated by sector
+const Float_t p_min_e16 = 0.70; //in GeV
+const Float_t ec_min_e16 = 0.06; //in GeV 
+const double sf_high_e16[6][4] = {
+		{0.380401, -0.019463, 0.004609, -0.000359},
+		{0.428533, -0.047554, 0.016350, -0.001938},
+		{0.420563, -0.064622, 0.025420, -0.003105},
+		{0.411866, -0.062074, 0.022444, -0.002734},
+		{0.383041, -0.020678, 0.007576, -0.000897},
+		{0.394516, -0.023219, 0.010402, -0.001431}
+		};
+const double sf_low_e16[6][4] = {
+		{0.141603, 0.063643, -0.012677, 0.000918},
+		{0.149598, 0.053507, -0.007504, 0.000323},
+		{0.172657, 0.038093, -0.002066, -0.000355},
+		{0.149623, 0.060981, -0.012957, 0.001054},
+		{0.099589, 0.102036, -0.028452, 0.002751},
+		{0.117104, 0.097765, -0.023769, 0.002149}
+		};
+const Float_t p_min_e1f = 0.64;
+const Float_t ec_min_e1f_exp[6] = {0.058,0.064,0.060,0.056,0.058,0.056}; 
+const Float_t ec_min_e1f_sim[6] = {0.063,0.063,0.063,0.063,0.063,0.063}; 
 
 //Fun names for file lists
 static const std::string list1 = "one";

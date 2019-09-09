@@ -6,6 +6,9 @@
 #include "histogram.hpp"
 #include "constants.hpp"
 #include "branches.hpp"
+#include "eid.hpp"//Electron ID Cuts
+#include "hid.hpp"//Hadron ID Cuts
+
 //#include "ntuple.hpp"
 
 /*
@@ -20,6 +23,10 @@ private:
 	bool _ppass = false;
 	bool _pippass = false;
 	bool _pimpass = false;
+
+	float _px = 0.0;
+	float _py = 0.0;
+	float _pz = 0.0;
 
 public:
 	void SetPID(int i);
@@ -76,6 +83,8 @@ public:
 	float Get_pid(int i);
 	bool is_valid();
 	//void Fill_Tree(forest tree, int event_n);
+
+	
 
 };
 

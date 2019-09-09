@@ -3,7 +3,7 @@
 
 Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogram> _hists, int run_type){ 
 		//Pre ID Filling
-		_W = 10; 
+		
 
 		//electron ID
 		

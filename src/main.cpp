@@ -42,7 +42,7 @@ int main(int argc, char **argv){
 		output_name = argv[1];
 		data_set = std::atoi(argv[2]);
 		for(int w = 3; w <argc; w++){//Putting all the files into 
-			infilenames[w%NUM_THREADS].push_back(argv[w]);
+			infilenames[(w-3)%NUM_THREADS].push_back(argv[w]);
 		}
 		_case = 2; 
 	}
