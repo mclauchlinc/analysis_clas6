@@ -41,7 +41,8 @@ float physics::Qsquared(int set, std::shared_ptr<Branches> data){
 float physics::WP(int set, std::shared_ptr<Branches> data){
 	TLorentzVector k_mu = physics::Set_k_mu(set);
 	TVector3 k_mu_3(data->p(0)*data->cx(0),data->p(0)*data->cy(0),data->p(0)*data->cz(0));
-	TLorentzVector k_mu_prime.SetVectM(k_mu_3,me);
+	TLorentzVector k_mu_prime;
+	k_mu_prime.SetVectM(k_mu_3,me);
 	TLorentzVector q_mu; 
 	q_mu = k_mu - k_mu_prime;
 	return (p_mu + q_mu).Mag();
@@ -60,6 +61,90 @@ float physics::MM_event(int set, TLorentzVector k1_mu, TLorentzVector k2_mu, TLo
 		MM = (k_mu + p_mu - k1_mu - k2_mu - k3_mu - k4_mu).Mag2();
 	}
 	return  MM;
+}
+
+float physics::get_theta(float cz_){
+	float degree = 180.0/TMath::Pi();
+	return TMath::ACos(cz_)*degree;
+}
+
+float physics::get_phi(float cx_, float cy_){
+	float degree = 180.0/TMath::Pi();
+	return TMath::ATan2(cy_,cx_)*degree;
+}
+
+int physics::get_sector(float phi_){
+	int sector;
+	if(phi_>=-30 && phi_ <=30)
+	{
+		sector = 1;
+	}else
+	if(phi_>=30 && phi_<=90)
+	{
+		sector = 2;
+	}else
+	if(phi_>=90 && phi_ <=150)
+	{
+		sector = 3;
+	}else
+	if(phi_>=150 || phi_<=-150)
+	{
+		sector = 4;
+	}else
+	if(phi_>=-150 && phi_<=-90)
+	{
+		sector = 5;
+	}else
+	if(phi_>=-90 && phi_<=-30)
+	{
+		sector = 6;
+	}//got rid of pointless "else" statement 3/10/2017
+	return sector;
+}
+
+float physics::phi_center( float phi_)
+{
+	double phi_corr;
+	int sector = get_sector(phi_);
+
+	if(sector ==1)
+	{
+		phi_corr = phi_;
+	}else
+	if(sector==2)
+	{
+		phi_corr = phi_-60;
+	}else
+	if(sector==3)
+	{
+		phi_corr = phi_-120;
+	}else
+	if(sector == 4)
+	{
+		if(phi_<=-150)
+		{
+			phi_corr = phi_+180;
+		}
+		if(phi_>=150)
+		{
+			phi_corr = phi_-180;
+		}
+	}else
+	if(sector==5)
+	{
+		phi_corr = phi_+120;
+	}else
+	if(sector==6)
+	{
+		phi_corr = phi_+60;
+	}
+
+	//Not working, but elegant. Adjust for elegance later
+	/*phi0 = phi0 +180;
+	int mod6 = ((int)phi0+210)/60;
+	phi_corr = phi0 - (double)mod6*60.0;
+	*/
+	return phi_corr;
 }
 
 
@@ -140,7 +225,7 @@ float physics::Sin_Vecs(TLorentzVector p1, TLorentzVector p2){
 } //Get the Sin between two vectors 
 
 float physics::Get_phie(int set, TLorentzVector p0){
-	TLorentzVector k_mu = physics::Get_k_mu(set);
+	TLorentzVector k_mu = physics::Set_k_mu(set);
 	TVector3 nE = (1/(Vec3_Mag(k_mu)*Vec3_Mag(p0)))*Cross_Product(k_mu,p0);
 	float phie = TMath::ATan2(nE[0],nE[1]);
 	return phie; 
@@ -163,11 +248,11 @@ void physics::COM_gp(int set, TLorentzVector &p0, TLorentzVector &p1, TLorentzVe
 	TLorentzVector nstar_mu = p_mu + q_mu; //Combined photon-target system
 	float phigp = TMath::ATan2(nstar_mu[1],nstar_mu[0]);//Phi angle out of the x-plane
 	nstar_mu.RotateZ(-phigp);//Get all horizontal momentum on x axis by roating around z axis
-	float thgp - TMath::ATan2(nstar_mu[0],nstar_mu[2]); //Theta angle away from z-axis
+	float thgp = TMath::ATan2(nstar_mu[0],nstar_mu[2]); //Theta angle away from z-axis
 	nstar_mu.RotateY(-thgp);//Rotate towards z-axis so all momentum is in the z direction
 	float b = nstar_mu.Beta();//Get the beta to boost to the rest frame for the center of mass
 	nstar_mu.Boost(0.0,0.0,-b);
-	float phie = physis::Get_phie(set,p0);//Get the angle for the scattering plane of the electrons just to have a consistent definition of phi 
+	float phie = physics::Get_phie(set,p0);//Get the angle for the scattering plane of the electrons just to have a consistent definition of phi 
 	physics::Rotate_4Vec(set, thgp,phigp,phie,p0);
 	physics::Rotate_4Vec(set, thgp,phigp,phie,p1);
 	physics::Rotate_4Vec(set, thgp,phigp,phie,p2);

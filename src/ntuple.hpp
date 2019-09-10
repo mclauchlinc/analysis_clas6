@@ -64,6 +64,7 @@ public:
 	//void mktree(int thread_id);
 	void mkfile(std::string tree_file_name);
 	void Fill_Thread_Tree(std::shared_ptr<Event_Class> event_friend, int event_n, int thread_id);//For multithreading there need to be separate trees for each thread
+	void scan_thread_tree(int thread_id);
 	void fill_evnt(int event_, int thread_id);
 	void fill_apart(int apart_, int thread_id);
 	void fill_px(float px_n, int i, int thread_id);

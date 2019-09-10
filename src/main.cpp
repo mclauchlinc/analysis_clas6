@@ -61,14 +61,25 @@ int main(int argc, char **argv){
 	auto a_good_forest = std::make_shared<forest>(1); 
 	 
 	//a_forest->forest::mktree(NUM_THREADS+1);
+	std::future<bool> fut; 
 
 	//For each thread
 	for(int i = 0; i<NUM_THREADS; i++){
 		//Set the thread to run asynchronously
 		//The function running is the first argument
 		//The functions arguments are all remaining arguments
-		threads[i] = std::async(run_files, infilenames.at(i), filepath_map[argv[1]], hists, a_good_forest, i, data_set, file_num, _case); //This is running the analysis 
+		threads[i] = std::async(run_files, infilenames.at(i), filepath_map[argv[1]], hists, a_good_forest, i, data_set, file_num, _case);
+		//run_files(infilenames.at(i), filepath_map[argv[1]], hists, a_good_forest, i, data_set, file_num, _case);
+		
+
+		 //This is running the analysis 
 	}
+	for(int j = 0; j<NUM_THREADS; j++){
+		threads[j].wait(); 
+	}
+	a_good_forest->forest::scan_thread_tree(1);
+	
+	a_good_forest->forest::Grow_Forest();
 	a_good_forest->forest::mkfile(output_name);
 
 	//For each thread to see how many events each thread successfully analyized

@@ -33,9 +33,9 @@ static const double Q2maxAna = 5.0;
 
 //Initial Four Vectors
 
-TLorentzVector k_mu_e16(0.0,0.0,sqrt(energy_e16*energy_e16-me*me),energy_e16);
-TLorentzVector k_mu_e1f(0.0,0.0,sqrt(energy_e16*energy_e1f-me*me),energy_e1f);
-TLorentzVector p_mu(0.0,0.0,0.0,mp);
+const TLorentzVector k_mu_e16(0.0,0.0,sqrt(energy_e16*energy_e16-me*me),energy_e16);
+const TLorentzVector k_mu_e1f(0.0,0.0,sqrt(energy_e16*energy_e1f-me*me),energy_e1f);
+const TLorentzVector p_mu(0.0,0.0,0.0,mp);
 
 //e1-6 Luminosity Values
 static const double lt_e16 = 5.0; //Target length in cm
@@ -60,62 +60,65 @@ static const double y_beam = -0.345;
 
 //Fiducial Cut Parameters (electrons have e, hadrons have h)
 //Arjun's cut_fid_e1f.f
-const double c1e = 12.0;
-const double c2e = 18.5;
-const double c3e = 0.25;
-const double c4e = 15.0;
-const double factor_e = 0.416667;
-const double p_shift_e = 0.14;
-const double a0xh[6] = {24.0,24.0,23.0,23.5,24.5,24.5};
-const double a0mh[6] = {25.0,26.0,26.0,25.5,27.0,26.0};
-const double a1xh[6] = {0.22,0.23,0.20,0.20,0.22,0.22};
-const double a1mh[6] = {0.22,0.22,0.22,0.22,0.16,0.16};
-const double a2xh[6] = {8.0,8.0,8.0,8.0,8.0,8.0};
-const double a2mh[6] = {8.0,8.0,8.0,8.0,8.0,8.0};
-const double a3xh[6] = {1.0,1.0,1.0,1.0,1.0,1.0};
-const double a3mh[6] = {1.0,1.0,1.0,1.0,1.0,1.0};
+static const double c1e = 12.0;
+static const double c2e = 18.5;
+static const double c3e = 0.25;
+static const double c4e = 15.0;
+static const double factor_e = 0.416667;
+static const double p_shift_e = 0.14;
+static const double a0xh[6] = {24.0,24.0,23.0,23.5,24.5,24.5};
+static const double a0mh[6] = {25.0,26.0,26.0,25.5,27.0,26.0};
+static const double a1xh[6] = {0.22,0.23,0.20,0.20,0.22,0.22};
+static const double a1mh[6] = {0.22,0.22,0.22,0.22,0.16,0.16};
+static const double a2xh[6] = {8.0,8.0,8.0,8.0,8.0,8.0};
+static const double a2mh[6] = {8.0,8.0,8.0,8.0,8.0,8.0};
+static const double a3xh[6] = {1.0,1.0,1.0,1.0,1.0,1.0};
+static const double a3mh[6] = {1.0,1.0,1.0,1.0,1.0,1.0};
 
 //Missing Mass Cuts
-const double pim_center = 0.164369;//These are all determined through fitting of b_wig fitting.h
-const double pim_sig = 0.0862474;
-const double pip_center = 0.157301;
-const double pip_sig = 0.0752388;
-const double p_center = 0.946847;
-const double p_sig = 0.0420984;
-const double pim_center2 = 0.022;
-const double pim_sig2 = 0.022;
-const double pip_center2 = 0.022;
-const double pip_sig2 = 0.022;
-const double p_center2 = 0.89;
-const double p_sig2 = 0.05;
+static const double pim_center = 0.164369;//These are all determined through fitting of b_wig fitting.h
+static const double pim_sig = 0.0862474;
+static const double pip_center = 0.157301;
+static const double pip_sig = 0.0752388;
+static const double p_center = 0.946847;
+static const double p_sig = 0.0420984;
+static const double pim_center2 = 0.022;
+static const double pim_sig2 = 0.022;
+static const double pip_center2 = 0.022;
+static const double pip_sig2 = 0.022;
+static const double p_center2 = 0.89;
+static const double p_sig2 = 0.05;
 
-const double pim_bot_MM[11] = {0.0781216,0.0781216,0.0781216,0.0781216,0.0781216,0.0781216,0.0781216,0.0781216,0.083,0.109,0.109};
-const double pim_top_MM[11] = {0.2506164,0.2506164,0.2506164,0.2506164,0.2506164,0.2506164,0.2506164,0.2506164,0.34,0.415,0.415};
+static const double pim_bot_MM[11] = {0.0781216,0.0781216,0.0781216,0.0781216,0.0781216,0.0781216,0.0781216,0.0781216,0.083,0.109,0.109};
+static const double pim_top_MM[11] = {0.2506164,0.2506164,0.2506164,0.2506164,0.2506164,0.2506164,0.2506164,0.2506164,0.34,0.415,0.415};
 
 
 //For Project
-const double MM_n_center = 0.944;
-const double MM_n_sigma = 0.07;
-const double MM_piz_center = 0.140;
-const double MM_piz_sigma = 0.1;
-const double MM_D_center = 1.232;
-const double MM_D_sigma = 0.08;
+static const double MM_n_center = 0.944;
+static const double MM_n_sigma = 0.07;
+static const double MM_piz_center = 0.140;
+static const double MM_piz_sigma = 0.1;
+static const double MM_D_center = 1.232;
+static const double MM_D_sigma = 0.08;
 
 //My Own MM cut parameters
-const double MM_zero_center = 0.0;
-const double MM_zero_sigma = 0.02;
-const double MM_zero_center2 = 0.0;
-const double MM_zero_sigma2 = 0.004;
+static const double MM_zero_center = 0.0;
+static const double MM_zero_sigma = 0.02;
+static const double MM_zero_center2 = 0.0;
+static const double MM_zero_sigma2 = 0.004;
 
 //Arjun's cut parameters: 3rd order polynomial
-const double DTL[4] = {-0.778903, 0.027350, 0.047947, -0.009641};
-const double DTH[4] = {0.758057, -0.147383, 0.034343, -0.002367};
+static const double DTL[4] = {-0.778903, 0.027350, 0.047947, -0.009641};
+static const double DTH[4] = {0.758057, -0.147383, 0.034343, -0.002367};
 
 //attempt to remove slice of electrons from Pi- delta t
-const double dt_e_sig = 0.05;
-const double dt_e_A = 20.0;
-const double dt_e_a = 8.55;
-const double dt_e_b = 0.31;
+static const double dt_e_sig = 0.05;
+static const double dt_e_A = 20.0;
+static const double dt_e_a = 8.55;
+static const double dt_e_b = 0.31;
+
+static const int MinCC_Cut[6][18] = {{35,35,35,35,35,35,35,35,35,35,35,35,35,35,35,35,35,35},{35,35,35,35,35,35,35,35,35,35,35,35,35,35,35,35,35,35},{35,35,35,35,35,35,35,35,35,35,35,35,35,35,35,35,35,35},{35,35,35,35,35,35,35,35,35,35,35,35,35,35,35,35,35,35},{35,35,35,35,35,35,35,35,35,35,35,35,35,35,35,35,35,35},{35,35,35,35,35,35,35,35,35,35,35,35,35,35,35,35,35,35}};
+
 
 
 //Kinematic Cuts
@@ -148,6 +151,84 @@ const double sf_low_e16[6][4] = {
 const Float_t p_min_e1f = 0.64;
 const Float_t ec_min_e1f_exp[6] = {0.058,0.064,0.060,0.056,0.058,0.056}; 
 const Float_t ec_min_e1f_sim[6] = {0.063,0.063,0.063,0.063,0.063,0.063}; 
+
+
+//Binning
+//Plot Formation Constants
+//W Q2
+const int WQxres = 300;
+const int WQyres = 300;
+const double WQxmin = -0.01;
+const double WQymin = -0.01;
+const double WQxmax = 3.99;
+const double WQymax = 8.99;
+//For Topology Selection
+const int WQ2xres = 20;
+const int WQ2yres = 20;
+
+//Electron Sampling Fraction
+const int SFxres = 100;
+const int SFyres = 100;
+const double SFxmin = 0.0;
+const double SFymin = 0.0;
+const double SFxmax = 6.0;
+const double SFymax = 1.0;
+//Minimum Electron Energy
+const int MEExres = 100;
+const int MEEyres = 100;
+const double MEExmin = 0.0;
+const double MEEymin = 0.0;
+const double MEExmax = 6.0;
+const double MEEymax = 1.0;
+//Fiducial Cuts
+const int FIDxres = 200;
+const int FIDyres = 200;
+const double FIDxmin = -30.0;
+const double FIDymin = 0.0;
+const double FIDxmax = 30.0;
+const double FIDymax = 180.0;
+//Delta_t
+const int DTxres = 25;//300;
+const int DTyres = 100;
+const double DTxmin = 0.0;
+const double DTymin = -5.0;//-4.0;
+const double DTxmax = 4.5;//7.0;
+const double DTymax = 5.0;//4.0;
+//Missing Mass
+const int MMxres = 1500;
+const double MMxmin = -0.2;
+const double MMxmax = 3.0;
+//Alpha
+const int alphaxres = 100;
+const double alphaxmin = 0.0;
+const double alphaxmax = 3.2;
+//Binning
+const double Wmin = 1;
+const double Wres = 0.5;
+const double Wmax = 3;
+const double Q2min = 1.5;
+const double Q2max = 5.0;
+const double Q2res = 0.5;
+//CC Min
+const double MinCCmin = -0.5;
+const double MinCCmax = 501.5;
+const int MinCCres = 502;
+
+//Project
+const int p_MMxres = 400;
+const double p_MMxmin = -0.2;
+const double p_MMxmax = 8.0;
+
+//binning
+const float Wbin_res = 0.025;//The width of a W bin //30 steps
+const float Wbin_start = 1.4;//The starting of W bins
+
+const float Q2bin_res = 0.5;//6 steps
+const float Q2bin_start = 2.0; 
+
+const float pbin_res = 0.5;//Range: 0-6.0
+const float pbin_start = 0.5;
+
 
 //Fun names for file lists
 static const std::string list1 = "one";
@@ -187,5 +268,11 @@ static std::unordered_map<std::string, int> filetype_map = 	{{list1,type1},
 																			{list4,type4},
 																			{list3p,type3p},
 																			{list3n,type3n}};
+
+static const char * species[] = {"ele","pro","pip","pim"};//4
+static const char * eid_cut[] = {"pre","sanity","fid","sf","min_cc","fid+sf","sif+cc","sf+cc","eid","bank"}; //10
+static const char * hid_cut[] = {"pre","sanity","fid","dt","hid","bank"};
+static const char * topologies[] = {"None","Pmiss","PIPmiss","PIMmiss","Zeromiss","ALLmiss"}; //6
+static const char * sec_list[] = {"all_sectors","sec1","sec2","sec3","sec4","sec5","sec6"}; //7`
 
 #endif

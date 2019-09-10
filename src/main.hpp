@@ -42,21 +42,13 @@ size_t run(std::shared_ptr<TChain> _chain, std::shared_ptr<Histogram> _hists, st
 		}
 
 		total_com++; 
-		//Sanity electron cuts
-		//if(sanity_elec()) continue; *come back to this*
 
-		//Make a reaction class from the data given
-		auto event = std::make_shared<Event_Class>(data,_hists,run_type);
-		if(true){//event->Event::is_valid()){ //changed this out just to see if it will create the files
+		//Analyze the event and look for particle ID and topology 
+		auto event = std::make_shared<Event_Class>(data,_hists,run_type);//All event selection happens in here 
+		if((data->gpart()) >= 4){//event->Event::is_valid()){ //changed this out just to see if it will create the files
 			good_event++;
-			a_forest->forest::Fill_Thread_Tree(event,good_event,thread_id);
+			a_forest->forest::Fill_Thread_Tree(event,good_event,thread_id);//Filling the individual thread tree to later be merged 
 		}
-		/*
-		for(int part = 1; part < data->gpart(); part++){
-			//Check Particle ID's and fill the reaction class
-
-		}*/
-		
 	}
 }
 
@@ -67,9 +59,9 @@ size_t run_files(std::vector<std::string> inputs, std::string list_file, std::sh
 	auto chain = std::make_shared<TChain>("h10");
 	//Add every file to the chain
 	if(_case==1){
-		fun::loadChain(chain,list_file,thread_id,max);
+		fun::loadChain(chain,list_file,thread_id,max);//Splits the list of files up into the individual thread chains
 	}else if(_case==2){
-		for(auto in:inputs) chain->Add(in.c_str());
+		for(auto in:inputs) chain->Add(in.c_str());//This will have already split up the list of input files into individual lists which become chains
 	}else{
 		std::cout<<"Not a proper case" <<std::endl; 
 	}

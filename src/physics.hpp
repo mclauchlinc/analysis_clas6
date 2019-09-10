@@ -17,7 +17,10 @@ namespace physics{
 
 	float beta_calc(float m, std::shared_ptr<Branches> data, int i);
 	float MM_event(int set, TLorentzVector k1_mu, TLorentzVector k2_mu, TLorentzVector k3_mu, TLorentzVector k4_mu , int squared = 0);
-
+	float get_theta(float cz_);//in lab frame
+	float get_phi(float cx_, float cy_);//in lab frame
+	int get_sector(float phi_);//Phi must be from lab frame
+	float phi_center(float phi_);//Center phi within the sector
 
 
 	//Math

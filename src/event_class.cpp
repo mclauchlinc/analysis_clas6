@@ -120,6 +120,9 @@ float Event_Class::Get_pid(int i){
 		case 3:
 			_pid = -PION;
 		break;
+		default:
+			_pid = 10; 
+		break;
 	}
 	return _pid; 
 }

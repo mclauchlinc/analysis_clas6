@@ -12,22 +12,22 @@ forest::forest(int is_alive){
 	_the_tree->Branch("py",&_py,"py[apart]/F");
 	_the_tree->Branch("pz",&_pz,"pz[apart]/F");
 	_the_tree->Branch("p0",&_p0,"p0[apart]/F");
-	_the_tree->Branch("pid",&_pid,"pid[apart]/F");
+	_the_tree->Branch("pid",&_pid,"pid[apart]/I");
 	_the_tree->Branch("hel",&_hel,"hel/I");
 	_the_tree->Branch("top",&_top,"top/I");
 	//The individual thread trees that will be merged
 	for(int thread_id = 0; thread_id < NUM_THREADS; thread_id++){
 		_a_tree[thread_id] = new TTree("TREEs","Tree to hold Thread Event Fourvectors");//
 		//_a_tree[thread_id]->Branch("EventBranch",&the_eventb,"evntb/I:apartb/I:pxb/F:pyb/F:pzb/F:p0b/F:pidb/I:helb/I:topb/I");
-		_a_tree[thread_id]->Branch("evnt",&_evntb[thread_id],"evnt/I");
-		_a_tree[thread_id]->Branch("apart",&_apartb[thread_id],"apart/I");
-		_a_tree[thread_id]->Branch("px",&_pxb[thread_id],"px[apart]/F");
-		_a_tree[thread_id]->Branch("py",&_pyb[thread_id],"py[apart]/F");
-		_a_tree[thread_id]->Branch("pz",&_pzb[thread_id],"pz[apart]/F");
-		_a_tree[thread_id]->Branch("p0",&_p0b[thread_id],"p0[apart]/F");
-		_a_tree[thread_id]->Branch("pid",&_pidb[thread_id],"pid[apart]/F");
-		_a_tree[thread_id]->Branch("hel",&_helb[thread_id],"hel/I");
-		_a_tree[thread_id]->Branch("top",&_topb[thread_id],"top/I");
+		_a_tree[thread_id]->Branch("evnt",&(_evntb[thread_id]),"evnt/I");
+		_a_tree[thread_id]->Branch("apart",&(_apartb[thread_id]),"apart/I");
+		_a_tree[thread_id]->Branch("px",&(_pxb[thread_id]),"px[apart]/F");
+		_a_tree[thread_id]->Branch("py",&(_pyb[thread_id]),"py[apart]/F");
+		_a_tree[thread_id]->Branch("pz",&(_pzb[thread_id]),"pz[apart]/F");
+		_a_tree[thread_id]->Branch("p0",&(_p0b[thread_id]),"p0[apart]/F");
+		_a_tree[thread_id]->Branch("pid",&(_pidb[thread_id]),"pid[apart]/I");
+		_a_tree[thread_id]->Branch("hel",&(_helb[thread_id]),"hel/I");
+		_a_tree[thread_id]->Branch("top",&(_topb[thread_id]),"top/I");
 		//The B Trees
 		/*
 		_b_tree[thread_id] = std::make_shared<TTree>("TREEsb","Tree to hold Thread Event Fourvectors");//
@@ -71,24 +71,31 @@ void forest::mkfile(std::string tree_file_name){
 	_almanac->cd();
 	_the_tree->Write();
 	_tree_file->Write();
+	_tree_file->Close();
 }
 
 
 void forest::Fill_Thread_Tree(std::shared_ptr<Event_Class> event_friend, int event_n, int thread_id){
 	//the_eventb[thread_id] = new Event();
-
+	//std::cout<<std::endl <<"Tree being filled in thread " <<thread_id; 
 	_evntb[thread_id] = event_n; 
-	for(int i; i<4; i++){
-		_apartb[thread_id] = i; 
+	_apartb[thread_id] = 4; 
+	for(int i = 0; i<4; i++){
 		_pxb[thread_id][i] = event_friend->Event_Class::Get_px(i);
+		//std::cout<<"Here is pxb " <<_pxb[thread_id][i] <<" for thread " <<thread_id <<" and index " <<i <<std::endl;
 		_pyb[thread_id][i] = event_friend->Event_Class::Get_py(i);
 		_pzb[thread_id][i] = event_friend->Event_Class::Get_pz(i);
 		_p0b[thread_id][i] = event_friend->Event_Class::Get_p0(i);
 		_pidb[thread_id][i] = event_friend->Event_Class::Get_pid(i);
+		//std::cout<<std::endl <<"pid? " <<_pidb[thread_id][i];
 	}
 	_helb[thread_id] = event_friend->Event_Class::Get_hel();
 	_topb[thread_id] = event_friend->Event_Class::Get_top();
 	_a_tree[thread_id]->TTree::Fill();	
+}
+
+void forest::scan_thread_tree(int thread_id){
+	_a_tree[thread_id]->TTree::Scan();
 }
 
 void forest::fill_evnt(int event_n, int thread_id){
@@ -149,15 +156,15 @@ void forest::move_forest_indoors(){
 }*/
 
 void forest::Grow_Forest(){
-	TList* the_forest; 
+	TList the_forest; 
 	for(int i = 0; i<NUM_THREADS ; i++){
 		//_a_tree[i]->TTree::Scan();
-		the_forest->TList::Add(_a_tree[i]);
+		the_forest.TList::Add(_a_tree[i]);
 	}
-	_the_tree = TTree::MergeTrees(the_forest,"");
+	_the_tree = TTree::MergeTrees(&the_forest,"");
 	_the_tree->TTree::Scan();
 
-	_the_tree->TTree::Write(); 
+	//_the_tree->TTree::Write(); 
 	//std::cout<<"This is the number of events in it: " <<_the_tree->GetEntries();
 }
 	/*
