@@ -60,7 +60,7 @@ char Histogram::Part_cut(int species, int cut){
 
 void Histogram::WQ2_Make(){
 	std::vector<long> space_dims(2);
-	space_dims[0] = 10; //Electron Cuts
+	space_dims[0] = 11; //Electron Cuts
 	space_dims[1] = 6; //Topologies
 
 	CartesianGenerator cart(space_dims);//CartesianGenerator.hpp
@@ -93,12 +93,13 @@ void Histogram::WQ2_Write(){
 void Histogram::Fid_Make(){
 	char hname[100];
 	float wtop, wbot,ptop,pbot; 
-	std::vector<long> space_dims(5);
+	std::vector<long> space_dims(6);
 	space_dims[0] = 7; //Sector
 	space_dims[1] = 4; //species
-	space_dims[2] = 10;//cuts
+	space_dims[2] = 11;//cuts
 	space_dims[3] = 30;//W Binning
 	space_dims[4] = 12;//Momentum binning
+	space_dims[5] = 6; //Topology
 
 	CartesianGenerator cart(space_dims);
 
@@ -123,34 +124,34 @@ void Histogram::Fid_Make(){
 		}
 		if(cart[2]<length){
 			if(cart[3] == 0){//All W bins
-				sprintf(hname,"%s_Fid_%s_%s_W:ALL_%s",species[cart[1]],sec_list[cart[0]],Histogram::Part_cut(cart[1],cart[2]),p_cut);//constants.hpp
+				sprintf(hname,"%s_Fid_%s_%s_W:ALL_%s_%s",species[cart[1]],sec_list[cart[0]],Histogram::Part_cut(cart[1],cart[2]),p_cut,topologies[cart[5]]);//constants.hpp
 			}else{//Specific W Bins
 				wtop = Wbin_start + (cart[3]*Wbin_res);//constants.hpp
 				wbot = wtop - Wbin_res;//constants.hpp
-				sprintf(hname,"%s_Fid_%s_%s_W:%f-%f_%s",species[cart[1]],sec_list[cart[0]],Histogram::Part_cut(cart[1],cart[2]),wbot,wtop,p_cut);//constants.hpp
+				sprintf(hname,"%s_Fid_%s_%s_W:%f-%f_%s_%s",species[cart[1]],sec_list[cart[0]],Histogram::Part_cut(cart[1],cart[2]),wbot,wtop,p_cut,topologies[cart[5]]);//constants.hpp
 			}
-			Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]] = std::make_shared<TH2D>(hname,hname, FIDxres, FIDxmin, FIDxmax, FIDyres, FIDymin, FIDymax);
+			Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]] = std::make_shared<TH2D>(hname,hname, FIDxres, FIDxmin, FIDxmax, FIDyres, FIDymin, FIDymax);
 		}
 	}
 }
 
-void Histogram::Fid_Fill(float theta, float phi, int part, int cut, float W_, float p_){
+void Histogram::Fid_Fill(int top, float theta, float phi, int part, int cut, float W_, float p_){
 	float phic = physics::phi_center(phi);
 	if(p_binning(p_) + W_binning(W_) != 0){//Both p and W dependence
-		Fid_hist[0][part][cut][Histogram::W_binning(W_)][Histogram::p_binning(p_)]->Fill(phic,theta);//All Sectors
-		Fid_hist[physics::get_sector(phi)][part][cut][Histogram::W_binning(W_)][Histogram::p_binning(p_)]->Fill(phic,theta);//Individual Sectors
+		Fid_hist[0][part][cut][Histogram::W_binning(W_)][Histogram::p_binning(p_)][top]->Fill(phic,theta);//All Sectors
+		Fid_hist[physics::get_sector(phi)][part][cut][Histogram::W_binning(W_)][Histogram::p_binning(p_)][top]->Fill(phic,theta);//Individual Sectors
 	}
 	if(p_binning(p_) != 0){ //All W with p binning
-		Fid_hist[0][part][cut][0][Histogram::p_binning(p_)]->Fill(phic,theta);//All Sectors
-		Fid_hist[physics::get_sector(phi)][part][cut][0][Histogram::p_binning(p_)]->Fill(phic,theta);//Individual Sectors
+		Fid_hist[0][part][cut][0][Histogram::p_binning(p_)][top]->Fill(phic,theta);//All Sectors
+		Fid_hist[physics::get_sector(phi)][part][cut][0][Histogram::p_binning(p_)][top]->Fill(phic,theta);//Individual Sectors
 	}
 	if(W_binning(W_) != 0){ //All p with W binning
-		Fid_hist[0][part][cut][Histogram::W_binning(W_)][0]->Fill(phic,theta);//All sectors
-		Fid_hist[physics::get_sector(phi)][part][cut][Histogram::W_binning(W_)][0]->Fill(phic,theta);//Individual Sectors
+		Fid_hist[0][part][cut][Histogram::W_binning(W_)][0][top]->Fill(phic,theta);//All sectors
+		Fid_hist[physics::get_sector(phi)][part][cut][Histogram::W_binning(W_)][0][top]->Fill(phic,theta);//Individual Sectors
 	}
 	//All W and All Momentum
-	Fid_hist[0][part][cut][0][0]->Fill(phic,theta);//All sectors, all W, all P
-	Fid_hist[physics::get_sector(phi)][part][cut][0][0]->Fill(phic,theta);//Individual sectors all W, all p
+	Fid_hist[0][part][cut][0][0][top]->Fill(phic,theta);//All sectors, all W, all P
+	Fid_hist[physics::get_sector(phi)][part][cut][0][0][top]->Fill(phic,theta);//Individual sectors all W, all p
 }
 
 void Histogram::Fid_Write(){
@@ -174,12 +175,13 @@ void Histogram::Fid_Write(){
 	TDirectory* pim_fid_wp = pim_fid->mkdir("Pi- Fid W-P-Dependence");
 
 	
-	std::vector<long> space_dims(5);
+	std::vector<long> space_dims(6);
 	space_dims[0] = 7; //Sector
 	space_dims[1] = 4; //species
-	space_dims[2] = 10;//cuts
+	space_dims[2] = 11;//cuts
 	space_dims[3] = 30;//W Binning
 	space_dims[4] = 12;//Momentum binning
+	space_dims[5] = 6; //Topology
 
 	CartesianGenerator cart(space_dims);
 
@@ -203,73 +205,285 @@ void Histogram::Fid_Write(){
 		}else{
 			p_dep = true;
 		}
-		/*switch(cart[1]){
+		switch(cart[1]){
 			case 0:
-			ele_fid->cd();
-			if(p_dep){
-				if(w_dep){
-
-				}else{}
-			}else{
-				if(w_dep){
-
+				ele_fid->cd();
+				if(p_dep){
+					if(w_dep){
+						ele_fid_wp->cd();
+					}else{
+						ele_fid_p->cd();
+					}
+				}else{
+					if(w_dep){
+						ele_fid_w->cd();
+					}
 				}
-			}
 			break;
-			case 0:
-			pro_fid->cd();
+			case 1:
+				pro_fid->cd();
+				if(p_dep){
+					if(w_dep){
+						pro_fid_wp->cd();
+					}else{
+						pro_fid_p->cd();
+					}
+				}else{
+					if(w_dep){
+						pro_fid_w->cd();
+					}
+				}
 			break;
-			case 0:
-			pip_fid->cd();
+			case 2:
+				pip_fid->cd();
+				if(p_dep){
+					if(w_dep){
+						pip_fid_wp->cd();
+					}else{
+						pip_fid_p->cd();
+					}
+				}else{
+					if(w_dep){
+						pip_fid_w->cd();
+					}
+				}
 			break;
-			case 0:
-			pim_fid->cd();
+			case 3:
+				pim_fid->cd();
+				if(p_dep){
+					if(w_dep){
+						pim_fid_wp->cd();
+					}else{
+						pim_fid_p->cd();
+					}
+				}else{
+					if(w_dep){
+						pim_fid_w->cd();
+					}
+				}
 			break;
-		}*/
+		}
 
-
+		//Just making sure we aren't looking in places that don't exist 
 		if(cart[1] == 0){ //Dealing with the different numbers of cuts for electrons vs. hadrons
 			//fid_cuts = eid_cut;
-			length = 10; 
+			length = 11; 
 		}else{
 			//fid_cuts = hid_cut; 
-			length = 6; 
+			length = 7; 
 		}
 		if(cart[2]<length){
-			if(cart[3] == 0){//All W bins
-			}else{//Specific W Bins
+			if(length == 11 && cart[1] != 10 && cart[5] == 0){
+				Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetXTitle("{phi} (degrees)");
+				Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetYTitle("{theta} (degrees)");
+				Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetOption("COLZ");
+				Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->Write();
+			}else{
+				if(length == 11 && cart[1] == 10 && cart[5] != 0){
+					Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetXTitle("{phi} (degrees)");
+					Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetYTitle("{theta} (degrees)");
+					Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetOption("COLZ");
+					Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->Write();
+				}
 			}
-			Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetXTitle("{phi} (degrees)");
-			Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetYTitle("{theta} (degrees)");
-			Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetOption("COLZ");
-			Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->Write();
+			if(length == 7 && cart[1] != 6 && cart[5] == 0){
+				Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetXTitle("{phi} (degrees)");
+				Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetYTitle("{theta} (degrees)");
+				Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetOption("COLZ");
+				Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->Write();
+			}else{
+				if(length == 7 && cart[1] == 6 && cart[5] != 0){
+					Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetXTitle("{phi} (degrees)");
+					Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetYTitle("{theta} (degrees)");
+					Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetOption("COLZ");
+					Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->Write();
+				}
+			}
 		}
 	}
 }
+
 //Sampling Fraction Cuts
 void Histogram::SF_Make(){
 	char hname[100];
-	std::vector<long> space_dims(3);
-	space_dims[0] = 10; //Electron Cuts
+	std::vector<long> space_dims(4);
+	space_dims[0] = 11; //Electron Cuts
 	space_dims[1] = 30; //W binning
 	space_dims[2] = 7;  //Sector
-}
-void Histogram::SF_Fill(float p, float en, int cut){
+	space_dims[3] = 6;  //Topology
 
+	float top,bot; 
+
+	CartesianGenerator cart(space_dims);
+
+	while(cart.GetNextCombination()){
+		if((cart[0] == 10 && cart[3] != 0) || (cart[0] != 0 && cart[3] == 0) ){//Topology only matters for event selection cut
+			if(cart[1] == 0 ){ //All W 
+				sprintf(hname,"SF_%s_%s_W:ALL_%s",eid_cut[cart[0]],sec_list[cart[2]],topologies[cart[3]]);
+			}else{	//Specific W Bins
+				top = Wbin_start + cart[1]*Wbin_res;
+				bot = top - Wbin_res;
+				sprintf(hname,"SF_%s_%s_W:%f-%f_%s",eid_cut[cart[0]],sec_list[cart[2]],bot,top,topologies[cart[3]]);
+			}
+		}
+		SF_hist[cart[0]][cart[1]][cart[2]][cart[3]] = std::make_shared<TH2D>(hname,hname, SFxres, SFxmin, SFxmax, SFyres, SFymin, SFymax);
+	}
 }
+
+void Histogram::SF_Fill(int top, float p, float en, int cut, float W_, int sec){
+	SF_hist[cut][Histogram::W_binning(W_)][sec][top]->Fill(p,en/p);
+	SF_hist[cut][Histogram::W_binning(W_)][0][top]->Fill(p,en/p);
+}
+
 void Histogram::SF_Write(){
+	TDirectory* dir_SF = RootOutputFile->mkdir("SF Plots");
+	dir_SF->cd();
+	TDirectory* sf_cut_all = dir_SF->mkdir("SF: All W,Sector, Topologies");
+	TDirectory* sf_cut1 = dir_SF->mkdir("SF Pre Cut");
+	TDirectory* sf_cut2 = dir_SF->mkdir("SF Sanity Cut");
+	TDirectory* sf_cut3 = dir_SF->mkdir("SF Fid Cut");
+	TDirectory* sf_cut4 = dir_SF->mkdir("SF SF Cut");
+	TDirectory* sf_cut5 = dir_SF->mkdir("SF CC Cut");
+	TDirectory* sf_cut6 = dir_SF->mkdir("SF Fid+SF Cut");
+	TDirectory* sf_cut7 = dir_SF->mkdir("SF Fid+CC Cut");
+	TDirectory* sf_cut8 = dir_SF->mkdir("SF SF+CC Cut");
+	TDirectory* sf_cut9 = dir_SF->mkdir("SF EID Cut");
+	TDirectory* sf_cut10 = dir_SF->mkdir("SF Bank Cut");
+	TDirectory* sf_cut11 = dir_SF->mkdir("SF Event Cut");
+	TDirectory* sf_cut1_w = sf_cut1->mkdir("SF Pre Cut W Dep");
+	TDirectory* sf_cut2_w = sf_cut2->mkdir("SF Sanity Cut W Dep");
+	TDirectory* sf_cut3_w = sf_cut3->mkdir("SF Fid Cut W Dep");
+	TDirectory* sf_cut4_w = sf_cut4->mkdir("SF SF Cut W Dep");
+	TDirectory* sf_cut5_w = sf_cut5->mkdir("SF CC Cut W Dep");
+	TDirectory* sf_cut6_w = sf_cut6->mkdir("SF Fid+SF Cut W Dep");
+	TDirectory* sf_cut7_w = sf_cut7->mkdir("SF Fid+CC Cut W Dep");
+	TDirectory* sf_cut8_w = sf_cut8->mkdir("SF SF+CC Cut W Dep");
+	TDirectory* sf_cut9_w = sf_cut9->mkdir("SF EID Cut W Dep");
+	TDirectory* sf_cut10_w = sf_cut10->mkdir("SF Bank Cut W Dep");
+	TDirectory* sf_cut11_w = sf_cut11->mkdir("SF Event Cut W Dep");
+
+
+	std::vector<long> space_dims(4);
+	space_dims[0] = 11; //Electron Cuts
+	space_dims[1] = 30; //W binning
+	space_dims[2] = 7;  //Sector
+	space_dims[3] = 6;  //Topology
+
+	CartesianGenerator cart(space_dims);
+
+	while(cart.GetNextCombination()){
+		if(cart[1] == 0 && cart[3]==0 && cart[2] == 0){
+			sf_cut_all->cd();
+			SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetXTitle("Momentum (GeV)");
+			SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetYTitle("Sampling Fraction");
+			SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetOption("COLZ");
+		}else{
+			switch(cart[0]){
+				case 0:
+					sf_cut1->cd();
+					if(cart[2] !=0){
+						sf_cut1_w->cd();
+					}
+				break;
+				case 1:
+					sf_cut2->cd();
+					if(cart[2] !=0){
+						sf_cut2_w->cd();
+					}
+				break;
+				case 2:
+					sf_cut3->cd();
+					if(cart[2] !=0){
+						sf_cut3_w->cd();
+					}
+				break;
+				case 3:
+					sf_cut4->cd();
+					if(cart[2] !=0){
+						sf_cut4_w->cd();
+					}
+				break;
+				case 4:
+					sf_cut5->cd();
+					if(cart[2] !=0){
+						sf_cut5_w->cd();
+					}
+				break;
+				case 5:
+					sf_cut6->cd();
+					if(cart[2] !=0){
+						sf_cut6_w->cd();
+					}
+				break;
+				case 6:
+					sf_cut7->cd();
+					if(cart[2] !=0){
+						sf_cut7_w->cd();
+					}
+				break;
+				case 7:
+					sf_cut8->cd();
+					if(cart[2] !=0){
+						sf_cut8_w->cd();
+					}
+				break;
+				case 8:
+					sf_cut9->cd();
+					if(cart[2] !=0){
+						sf_cut9_w->cd();
+					}
+				break;
+				case 9:
+					sf_cut10->cd();
+					if(cart[2] !=0){
+						sf_cut10_w->cd();
+					}
+				break;
+				case 10:
+					sf_cut11->cd();
+					if(cart[2] !=0){
+						sf_cut11_w->cd();
+					}
+				break;
+			}
+		}
+		SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetXTitle("Momentum (GeV)");
+		SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetYTitle("Sampling Fraction");
+		SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetOption("COLZ");
+	}
 
 }
+
+
 //Delta T Cuts
 void Histogram::DT_Make(){
 	char hname[100];
-	std::vector<long> space_dims(4);
+	std::vector<long> space_dims(5);
 	space_dims[0] = 3;  //species
-	space_dims[1] = 6;  //Cuts
+	space_dims[1] = 7;  //Cuts
 	space_dims[2] = 30; //W Binning
 	space_dims[3] = 7; //Sector
+	space_dims[4] = 6; //topology
+
+	float bot,top;
+
+	CartesianGenerator cart(space_dims);
+
+	while(cart.GetNextCombination()){
+		if((cart[1] == 6 && cart[4]!=0) || (cart[1]!=6 && cart[4] ==0)){
+			if(cart[2] == 0){
+				sprintf(hname,"%s_DeltaT_%s_%s_W:ALL_%s",species[cart[0]+1],hid_cut[cart[1]],sec_list[cart[3]],topologies[cart[4]]);
+			}else{
+				top = Wbin_start + cart[2]*Wbin_res;
+				bot = top - Wbin_res;
+				sprintf(hname,"%s_DeltaT_%s_%s_W:%f-%f_%s",species[cart[0]+1],hid_cut[cart[1]],sec_list[cart[3]],bot,top,topologies[cart[4]]);
+			}
+		}
+		DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]] = std::make_shared<TH2D>(hname,hname, DTxres, DTxmin, DTxmax, DTyres, DTymin, DTymax);
+	}
 }
-void Histogram::DT_Fill(int part, float p, float d, float t, float d0, float t0, int cut, float W_){
+
+void Histogram::DT_Fill(int top, int part, float p, float d, float t, float d0, float t0, int cut, float W_, int sec){
 
 }
 void Histogram::DT_Write(){
@@ -278,13 +492,14 @@ void Histogram::DT_Write(){
 //Min CC Cuts
 void Histogram::CC_Make(){
 	char hname[100];
-	std::vector<long> space_dims(4);
+	std::vector<long> space_dims(5);
 	space_dims[0] = 6;  //Sector
 	space_dims[1] = 18; //Segment
 	space_dims[2] = 5;  //Cut
 	space_dims[3] = 4;  //Side of detector
+	space_dims[4] = 6;  //Topology
 }
-void Histogram::CC_Fill(int sec, int segm, int nphe, int cut){
+void Histogram::CC_Fill(int top, int sec, int segm, int nphe, int cut){
 
 }
 void Histogram::CC_Write(){
@@ -293,10 +508,11 @@ void Histogram::CC_Write(){
 //Missing Mass Cuts
 void Histogram::MM_Make(){
 	char hname[100];
-	std::vector<long> space_dims(3);
+	std::vector<long> space_dims(4);
 	space_dims[0] = 5;  //Topology
 	space_dims[1] = 3;  //Cuts
 	space_dims[2] = 30; //W Binning
+	space_dims[3] = 6;  //Topology
 }
 void Histogram::MM_Fill(int top, float mm, int cut){
 

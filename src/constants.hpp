@@ -270,8 +270,8 @@ static std::unordered_map<std::string, int> filetype_map = 	{{list1,type1},
 																			{list3n,type3n}};
 
 static const char * species[] = {"ele","pro","pip","pim"};//4
-static const char * eid_cut[] = {"pre","sanity","fid","sf","min_cc","fid+sf","sif+cc","sf+cc","eid","bank"}; //10
-static const char * hid_cut[] = {"pre","sanity","fid","dt","hid","bank"};
+static const char * eid_cut[] = {"pre","sanity","fid","sf","min_cc","fid+sf","fid+cc","sf+cc","eid","bank","event"}; //11
+static const char * hid_cut[] = {"pre","sanity","fid","dt","hid","bank","event"}; //7
 static const char * topologies[] = {"None","Pmiss","PIPmiss","PIMmiss","Zeromiss","ALLmiss"}; //6
 static const char * sec_list[] = {"all_sectors","sec1","sec2","sec3","sec4","sec5","sec6"}; //7`
 

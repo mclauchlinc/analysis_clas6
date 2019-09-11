@@ -94,11 +94,11 @@ protected:
 	double YM_res[3] = {0.06,0.06,0.06};
 
 	 //Making the Histograms
-	TH2D_ptr WQ2_hist[10][6];//electron cuts, topologies (including pre)
-	TH2D_ptr Fid_hist[7][4][10][30][12];//sector, species, cut, W binning, p binning
-	TH2D_ptr SF_hist[10][30][7];//cuts, W Binning, Sector
-	TH2D_ptr DT_hist[3][6][30][7]; //particle, cuts, W binning, sector
-	TH1D_ptr CC_hist[6][18][5][4]; //Sector, segment, cut, side of detector
+	TH2D_ptr WQ2_hist[11][6];//electron cuts, topologies (including pre)
+	TH2D_ptr Fid_hist[7][4][11][30][12][6];//sector, species, cut, W binning, p binning, topology
+	TH2D_ptr SF_hist[10][30][7][6];//cuts, W Binning, Sector, topology
+	TH2D_ptr DT_hist[3][7][30][7][6]; //particle, cuts, W binning, sector, topology
+	TH1D_ptr CC_hist[6][18][11][4][6]; //Sector, segment, cut, side of detector, topology
 	TH1D_ptr MM_hist[5][3][30];//topology, cut, W Binning
 
 
@@ -115,19 +115,19 @@ public:
 	void WQ2_Write();
 	//Fiducial Cuts
 	void Fid_Make();
-	void Fid_Fill(float theta, float phi, int part, int cut, float W_, float p);
+	void Fid_Fill(int top, float theta, float phi, int part, int cut, float W_, float p);
 	void Fid_Write();
 	//Sampling Fraction Cuts
 	void SF_Make();
-	void SF_Fill(float p, float en, int cut);
+	void SF_Fill(int top, float p, float en, int cut, float W_, int sec);
 	void SF_Write();
 	//Delta T Cuts
 	void DT_Make();
-	void DT_Fill(int part, float p, float d, float t, float d0, float t0, int cut, float W_);
+	void DT_Fill(int top, int part, float p, float d, float t, float d0, float t0, int cut, float W_, int sec);
 	void DT_Write();
 	//Min CC Cuts
 	void CC_Make();
-	void CC_Fill(int sec, int segm, int nphe, int cut);
+	void CC_Fill(int top, int sec, int segm, int nphe, int cut);
 	void CC_Write();
 	//Missing Mass Cuts
 	void MM_Make();
