@@ -201,16 +201,16 @@ void Histogram::Fid_Write(){
 	TDirectory* pim_fid = dir_Fid->mkdir("Pi- Fiducial Plots");
 	TDirectory* ele_fid_w = ele_fid->mkdir("Electron Fid W-Dependence");
 	TDirectory* ele_fid_p = ele_fid->mkdir("Electron Fid P-Dependence");
-	TDirectory* ele_fid_wp = ele_fid->mkdir("Electron Fid W-P-Dependence");
 	TDirectory* pro_fid_w = pro_fid->mkdir("Proton Fid W-Dependence");
 	TDirectory* pro_fid_p = pro_fid->mkdir("Proton Fid P-Dependence");
-	TDirectory* pro_fid_wp = pro_fid->mkdir("Proton Fid W-P-Dependence");
 	TDirectory* pip_fid_w = pip_fid->mkdir("Pi+ Fid W-Dependence");
 	TDirectory* pip_fid_p = pip_fid->mkdir("Pi+ Fid P-Dependence");
-	TDirectory* pip_fid_wp = pip_fid->mkdir("Pi+ Fid W-P-Dependence");
 	TDirectory* pim_fid_w = pim_fid->mkdir("Pi- Fid W-Dependence");
 	TDirectory* pim_fid_p = pim_fid->mkdir("Pi- Fid P-Dependence");
-	TDirectory* pim_fid_wp = pim_fid->mkdir("Pi- Fid W-P-Dependence");
+	TDirectory* ele_fid_s = ele_fid->mkdir("Electron Fid Sec-Dependence");
+	TDirectory* pro_fid_s = pro_fid->mkdir("Proton Fid Sec-Dependence");
+	TDirectory* pip_fid_s = pip_fid->mkdir("Pi+ Fid Sec-Dependence");
+	TDirectory* pim_fid_s = pim_fid->mkdir("Pi- Fid Sec-Dependence");
 
 	
 	std::vector<long> space_dims(6);
@@ -229,10 +229,12 @@ void Histogram::Fid_Write(){
 
 	bool p_dep = false;
 	bool w_dep = false; 
+	bool s_dep = false; 
 
 	while(cart.GetNextCombination()){
 		p_dep = false;
 		w_dep = false;
+		s_dep = false;
 		if(cart[3] == 0){
 			w_dep = false;
 		}else {
@@ -243,6 +245,11 @@ void Histogram::Fid_Write(){
 		}else{
 			p_dep = true;
 		}
+		if( cart[0] == 0 || w_dep || p_dep){
+			s_dep = false;
+		} else{
+			s_dep = true; 
+		}
 		switch(cart[1]){
 			case 0:
 				ele_fid->cd();
@@ -250,6 +257,8 @@ void Histogram::Fid_Write(){
 					ele_fid_p->cd();
 				}else if(w_dep){
 					ele_fid_w->cd();
+				}else if(s_dep){
+					ele_fid_s->cd();
 				}
 			break;
 			case 1:
@@ -259,6 +268,9 @@ void Histogram::Fid_Write(){
 				}else if(w_dep){
 					pro_fid_w->cd();
 				}
+				else if(s_dep){
+					pro_fid_s->cd();
+				}
 			break;
 			case 2:
 				pip_fid->cd();
@@ -267,6 +279,9 @@ void Histogram::Fid_Write(){
 				}else if(w_dep){
 					pip_fid_w->cd();
 				}
+				else if(s_dep){
+					pip_fid_s->cd();
+				}
 			break;
 			case 3:
 				pim_fid->cd();
@@ -274,6 +289,8 @@ void Histogram::Fid_Write(){
 					pim_fid_p->cd();
 				}else if(w_dep){
 					pim_fid_w->cd();
+				}else if(s_dep){
+					pim_fid_s->cd();
 				}
 			break;
 		}
@@ -333,13 +350,15 @@ void Histogram::SF_Make(){
 		if((cart[0] == 10 && cart[3] != 0) || (cart[0] != 0 && cart[3] == 0) ){//Topology only matters for event selection cut
 			if(cart[1] == 0 ){ //All W 
 				sprintf(hname,"SF_%s_%s_W:ALL_%s",eid_cut[cart[0]],sec_list[cart[2]],topologies[cart[3]]);
-			}else{	//Specific W Bins
+				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]] = std::make_shared<TH2D>(hname,hname, SFxres, SFxmin, SFxmax, SFyres, SFymin, SFymax);
+
+			}else if(cart[3]==0){	//Specific W Bins
 				top = Wbin_start + cart[1]*Wbin_res;
 				bot = top - Wbin_res;
 				sprintf(hname,"SF_%s_%s_W:%f-%f_%s",eid_cut[cart[0]],sec_list[cart[2]],bot,top,topologies[cart[3]]);
+				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]] = std::make_shared<TH2D>(hname,hname, SFxres, SFxmin, SFxmax, SFyres, SFymin, SFymax);
 			}
 		}
-		SF_hist[cart[0]][cart[1]][cart[2]][cart[3]] = std::make_shared<TH2D>(hname,hname, SFxres, SFxmin, SFxmax, SFyres, SFymin, SFymax);
 	}
 }
 
@@ -385,12 +404,8 @@ void Histogram::SF_Write(){
 	CartesianGenerator cart(space_dims);
 
 	while(cart.GetNextCombination()){
-		if(cart[1] == 0 && cart[3]==0 && cart[2] == 0){
+		if(cart[1] == 0 && cart[3]== 0 && cart[2] == 0){
 			sf_cut_all->cd();
-			SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetXTitle("Momentum (GeV)");
-			SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetYTitle("Sampling Fraction");
-			SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetOption("COLZ");
-			SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->Write();
 		}else{
 			switch(cart[0]){
 				case 0:
@@ -461,10 +476,20 @@ void Histogram::SF_Write(){
 				break;
 			}
 		}
-		SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetXTitle("Momentum (GeV)");
-		SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetYTitle("Sampling Fraction");
-		SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetOption("COLZ");
-		SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->Write();
+		if((cart[0] == 10 && cart[3] != 0) || (cart[0] != 10 && cart[3] == 0) ){//Topology only matters for event selection cut
+			if(cart[1] == 0 ){ //All W 
+				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetXTitle("Momentum (GeV)");
+				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetYTitle("Sampling Fraction");
+				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetOption("COLZ");
+				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->Write();
+			}else if(cart[3]==0){	//Specific W Bins
+				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetXTitle("Momentum (GeV)");
+				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetYTitle("Sampling Fraction");
+				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetOption("COLZ");
+				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->Write();
+			}
+		}
+		
 	}
 
 }
