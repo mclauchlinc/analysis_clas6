@@ -59,6 +59,7 @@ int main(int argc, char **argv){
 
 	//Make relevant TTrees and Event Rootfile
 	auto a_good_forest = std::make_shared<forest>(1); 
+	a_good_forest->forest::mkfile(output_name);//Making the Tree File
 	 
 	//a_forest->forest::mktree(NUM_THREADS+1);
 	std::future<bool> fut; 
@@ -77,10 +78,9 @@ int main(int argc, char **argv){
 	for(int j = 0; j<NUM_THREADS; j++){
 		threads[j].wait(); 
 	}
-	a_good_forest->forest::scan_thread_tree(1);
+	//a_good_forest->forest::scan_thread_tree(1);
 	
 	a_good_forest->forest::Grow_Forest();
-	a_good_forest->forest::mkfile(output_name);
 
 	//For each thread to see how many events each thread successfully analyized
 	for(int i = 0; i<NUM_THREADS; i++){

@@ -22,6 +22,11 @@ namespace physics{
 	int get_sector(float phi_);//Phi must be from lab frame
 	float phi_center(float phi_);//Center phi within the sector
 
+	//Delta T
+	float vert_e(float d, float t);
+	float vert_h(float p, float d, float t, float m);
+	float delta_t(int part, float p, float d, float t, float d0, float t0);
+
 
 	//Math
 	TVector3 V4_to_V3(TLorentzVector p1);//Get just the three vector part out of a four vector

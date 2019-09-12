@@ -42,10 +42,20 @@ forest::forest(int is_alive){
 		_b_tree[thread_id]->Branch("top",&_topc[thread_id],"top/I");*/
 	}
 	alive = is_alive; 
-};
+}
 
-forest::~forest(){
-	_tree_file->Write();
+forest::~forest(){ this->Write();}//Including this and the forest::Write() are necessary for properly writing the TTree to the TFile 
+
+
+void forest::Write(){
+	std::cout<<"Writing Event Tree: ";
+	_tree_file->cd();
+	_tree_file->cd();
+	TDirectory* _almanac = _tree_file->mkdir("k10");
+	_almanac->cd();
+	_the_tree->Write();
+	_tree_file->Close();
+	std::cout<<" Written and Closed" <<std::endl;
 }
 
 /*
@@ -67,11 +77,6 @@ void forest::mktree(int thread_id){
 
 void forest::mkfile(std::string tree_file_name){
 	_tree_file = fun::Name_Tree_File(tree_file_name);//The output rootfile containng the tree
-	TDirectory* _almanac = _tree_file->mkdir("physics_phorest");
-	_almanac->cd();
-	_the_tree->Write();
-	_tree_file->Write();
-	_tree_file->Close();
 }
 
 
@@ -162,7 +167,7 @@ void forest::Grow_Forest(){
 		the_forest.TList::Add(_a_tree[i]);
 	}
 	_the_tree = TTree::MergeTrees(&the_forest,"");
-	_the_tree->TTree::Scan();
+	//_the_tree->TTree::Scan();
 
 	//_the_tree->TTree::Write(); 
 	//std::cout<<"This is the number of events in it: " <<_the_tree->GetEntries();

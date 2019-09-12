@@ -147,6 +147,33 @@ float physics::phi_center( float phi_)
 	return phi_corr;
 }
 
+//Delta t
+float physics::vert_e(float d, float t){
+	return t-(d/c_special);
+}
+
+float physics::vert_h(float p, float d, float t, float m){
+	return t-((d/c_special)*sqrt(1.0 + m*m/(p*p)));
+}
+
+float physics::delta_t(int part, float p, float d, float t, float d0, float t0){
+	float mass = -99; 
+	switch(part){
+		case 1:
+			mass = mp; 
+		break;
+		case 2:
+			mass = mpi;
+		break;
+		case 3:
+			mass = mpi;
+		break;
+	}
+	float vertex_e = physics::vert_e(d0,t0);
+	float vertex_h = physics::vert_h(p,d,t,mass);
+	return vertex_e - vertex_h;
+}
+
 
 //Math
 TVector3 physics::V4_to_V3(TLorentzVector p1){

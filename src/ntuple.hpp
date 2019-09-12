@@ -60,6 +60,7 @@ private:
 public:
 	forest(int is_alive);//-1 thread_id gives the whole tree, but the others give pieces of trees
 	~forest();
+	void Write();
 
 	//void mktree(int thread_id);
 	void mkfile(std::string tree_file_name);
