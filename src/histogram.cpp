@@ -7,8 +7,8 @@ Histogram::Histogram(const std::string& output_file){
 	Histogram::WQ2_Make();
 	Histogram::Fid_Make();
 	Histogram::SF_Make();
-	//Histogram::DT_Make();
-	//Histogram::CC_Make();
+	Histogram::DT_Make();
+	Histogram::CC_Make();
 	//Histogram::MM_Make();
 }
 
@@ -17,11 +17,16 @@ Histogram::~Histogram() { this->Write(); }
 void Histogram::Write(){
 	std::cout<< "Writing" <<std::endl;
 	RootOutputFile->cd();
-	WQ2_Write();
-	Fid_Write();
-	SF_Write();
-	//DT_Write();
-	//CC_Write();
+	std::cout<<"Writing WQ2 Plots"; 
+	Histogram::WQ2_Write();
+	std::cout <<"Done!" <<std::endl <<"Writing Fid Plots"; 
+	Histogram::Fid_Write();
+	std::cout <<"Done!" <<std::endl <<"Writing SF Plots"; 
+	Histogram::SF_Write();
+	std::cout <<"Done!" <<std::endl <<"Writing DT Plots"; 
+	Histogram::DT_Write();
+	std::cout<<"Done!";
+	CC_Write();
 	//MM_Write();
 	RootOutputFile->Close();
 }
@@ -81,7 +86,7 @@ void Histogram::WQ2_Make(){
 
 	while(cart.GetNextCombination()){
 		sprintf(hname,"W_Q2_%s_%s",eid_cut[cart[0]],topologies[cart[1]]); //constants.h and otherwise writing the specific cut to the right plot
-    	WQ2_hist[cart[0]][cart[1]] = std::make_shared<TH2D>( hname, hname, WQxres, WQxmin, WQxmax, WQyres, WQymin, WQymax); // constants.h
+    	WQ2_hist[cart[0]][cart[1]] = std::make_shared<TH2F>( hname, hname, WQxres, WQxmin, WQxmax, WQyres, WQymin, WQymax); // constants.h
 	}
 }
 
@@ -149,13 +154,13 @@ void Histogram::Fid_Make(){
 				if(cart[5] == 0 && cart[1] != (length-1) && cart[4]!=0){//Specific Momentum Bins
 					if((cart[1]!=0 && (cart[1] == 0 || cart[1]==3)) || (cart[1]==0 && (cart[1]==0 || cart[1] == 7))){//Isolated cuts for particles
 						sprintf(hname,"%s_Fid_%s_%s_W:ALL_%s_%s",species[cart[1]],sec_list[cart[0]],par_cut,p_cut,topologies[cart[5]]);//constants.hpp
-						Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]] = std::make_shared<TH2D>(hname,hname, FIDxres, FIDxmin, FIDxmax, FIDyres, FIDymin, FIDymax);
+						Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]] = std::make_shared<TH2F>(hname,hname, FIDxres, FIDxmin, FIDxmax, FIDyres, FIDymin, FIDymax);
 						num_hist++;
 					}
 				}
 				if(cart[4]==0 && (((cart[1] != (length-1) || cart[5]==0)) || (cart[1]== (length-1) && cart[5]!=0 ))) {//No momentum dependence and correct event stuff
 					sprintf(hname,"%s_Fid_%s_%s_W:ALL_%s_%s",species[cart[1]],sec_list[cart[0]],par_cut,p_cut,topologies[cart[5]]);//constants.hpp
-					Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]] = std::make_shared<TH2D>(hname,hname, FIDxres, FIDxmin, FIDxmax, FIDyres, FIDymin, FIDymax);
+					Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]] = std::make_shared<TH2F>(hname,hname, FIDxres, FIDxmin, FIDxmax, FIDyres, FIDymin, FIDymax);
 					num_hist++;
 				}
 			}else{//Specific W Bins
@@ -164,7 +169,7 @@ void Histogram::Fid_Make(){
 						wtop = Wbin_start + (cart[3]*Wbin_res);//constants.hpp
 						wbot = wtop - Wbin_res;//constants.hpp
 						sprintf(hname,"%s_Fid_%s_%s_W:%f-%f_%s_%s",species[cart[1]],sec_list[cart[0]],par_cut,wbot,wtop,p_cut,topologies[cart[5]]);//constants.hpp
-						Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]] = std::make_shared<TH2D>(hname,hname, FIDxres, FIDxmin, FIDxmax, FIDyres, FIDymin, FIDymax);
+						Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]] = std::make_shared<TH2F>(hname,hname, FIDxres, FIDxmin, FIDxmax, FIDyres, FIDymin, FIDymax);
 						num_hist++;
 					}
 				}
@@ -347,16 +352,18 @@ void Histogram::SF_Make(){
 	CartesianGenerator cart(space_dims);
 
 	while(cart.GetNextCombination()){
-		if((cart[0] == 10 && cart[3] != 0) || (cart[0] != 0 && cart[3] == 0) ){//Topology only matters for event selection cut
+		if((cart[0] == 10 && cart[3] != 0) || (cart[0] != 10 && cart[3] == 0) ){//Topology only matters for event selection cut
 			if(cart[1] == 0 ){ //All W 
 				sprintf(hname,"SF_%s_%s_W:ALL_%s",eid_cut[cart[0]],sec_list[cart[2]],topologies[cart[3]]);
-				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]] = std::make_shared<TH2D>(hname,hname, SFxres, SFxmin, SFxmax, SFyres, SFymin, SFymax);
+				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]] = std::make_shared<TH2F>(hname,hname, SFxres, SFxmin, SFxmax, SFyres, SFymin, SFymax);
+				//std::cout<<std::endl <<"Created plot: " <<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3];
 
-			}else if(cart[3]==0){	//Specific W Bins
+			}else{	//Specific W Bins
 				top = Wbin_start + cart[1]*Wbin_res;
 				bot = top - Wbin_res;
 				sprintf(hname,"SF_%s_%s_W:%f-%f_%s",eid_cut[cart[0]],sec_list[cart[2]],bot,top,topologies[cart[3]]);
-				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]] = std::make_shared<TH2D>(hname,hname, SFxres, SFxmin, SFxmax, SFyres, SFymin, SFymax);
+				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]] = std::make_shared<TH2F>(hname,hname, SFxres, SFxmin, SFxmax, SFyres, SFymin, SFymax);
+				//std::cout<<std::endl <<"Created plot: " <<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3];
 			}
 		}
 	}
@@ -370,29 +377,31 @@ void Histogram::SF_Fill(int top, float p, float en, int cut, float W_, int sec){
 void Histogram::SF_Write(){
 	TDirectory* dir_SF = RootOutputFile->mkdir("SF Plots");
 	dir_SF->cd();
-	TDirectory* sf_cut_all = dir_SF->mkdir("SF: All W,Sector, Topologies");
-	TDirectory* sf_cut1 = dir_SF->mkdir("SF Pre Cut");
-	TDirectory* sf_cut2 = dir_SF->mkdir("SF Sanity Cut");
-	TDirectory* sf_cut3 = dir_SF->mkdir("SF Fid Cut");
-	TDirectory* sf_cut4 = dir_SF->mkdir("SF SF Cut");
-	TDirectory* sf_cut5 = dir_SF->mkdir("SF CC Cut");
-	TDirectory* sf_cut6 = dir_SF->mkdir("SF Fid+SF Cut");
-	TDirectory* sf_cut7 = dir_SF->mkdir("SF Fid+CC Cut");
-	TDirectory* sf_cut8 = dir_SF->mkdir("SF SF+CC Cut");
-	TDirectory* sf_cut9 = dir_SF->mkdir("SF EID Cut");
-	TDirectory* sf_cut10 = dir_SF->mkdir("SF Bank Cut");
-	TDirectory* sf_cut11 = dir_SF->mkdir("SF Event Cut");
-	TDirectory* sf_cut1_w = sf_cut1->mkdir("SF Pre Cut W Dep");
-	TDirectory* sf_cut2_w = sf_cut2->mkdir("SF Sanity Cut W Dep");
-	TDirectory* sf_cut3_w = sf_cut3->mkdir("SF Fid Cut W Dep");
-	TDirectory* sf_cut4_w = sf_cut4->mkdir("SF SF Cut W Dep");
-	TDirectory* sf_cut5_w = sf_cut5->mkdir("SF CC Cut W Dep");
-	TDirectory* sf_cut6_w = sf_cut6->mkdir("SF Fid+SF Cut W Dep");
-	TDirectory* sf_cut7_w = sf_cut7->mkdir("SF Fid+CC Cut W Dep");
-	TDirectory* sf_cut8_w = sf_cut8->mkdir("SF SF+CC Cut W Dep");
-	TDirectory* sf_cut9_w = sf_cut9->mkdir("SF EID Cut W Dep");
-	TDirectory* sf_cut10_w = sf_cut10->mkdir("SF Bank Cut W Dep");
-	TDirectory* sf_cut11_w = sf_cut11->mkdir("SF Event Cut W Dep");
+	TDirectory* sf_dir[11];//Cut
+	TDirectory* sf_dir_w[11];
+	TDirectory* sf_dir_sec[11][7];
+	TDirectory* sf_dir_top[11][5];
+	//[8][6];// W binning, Sector, Topology
+	char dir_name[100];
+	std::cout<<std::endl;
+	for(int cut = 0 ; cut < 11; cut++){
+		sprintf(dir_name,"SF_%s",eid_cut[cut]);
+		sf_dir[cut] = dir_SF->mkdir(dir_name);
+		//std::cout<<"Made Directory: " <<cut <<" 0 0 0" <<std::endl; 
+		sprintf(dir_name,"SF_%s_%s",eid_cut[cut],W_dep_list[1]);
+		sf_dir_w[cut] = sf_dir[cut]->mkdir(dir_name);
+		//std::cout<<"Made Directory: " <<cut <<" " <<1 <<" 0 0" <<std::endl;
+		for(int sec = 1; sec < 8 ; sec++){
+			sprintf(dir_name,"SF_%s_%s",eid_cut[cut],sec_list[sec-1]);
+			sf_dir_sec[cut][sec] = sf_dir[cut]->mkdir(dir_name);
+			//std::cout<<"Made Directory: " <<cut <<" " <<0 <<" " <<sec <<" 0" <<std::endl;
+		}
+		for(int top = 1; top < 6; top++){
+			sprintf(dir_name,"SF_%s_%s",eid_cut[cut],topologies[top]);
+			sf_dir_top[cut][top] = sf_dir[cut]->mkdir(dir_name);
+			//std::cout<<"Made Directory: " <<cut <<" " <<0 <<" " <<0 <<" "<<top <<std::endl;
+		}
+	}
 
 
 	std::vector<long> space_dims(4);
@@ -404,94 +413,49 @@ void Histogram::SF_Write(){
 	CartesianGenerator cart(space_dims);
 
 	while(cart.GetNextCombination()){
-		if(cart[1] == 0 && cart[3]== 0 && cart[2] == 0){
-			sf_cut_all->cd();
-		}else{
-			switch(cart[0]){
-				case 0:
-					sf_cut1->cd();
-					if(cart[2] !=0){
-						sf_cut1_w->cd();
-					}
-				break;
-				case 1:
-					sf_cut2->cd();
-					if(cart[2] !=0){
-						sf_cut2_w->cd();
-					}
-				break;
-				case 2:
-					sf_cut3->cd();
-					if(cart[2] !=0){
-						sf_cut3_w->cd();
-					}
-				break;
-				case 3:
-					sf_cut4->cd();
-					if(cart[2] !=0){
-						sf_cut4_w->cd();
-					}
-				break;
-				case 4:
-					sf_cut5->cd();
-					if(cart[2] !=0){
-						sf_cut5_w->cd();
-					}
-				break;
-				case 5:
-					sf_cut6->cd();
-					if(cart[2] !=0){
-						sf_cut6_w->cd();
-					}
-				break;
-				case 6:
-					sf_cut7->cd();
-					if(cart[2] !=0){
-						sf_cut7_w->cd();
-					}
-				break;
-				case 7:
-					sf_cut8->cd();
-					if(cart[2] !=0){
-						sf_cut8_w->cd();
-					}
-				break;
-				case 8:
-					sf_cut9->cd();
-					if(cart[2] !=0){
-						sf_cut9_w->cd();
-					}
-				break;
-				case 9:
-					sf_cut10->cd();
-					if(cart[2] !=0){
-						sf_cut10_w->cd();
-					}
-				break;
-				case 10:
-					sf_cut11->cd();
-					if(cart[2] !=0){
-						sf_cut11_w->cd();
-					}
-				break;
-			}
+		dir_SF->cd();
+		//General Entry
+		//std::cout<<"Curr Vals: " <<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3]<<std::endl ;
+		sf_dir[cart[0]]->cd();
+		//std::cout<<"    Now In: " <<cart[0] /*<<" " <<"0" <<" " <<"0" <<" " <<"0"*/<<std::endl ; 
+		//Want just cuts, so all Sectors, W, and use Combined Topology
+		if(cart[2]==0 && cart[1]==0 && ((cart[0]!=10 && cart[3]==0)||(cart[0]==10 && cart[3]==5))){
+			SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetXTitle("Momentum (GeV)");
+			SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetYTitle("Sampling Fraction");
+			SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetOption("COLZ");
+			SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->Write();
 		}
-		if((cart[0] == 10 && cart[3] != 0) || (cart[0] != 10 && cart[3] == 0) ){//Topology only matters for event selection cut
-			if(cart[1] == 0 ){ //All W 
-				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetXTitle("Momentum (GeV)");
-				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetYTitle("Sampling Fraction");
-				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetOption("COLZ");
-				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->Write();
-			}else if(cart[3]==0){	//Specific W Bins
-				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetXTitle("Momentum (GeV)");
-				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetYTitle("Sampling Fraction");
-				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetOption("COLZ");
-				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->Write();
-			}
+		//W binning
+		if(cart[2]==0 && cart[1]!=0 && ((cart[0]!=10 && cart[3]==0)||(cart[0]==10 && cart[3]==5))){
+			//std::cout<<"    Try In: " <<cart[0] <<" " <<"1" <<" " <<"0" <<" " <<"0"<<std::endl ;
+			sf_dir_w[cart[0]]->cd();
+			//std::cout<<"    Now In: " <<cart[0] <<" " <<"1" <<" " <<"0" <<" " <<"0"<<std::endl ; 
+			SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetXTitle("Momentum (GeV)");
+			SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetYTitle("Sampling Fraction");
+			SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetOption("COLZ");
+			SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->Write();
 		}
-		
+		//Sector Binning
+		if(cart[2]!=0 && cart[1]==0 && ((cart[0]!=10 && cart[3]==0)||(cart[0]==10 && cart[3]==5))){
+			//std::cout<<"    Try In: " <<cart[0] <<" " <<"0" <<" " <<cart[2]+1 <<" " <<"0"<<std::endl ; 
+			sf_dir_sec[cart[0]][cart[2]]->cd();
+			//std::cout<<"    Now In: " <<cart[0] <<" " <<"0" <<" " <<cart[2]+1 <<" " <<"0"<<std::endl ; 
+			SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetXTitle("Momentum (GeV)");
+			SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetYTitle("Sampling Fraction");
+			SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetOption("COLZ");
+			SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->Write();
+		}
+		//Topology Binning
+		if(cart[2]==0 && cart[1]==0 && (cart[0]==10 && cart[3]!=0)){
+			//std::cout<<"    Now In: " <<cart[0] <<" " <<"0" <<" " <<"0" <<" " <<cart[3]<<std::endl ;
+			sf_dir_top[cart[0]][cart[3]]->cd();
+			//std::cout<<"    Now In: " <<cart[0] <<" " <<"0" <<" " <<"0" <<" " <<cart[3]<<std::endl ; 
+			SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetXTitle("Momentum (GeV)");
+			SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetYTitle("Sampling Fraction");
+			SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->SetOption("COLZ");
+			SF_hist[cart[0]][cart[1]][cart[2]][cart[3]]->Write();
+		}
 	}
-
 }
 
 
@@ -513,13 +477,14 @@ void Histogram::DT_Make(){
 		if((cart[1] == 6 && cart[4]!=0) || (cart[1]!=6 && cart[4] ==0)){
 			if(cart[2] == 0){
 				sprintf(hname,"%s_DeltaT_%s_%s_W:ALL_%s",species[cart[0]+1],hid_cut[cart[1]],sec_list[cart[3]],topologies[cart[4]]);
-			}else if(cart[3]==0 & cart[4] ==0 && cart[1]!=6){
+				DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]] = std::make_shared<TH2F>(hname,hname, DTxres, DTxmin, DTxmax, DTyres, DTymin, DTymax);
+			}else if(cart[3]==0 & cart[4] == 0 && cart[1]!=6){//Looking at specific Cuts on fiducial and pre cut regimes 
 				top = Wbin_start + cart[2]*Wbin_res;
 				bot = top - Wbin_res;
 				sprintf(hname,"%s_DeltaT_%s_%s_W:%f-%f_%s",species[cart[0]+1],hid_cut[cart[1]],sec_list[cart[3]],bot,top,topologies[cart[4]]);
+				DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]] = std::make_shared<TH2F>(hname,hname, DTxres, DTxmin, DTxmax, DTyres, DTymin, DTymax);
 			}
 		}
-		DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]] = std::make_shared<TH2D>(hname,hname, DTxres, DTxmin, DTxmax, DTyres, DTymin, DTymax);
 	}
 }
 
@@ -533,58 +498,38 @@ void Histogram::DT_Fill(int top, int part, float p, float d, float t, float d0, 
 void Histogram::DT_Write(){
 	char dir_name[100]; 
 	TDirectory* DT_plot = RootOutputFile->mkdir("DT_plots");
-	TDirectory* par_dt[3][8][3][8][7][3];
+	TDirectory* par_dt[3][8][2][8][6];
+	//std::cout<<"Did I get here?" <<std::endl; 
 	DT_plot->cd(); 
-	for(int i = 1; i<4; i++){
-		sprintf(dir_name,"%s_DT_plots",species[i]);
-		par_dt[i][0][0][0][0][0]= DT_plot->mkdir(dir_name);
+	for(int i = 0; i<3; i++){
+		sprintf(dir_name,"%s_DT_plots",species[i+1]);
+		par_dt[i][0][0][0][0]= DT_plot->mkdir(dir_name);
+		//std::cout<<"Made pointer:" <<i <<" 0 0 0 0" <<std::endl;
 		for(int j = 1; j < 8; j++){//cut
-			sprintf(dir_name,"%s_DT_%s_%s_%s_%s",species[i],hid_cut[j-1]);
-			par_dt[i][j][0][0][0][0] = par_dt[i][0][0][0][0][0]->mkdir(dir_name);
-			for( int k = 1; k < 3; k++){//W Dep 
-				sprintf(dir_name,"%s_DT_%s_%s",species[i],hid_cut[j-1],W_dep_list[k-1]);
-				par_dt[i][j][k][0][0][0] = par_dt[i][j][0][0][0][0]->mkdir(dir_name);
-				for( int l = 1; l < 8; l++){//Sector
-					sprintf(dir_name,"%s_DT_%s_%s_%s",species[i],hid_cut[j-1],W_dep_list[k-1],sec_list[l-1]);
-					par_dt[i][j][k][l][0][0] = par_dt[i][j][k][0][0][0]->mkdir(dir_name);
-					for( int m = 1; m <7; m++){//Topology
-						sprintf(dir_name,"%s_DT_%s_%s_%s_%s",species[i],hid_cut[j-1],W_dep_list[k-1],sec_list[l-1],topologies[m-1]);
-						par_dt[i][j][k][l][m][0] = par_dt[i][j][k][l][0][0]->mkdir(dir_name);
-					}
-				}
-			}
+			sprintf(dir_name,"%s_DT_%s",species[i+1],hid_cut[j-1]);
+			par_dt[i][j][0][0][0] = par_dt[i][0][0][0][0]->mkdir(dir_name);
+			//std::cout<<"    Made Pointers" <<i <<j <<" 0 0 0"<<std::endl;
+			//W Dependence
+			sprintf(dir_name,"%s_DT_%s_%s",species[i+1],hid_cut[j-1],W_dep_list[1]);
+			par_dt[i][j][1][0][0] = par_dt[i][j][0][0][0]->mkdir(dir_name);
+			//std::cout<<"    Made Pointers" <<i <<j <<" 1 0 0"<<std::endl;
 			for(int k = 1; k < 8; k++){ //Sector 
-				sprintf(dir_name,"%s_DT_%s_%s",species[i],hid_cut[j-1],sec_list[k-1]);
-				par_dt[i][j][0][k][0][1] = par_dt[i][j][0][0][0][0]->mkdir(dir_name);
-				for(int l = 1; l <7; l++){ //topology
-					sprintf(dir_name,"%s_DT_%s_%s_%s",species[i],hid_cut[j-1],sec_list[k-1],topologies[l-1]);
-					par_dt[i][j][0][k][l][1] = par_dt[i][j][0][k][0][1]->mkdir(dir_name);
-					for(int m = 1; m < 3; m++){//W dep
-						sprintf(dir_name,"%s_DT_%s_%s",species[i],hid_cut[j-1],sec_list[k-1],topologies[l-1],W_dep_list[m-1]);
-						par_dt[i][j][m][k][l][1] = par_dt[i][j][0][k][l][1]->mkdir(dir_name);
-					}
+				sprintf(dir_name,"%s_DT_%s_%s",species[i+1],hid_cut[j-1],sec_list[k-1]);
+				par_dt[i][j][0][k][0] = par_dt[i][j][0][0][0]->mkdir(dir_name);
+				//std::cout<<"    Made Pointers" <<i <<j <<" 0 " <<k <<" 0"<<std::endl;
+				//std::cout<<"Sector Pointer" <<std::endl;
 				}
-			}
-			for(int k = 1; k < 7; k++){ //topology 
-				sprintf(dir_name,"%s_DT_%s_%s",species[i],hid_cut[j-1],topologies[k-1]);
-				par_dt[i][j][0][0][k][2] = par_dt[i][j][0][0][0][0]->mkdir(dir_name);
-				for(int l = 1; l <8; l++){ //sector
-					sprintf(dir_name,"%s_DT_%s_%s_%s",species[i],hid_cut[j-1],topologies[k-1],sec_list[l-1]);
-					par_dt[i][j][0][l][k][2] = par_dt[i][j][0][k][0][2]->mkdir(dir_name);
-					for(int m = 1; m < 3; m++){//W dep
-						sprintf(dir_name,"%s_DT_%s_%s_%s",species[i],hid_cut[j-1],topologies[k-1],sec_list[l-1],W_dep_list[m-1]);
-						par_dt[i][j][m][l][k][2] = par_dt[i][j][0][k][l][2]->mkdir(dir_name);
-					}
+			if(j == 7){//Event cut
+				for(int k = 1; k < 6; k++){ //topology 
+					sprintf(dir_name,"%s_DT_%s_%s",species[i+1],hid_cut[j-1],topologies[k]);
+					par_dt[i][j][0][0][k] = par_dt[i][j][0][0][0]->mkdir(dir_name);
+					//std::cout<<"    Made Pointers" <<i <<j <<" 0 0 " <<k<<std::endl;
+					//std::cout<<"Topology Pointer" <<std::endl;
+
 				}
 			}
 		}
 	}
-	TDirectory* pro_dt = DT_plot->mkdir("Proton DT Plots");
-	TDirectory* pip_dt = DT_plot->mkdir("Pi+ DT Plots");
-	TDirectory* pim_dt = DT_plot->mkdir("Pi- DT Plots");
-	TDirectory* pro_dt_w = pro_dt->mkdir("Proton DT Plots W Dep");
-	TDirectory* pip_dt_w = pip_dt->mkdir("Pi+ DT Plots W Dep");
-	TDirectory* pim_dt_w = pim_dt->mkdir("Pi- DT Plots W Dep");
 
 	std::vector<long> space_dims(5);
 	space_dims[0] = 3;  //species
@@ -594,90 +539,53 @@ void Histogram::DT_Write(){
 	space_dims[4] = 6; //topology
 
 	CartesianGenerator cart(space_dims);
-
+	std::cout<<std::endl;
 	while(cart.GetNextCombination()){
-		par_dt[cart[0]][0][0][0][0][0]->cd();//Main folder for particles
-		if(cart[2]==0 && cart[3] == 0 && ((cart[1]!=6 && cart[4] == 0) || (cart[1] ==6 && cart[4]!=0))){ //These are all W, All Sectors, Combined Topology
+		par_dt[cart[0]][0][0][0][0]->cd();//Main folder for particles
+		//std::cout<<std::endl <<"Current Vals: " <<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3] <<" " <<cart[4]; 
+		//std::cout<<" Now Writing in " <<cart[0] <<" 0 0 0 0"<<std::endl;
+		par_dt[cart[0]][cart[1]+1][0][0][0]->cd();//Get into those CUTS
+		//std::cout <<"      Now Writing in " <<cart[0] <<" " <<cart[1]+1 <<" 0 0 0"<<std::endl;
+		//All W, Sectors, and Combined Topology for Event selection, but still by Cut
+		if(cart[2] ==0 && cart[3] == 0 && ((cart[1]!=6 && cart[4]==0)||(cart[1]==6 && cart[4]==5))){
 			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetXTitle("Momentum (GeV)");
 			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetYTitle("Delta T (ns)");
 			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetOption("COLZ");
-			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->Write();
-		}
-		par_dt[cart[0]][cart[1]+1][0][0][0][0]->cd();//Go into the particle cuts
-		if(cart[2] == 0 && cart[3] ==0 && ((cart[1]==6 && cart[4] !=0) || (cart[1]!=6 && cart[4]==0))){
-			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetXTitle("Momentum (GeV)");
-			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetYTitle("Delta T (ns)");
-			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetOption("COLZ");
-			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->Write();
-		}
-
-		// W Dependence
-		par_dt[cart[0]][cart[1]][cart[2]+1][0][0][0]->cd();
-		if(cart[3] == 0 && ((cart[1]!=6 &&cart[4] == 0) || (cart[1]==6 && cart[4] == 5))){//All sec & all/No tops
-			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetXTitle("Momentum (GeV)");
-			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetYTitle("Delta T (ns)");
-			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetOption("COLZ");
-			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->Write();
-		}
-		par_dt[cart[0]][cart[1]][cart[2]+1][cart[3]+1][0][0]->cd(); 
-		if((cart[1]!=6 &&cart[4] == 0) || (cart[1]==6 && cart[4]==5) ){//all or no tops
-			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetXTitle("Momentum (GeV)");
-			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetYTitle("Delta T (ns)");
-			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetOption("COLZ");
-			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->Write();
-		}
-		if(cart[1]==6){//Make sure we're looking at event selected things
-			par_dt[cart[0]][cart[1]][cart[2]+1][cart[3]+1][cart[4]+1][0]->cd();
-			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetXTitle("Momentum (GeV)");
-			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetYTitle("Delta T (ns)");
-			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetOption("COLZ");
-			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->Write();
+			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->Write();			
 		}
 		
-		// Sector
-		par_dt[cart[0]][cart[1]][0][cart[3]+1][0][1]->cd();
-		if(cart[3] == 0 && ((cart[1]!=6 &&cart[4] == 0) || (cart[1]==6 && cart[4] == 5))){//All W & all/No tops
+		//For W Range, but all sectors, combine topology for event selection, all sectors
+		if(cart[2]!=0 && cart[3] == 0 && ((cart[1]!=6 && cart[4]==0))){//||(cart[1]==6 && cart[4]==5))){ //Issue when trying to look at event selection for this. Not sure why, but getting rid of it solved it *shrug* 9/12/19
+			//std::cout <<"          trying to Write in " <<cart[0] <<" " <<cart[1]+1 <<" 1 0 0"<<std::endl;
+			par_dt[cart[0]][cart[1]+1][0][0][0]->cd();//Get into those CUTS
+			par_dt[cart[0]][cart[1]+1][1][0][0]->cd();
+			//std::cout <<"   We are writing" <<std::endl;
 			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetXTitle("Momentum (GeV)");
 			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetYTitle("Delta T (ns)");
 			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetOption("COLZ");
-			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->Write();
+			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->Write();			
 		}
-		if(cart[1] == 6){
-			par_dt[cart[0]][cart[1]][0][cart[3]+1][cart[4]+1][1]->cd(); 
-			if(cart[2]==0){//all W
-				DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetXTitle("Momentum (GeV)");
-				DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetYTitle("Delta T (ns)");
-				DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetOption("COLZ");
-				DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->Write();
-			}
-			par_dt[cart[0]][cart[1]][cart[2]+1][cart[3]+1][cart[4]+1][1]->cd();
+		//For Sector Range, but all W, combine topology for event selection
+		if(cart[2] ==0 && ((cart[1]!=6 && cart[4]==0)||(cart[1]==6 && cart[4]==5))){
+			//std::cout <<"          Trying to Write in " <<cart[0] <<" " <<cart[1]+1 <<" 0 " <<cart[3]+1 <<" 0"<<std::endl;
+			par_dt[cart[0]][cart[1]+1][0][0][0]->cd();//Get into those CUTS
+			par_dt[cart[0]][cart[1]+1][0][cart[3]+1][0]->cd();
+			//std::cout <<"  We are writing "<<std::endl;
 			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetXTitle("Momentum (GeV)");
 			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetYTitle("Delta T (ns)");
 			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetOption("COLZ");
-			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->Write();
+			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->Write();			
 		}
-
-		// Topology
-		par_dt[cart[0]][cart[1]][0][0][cart[4]+1][2]->cd();
-		if(cart[1] == 6){
-			if(cart[3] == 0 && cart[2]==0){//All W & all sec
-				DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetXTitle("Momentum (GeV)");
-				DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetYTitle("Delta T (ns)");
-				DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetOption("COLZ");
-				DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->Write();
-			}
-			par_dt[cart[0]][cart[1]][0][cart[3]+1][cart[4]+1][2]->cd(); 
-			if(cart[2]==0){//all W
-				DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetXTitle("Momentum (GeV)");
-				DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetYTitle("Delta T (ns)");
-				DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetOption("COLZ");
-				DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->Write();
-			}
-			par_dt[cart[0]][cart[1]][cart[2]+1][cart[3]+1][cart[4]+1][2]->cd();
+		//For topology Range, but all W, all sector
+		if(cart[2] ==0 && cart[3] == 0 && cart[1] == 6 && cart[4]!=0){
+			//std::cout <<"          Trying to Write in " <<cart[0] <<" " <<cart[1]+1 <<" 0 0 " <<cart[4]+1<<std::endl;
+			par_dt[cart[0]][cart[1]+1][0][0][0]->cd();//Get into those CUTS
+			par_dt[cart[0]][cart[1]+1][0][0][cart[4]]->cd();
+			//std::cout <<"  we are writing"<<std::endl;
 			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetXTitle("Momentum (GeV)");
 			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetYTitle("Delta T (ns)");
 			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetOption("COLZ");
-			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->Write();
+			DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->Write();			
 		}
 	}
 }
@@ -688,14 +596,91 @@ void Histogram::CC_Make(){
 	std::vector<long> space_dims(5);
 	space_dims[0] = 6;  //Sector
 	space_dims[1] = 18; //Segment
-	space_dims[2] = 5;  //Cut
+	space_dims[2] = 11;  //Cut
 	space_dims[3] = 4;  //Side of detector
 	space_dims[4] = 6;  //Topology
+
+	CartesianGenerator cart(space_dims);
+
+	while(cart.GetNextCombination()){
+		if((cart[2] == 10 && cart[4]!=0) || (cart[2]!=10 && cart[4] ==0)){
+				sprintf(hname,"MinCC_%s_%s_Seg%d_%s_%s",eid_cut[cart[2]],sec_list[cart[0]+1],cart[1]+1,CC_det_side[cart[3]],topologies[cart[4]]);
+				CC_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]] = std::make_shared<TH1F>(hname,hname, MinCCres, MinCCmin, MinCCmax);
+		}
+	}
 }
+
 void Histogram::CC_Fill(int top, int sec, int segm, int nphe, int cut){
+	CC_hist[sec][segm][cut][detect::cc_lrc(segm)][top]->Fill(nphe);
 
 }
 void Histogram::CC_Write(){
+	char dir_name[100]; 
+	TDirectory* CC_plot = RootOutputFile->mkdir("CC_plots");
+	TDirectory* par_cc[6][19][12][5][6];
+	for(int i = 0; i< 6; i++){//Sectors
+		sprintf(dir_name,"CC_%s",sec_list[i+1]);
+		par_cc[i][0][0][0][0] = CC_plot->mkdir(dir_name);
+		for(int j = 1; j < 19 ; j++){//Segments
+			sprintf(dir_name,"CC_%s_Segm%d",sec_list[i+1],j);
+			par_cc[i][j][0][0][0] = par_cc[i][0][0][0][0]->mkdir(dir_name);
+			for(int k = 1; k < 5; k++){//Part of CC hit
+				sprintf(dir_name,"CC_%s_Segm%d_%s",sec_list[i+1],j,CC_det_side[k-1]);
+				par_cc[i][j][0][k][0] = par_cc[i][j][0][0][0]->mkdir(dir_name);
+				for(int l = 1; l<12; l++){//EID Cuts
+					sprintf(dir_name,"CC_%s_Segm%d_%s_%s",sec_list[i+1],j,CC_det_side[k-1],eid_cut[l-1]);
+					par_cc[i][j][l][k][0] = par_cc[i][j][0][k][0]->mkdir(dir_name);
+					if(l == 11){
+						for(int m = 1; m<6; m++){//Topologies
+							sprintf(dir_name,"CC_%s_Segm%d_%s_%s_%s",sec_list[i+1],j,CC_det_side[k-1],eid_cut[l-1],topologies[m]);
+							par_cc[i][j][l][k][m] = par_cc[i][j][l][k][0]->mkdir(dir_name);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	CC_plot->cd();
+	for(int i = 0; i< 6; i++){//Sectors
+		//std::cout<<" Trying to Enter: " <<i <<std::endl;
+		par_cc[i][0][0][0][0]->cd();
+		//std::cout<<" Did do it Enter: " <<i <<std::endl;
+		for(int j = 1; j < 19 ; j++){//Segments
+			//std::cout<<" Trying to Enter: " <<i <<" " <<j <<std::endl;
+			par_cc[i][j][0][0][0]->cd();
+			//std::cout<<" Did do it Enter: " <<i <<" " <<j <<std::endl;
+			for(int k = 1; k < 5; k++){//Part of CC hit
+				//std::cout<<" Trying to Enter: " <<i <<" " <<j <<" 0 " <<k <<std::endl;
+				par_cc[i][j][0][k][0]->cd();
+				//std::cout<<" Did do it Enter: " <<i <<" " <<j <<" 0 " <<k <<std::endl;
+				for(int l = 1; l<12; l++){//EID Cuts
+					//std::cout<<" Trying to Enter: " <<i <<" " <<j <<" "<<l <<" " <<k <<std::endl;
+					par_cc[i][j][l][k][0]->cd();
+					//std::cout<<" Did do it Enter: " <<i <<" " <<j <<" "<<l <<" " <<k <<std::endl;
+					for(int m = 0; m<6; m++){
+						if(l == 11 && m!=0){//Event selected
+							//std::cout<<" Trying to Enter: " <<i <<" " <<j <<" "<<l <<" " <<k <<" " <<m <<std::endl;
+							par_cc[i][j][l][k][m]->cd();
+							//std::cout<<" Did do it Enter: " <<i <<" " <<j <<" "<<l <<" " <<k <<" " <<m <<std::endl;
+							CC_hist[i][j-1][l-1][k-1][m]->SetXTitle("num photoelectrons");
+							CC_hist[i][j-1][l-1][k-1][m]->SetYTitle("Counts");
+							CC_hist[i][j-1][l-1][k-1][m]->Write();
+						}else if( l != 11 && m==0){//Not event selected
+							//std::cout<<" Trying to Enter: " <<i <<" " <<j <<" "<<l <<" " <<k <<" " <<m <<std::endl;
+							par_cc[i][j][l][k][0]->cd();
+							//std::cout<<" Did do it Enter: " <<i <<" " <<j <<" "<<l <<" " <<k <<" " <<m <<std::endl;
+							CC_hist[i][j-1][l-1][k-1][m]->SetXTitle("num photoelectrons");
+							CC_hist[i][j-1][l-1][k-1][m]->SetYTitle("Counts");
+							CC_hist[i][j-1][l-1][k-1][m]->Write();
+						}
+					}
+				}
+			}
+		}
+	}
+
+	
 
 }
 //Missing Mass Cuts

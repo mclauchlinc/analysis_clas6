@@ -275,5 +275,6 @@ static const char * hid_cut[] = {"pre","sanity","fid","dt","hid","bank","event"}
 static const char * topologies[] = {"None","Pmiss","PIPmiss","PIMmiss","Zeromiss","ALLmiss"}; //6
 static const char * sec_list[] = {"all_sectors","sec1","sec2","sec3","sec4","sec5","sec6"}; //7`
 static const char * W_dep_list[] = {"No_W_Dep","W_Dep"};
+static const char * CC_det_side[] = {"Left","Coince","Right","All"};
 
 #endif

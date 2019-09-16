@@ -10,12 +10,13 @@
 #include "functions.hpp"
 #include "CartesianGenerator.hpp"
 #include "physics.hpp"
+#include "detectors.hpp"
 //#include "variables.h"
 //#include "CartesianGenerator.hh"
 
 
-using TH2D_ptr = std::shared_ptr<TH2D>;
-using TH1D_ptr = std::shared_ptr<TH1D>;
+using TH2F_ptr = std::shared_ptr<TH2F>;
+using TH1F_ptr = std::shared_ptr<TH1F>;
 
 
 class Histogram {
@@ -78,6 +79,10 @@ protected:
 	 double Q2min = 1.5;
 	 double Q2max = 5.0;
 	 double Q2res = 0.5;
+	 //CC Min
+	 double MinCCmin = -0.5;
+	 double MinCCmax = 501.5;
+	 int MinCCres = 502;
 
 	//binning
 	 float Wbin_res = 0.025;//The width of a W bin //30 steps
@@ -94,12 +99,12 @@ protected:
 	double YM_res[3] = {0.06,0.06,0.06};
 
 	 //Making the Histograms
-	TH2D_ptr WQ2_hist[11][6];//electron cuts, topologies (including pre)
-	TH2D_ptr Fid_hist[7][4][11][30][12][6];//sector, species, cut, W binning, p binning, topology
-	TH2D_ptr SF_hist[10][30][7][6];//cuts, W Binning, Sector, topology
-	TH2D_ptr DT_hist[3][7][30][7][6]; //particle, cuts, W binning, sector, topology
-	TH1D_ptr CC_hist[6][18][11][4][6]; //Sector, segment, cut, side of detector, topology
-	TH1D_ptr MM_hist[5][3][30];//topology, cut, W Binning
+	TH2F_ptr WQ2_hist[11][6];//electron cuts, topologies (including pre)
+	TH2F_ptr Fid_hist[7][4][11][30][12][6];//sector, species, cut, W binning, p binning, topology
+	TH2F_ptr SF_hist[10][30][7][6];//cuts, W Binning, Sector, topology
+	TH2F_ptr DT_hist[3][7][30][7][6]; //particle, cuts, W binning, sector, topology
+	TH1F_ptr CC_hist[6][18][11][3][6]; //Sector, segment, cut, side of detector, topology
+	TH1F_ptr MM_hist[5][3][30];//topology, cut, W Binning
 
 
 public:
