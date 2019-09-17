@@ -195,9 +195,20 @@ const double DTymin = -5.0;//-4.0;
 const double DTxmax = 4.5;//7.0;
 const double DTymax = 5.0;//4.0;
 //Missing Mass
-const int MMxres = 1500;
-const double MMxmin = -0.2;
-const double MMxmax = 3.0;
+static const int MMxres = 1500;//[2][4] = {
+	//{1500,500,500,500},
+	//{1500,500,500,500}
+//};
+static const double MMxmin = -0.2;
+/*[2][4] = {
+	{-0.2,-0.2,-0.2,-0.2},
+	{-0.2,-0.2,-0.2,-0.2}
+};*/
+static const double MMxmax = 2.0;
+/*[2][4] = {
+	{3.0,1.0,1.0,0.4},
+	{2.0,0.4,0.4,0.2}
+};*/
 //Alpha
 const int alphaxres = 100;
 const double alphaxmin = 0.0;
@@ -271,10 +282,13 @@ static std::unordered_map<std::string, int> filetype_map = 	{{list1,type1},
 
 static const char * species[] = {"ele","pro","pip","pim"};//4
 static const char * eid_cut[] = {"pre","sanity","fid","sf","min_cc","fid+sf","fid+cc","sf+cc","eid","bank","event"}; //11
+static const char * cut_ver[] = {"cut","anticut"};
 static const char * hid_cut[] = {"pre","sanity","fid","dt","hid","bank","event"}; //7
 static const char * topologies[] = {"None","Pmiss","PIPmiss","PIMmiss","Zeromiss","ALLmiss"}; //6
 static const char * sec_list[] = {"all_sectors","sec1","sec2","sec3","sec4","sec5","sec6"}; //7`
 static const char * W_dep_list[] = {"No_W_Dep","W_Dep"};
 static const char * CC_det_side[] = {"Left","Coince","Right","All"};
+static const char * basic_cut[] = {"pre","cut","anti"};
+static const char * MM_sq[] = {"linear","squared"};
 
 #endif

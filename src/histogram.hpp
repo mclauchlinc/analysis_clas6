@@ -100,11 +100,11 @@ protected:
 
 	 //Making the Histograms
 	TH2F_ptr WQ2_hist[11][6];//electron cuts, topologies (including pre)
-	TH2F_ptr Fid_hist[7][4][11][30][12][6];//sector, species, cut, W binning, p binning, topology
-	TH2F_ptr SF_hist[10][30][7][6];//cuts, W Binning, Sector, topology
-	TH2F_ptr DT_hist[3][7][30][7][6]; //particle, cuts, W binning, sector, topology
-	TH1F_ptr CC_hist[6][18][11][3][6]; //Sector, segment, cut, side of detector, topology
-	TH1F_ptr MM_hist[5][3][30];//topology, cut, W Binning
+	TH2F_ptr Fid_hist[7][4][11][30][12][6][2];//sector, species, cut, W binning, p binning, topology
+	TH2F_ptr SF_hist[10][30][7][6][2];//cuts, W Binning, Sector, topology
+	TH2F_ptr DT_hist[3][7][30][7][6][2]; //particle, cuts, W binning, sector, topology
+	TH1F_ptr CC_hist[6][18][11][3][6][2]; //Sector, segment, cut, side of detector, topology
+	TH1F_ptr MM_hist[5][3][2];//topology, cut, squared v linear
 
 
 public:
@@ -120,23 +120,23 @@ public:
 	void WQ2_Write();
 	//Fiducial Cuts
 	void Fid_Make();
-	void Fid_Fill(int top, float theta, float phi, int part, int cut, float W_, float p);
+	void Fid_Fill(int top, float theta, float phi, int part, int cut, int cutvanti, float W_, float p);
 	void Fid_Write();
 	//Sampling Fraction Cuts
 	void SF_Make();
-	void SF_Fill(int top, float p, float en, int cut, float W_, int sec);
+	void SF_Fill(int top, float p, float en, int cut, int cva, float W_, int sec);
 	void SF_Write();
 	//Delta T Cuts
 	void DT_Make();
-	void DT_Fill(int top, int part, float p, float d, float t, float d0, float t0, int cut, float W_, int sec);
+	void DT_Fill(int top, int part, float p, float d, float t, float d0, float t0, int cut, int anti, float W_, int sec);
 	void DT_Write();
 	//Min CC Cuts
 	void CC_Make();
-	void CC_Fill(int top, int sec, int segm, int nphe, int cut);
+	void CC_Fill(int top, int sec, int segm, int nphe, int cut, int anti);
 	void CC_Write();
 	//Missing Mass Cuts
 	void MM_Make();
-	void MM_Fill(int top, float mm, int cut);
+	void MM_Fill(int top, float mm, int cut, int square);
 	void MM_Write();
 	/*//Signature Plots //We'll get there
 	void MM2_Make();
