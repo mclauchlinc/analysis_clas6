@@ -136,10 +136,10 @@ void Histogram::Fid_Make(){
 		//std::cout<<"In the loop: " <<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3] <<" " <<cart[4] <<" " <<cart[5] <<" Histogram Number: " <<num_hist <<std::endl;
 		if(cart[1] == 0){ //Dealing with the different numbers of cuts for electrons vs. hadrons
 			//fid_cuts = eid_cut;
-			length = 10; 
+			length = 11; 
 		}else{
 			//fid_cuts = hid_cut; 
-			length = 6; 
+			length = 7; 
 		}
 		if(cart[4] ==0){
 			sprintf(p_cut,"p_range:All");
@@ -155,27 +155,30 @@ void Histogram::Fid_Make(){
 				sprintf(par_cut,"%s_%s",hid_cut[cart[2]],cut_ver[cart[6]]);
 			}
 			if(cart[3] == 0){//All W bins
-				if(cart[5] == 0 && cart[1] != (length-1) && cart[4]!=0){//Specific Momentum Bins
-					if((cart[1]!=0 && (cart[1] == 0 || cart[1]==3)) || (cart[1]==0 && (cart[1]==0 || cart[1] == 7))){//Isolated cuts for particles
+				if((cart[5] == 0) && (cart[2] != (length-1)) && (cart[4]!=0)){//Specific Momentum Bins
+					//if((cart[1]!=0 && (cart[2] == 0 || cart[2]==3)) || (cart[1]==0 && (cart[2]==0 || cart[2] == 7))){//Isolated cuts for particles
 						sprintf(hname,"%s_Fid_%s_%s_W:ALL_%s_%s",species[cart[1]],sec_list[cart[0]],par_cut,p_cut,topologies[cart[5]]);//constants.hpp
 						Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]] = std::make_shared<TH2F>(hname,hname, FIDxres, FIDxmin, FIDxmax, FIDyres, FIDymin, FIDymax);
 						num_hist++;
-					}
+						Fid_made_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]=true;
+					//}
 				}
-				if(cart[4]==0 && (((cart[1] != (length-1) || cart[5]==0)) || (cart[1]== (length-1) && cart[5]!=0 ))) {//No momentum dependence and correct event stuff
+				if(cart[4]==0 && (((cart[2] != (length-1) || cart[5]==0)) || (cart[2]== (length-1) && cart[5]!=0 ))) {//No momentum dependence and correct event stuff
 					sprintf(hname,"%s_Fid_%s_%s_W:ALL_%s_%s",species[cart[1]],sec_list[cart[0]],par_cut,p_cut,topologies[cart[5]]);//constants.hpp
 					Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]] = std::make_shared<TH2F>(hname,hname, FIDxres, FIDxmin, FIDxmax, FIDyres, FIDymin, FIDymax);
+					Fid_made_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]=true;
 					num_hist++;
 				}
 			}else{//Specific W Bins
 				if(cart[5]==0 && cart[4]==0 && cart[1] != (length-1) ){ //No event selection or momentum dependence
-					if((cart[1]!=0 && (cart[1] == 0 || cart[1]==3)) || (cart[1]==0 && (cart[1]==0 || cart[1] == 7))){//Isolated cuts for particles
+					//if((cart[1]!=0 && (cart[2] == 0 || cart[2]==3)) || (cart[1]==0 && (cart[2]==0 || cart[2] == 7))){//Isolated cuts for particles
 						wtop = Wbin_start + (cart[3]*Wbin_res);//constants.hpp
 						wbot = wtop - Wbin_res;//constants.hpp
 						sprintf(hname,"%s_Fid_%s_%s_W:%f-%f_%s_%s",species[cart[1]],sec_list[cart[0]],par_cut,wbot,wtop,p_cut,topologies[cart[5]]);//constants.hpp
 						Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]] = std::make_shared<TH2F>(hname,hname, FIDxres, FIDxmin, FIDxmax, FIDyres, FIDymin, FIDymax);
+						Fid_made_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]=true;
 						num_hist++;
-					}
+					//}
 				}
 			}
 		}
@@ -183,22 +186,47 @@ void Histogram::Fid_Make(){
 }
 
 void Histogram::Fid_Fill(int top, float theta, float phi, int part, int cut, int cutvanti, float W_, float p_){
+	//std::cout<< std::endl <<"We are inside the Fid Fill function ";
+	//std::cout<< std::endl <<"top: " <<top <<" theta: " <<theta <<" phi: " <<phi <<" part: " <<part <<" cut: " <<cut <<" cva: " <<cutvanti <<" W: " <<W_ <<" p: " <<p_ <<std::endl; 
+	//std::cout<< std::endl <<"filling: " <<physics::get_sector(phi) <<" " <<part <<" " <<cut <<" " <<0 <<" " <<Histogram::p_binning(p_) <<" " <<top <<" " <<cutvanti <<std::endl;
+
 	float phic = physics::phi_center(phi);
-	if(p_binning(p_) + W_binning(W_) != 0){//Both p and W dependence
-		Fid_hist[0][part][cut][Histogram::W_binning(W_)][Histogram::p_binning(p_)][top][cutvanti]->Fill(phic,theta);//All Sectors
-		Fid_hist[physics::get_sector(phi)][part][cut][Histogram::W_binning(W_)][Histogram::p_binning(p_)][top][cutvanti]->Fill(phic,theta);//Individual Sectors
-	}
+	//std::cout<<"Filling p binning" <<std::endl;
 	if(p_binning(p_) != 0){ //All W with p binning
-		Fid_hist[0][part][cut][0][Histogram::p_binning(p_)][top][cutvanti]->Fill(phic,theta);//All Sectors
-		Fid_hist[physics::get_sector(phi)][part][cut][0][Histogram::p_binning(p_)][top][cutvanti]->Fill(phic,theta);//Individual Sectors
+		Fid_fill_hist[physics::get_sector(phi)][part][cut][0][Histogram::p_binning(p_)][top][cutvanti]=true;
+		if(Fid_fill_hist[physics::get_sector(phi)][part][cut][0][Histogram::p_binning(p_)][top][cutvanti] == Fid_made_hist[physics::get_sector(phi)][part][cut][0][Histogram::p_binning(p_)][top][cutvanti]){
+			Fid_hist[0][part][cut][0][Histogram::p_binning(p_)][top][cutvanti]->Fill(phic,theta);//All Sectors
+			Fid_hist[physics::get_sector(phi)][part][cut][0][Histogram::p_binning(p_)][top][cutvanti]->Fill(phic,theta);//Individual Sectors
+			//std::cout<<"We did it! ";
+		}else{
+			std::cout<<"would have segfaulted ";
+			std::cout<<std::endl <<"For Fid Plot: " <<physics::get_sector(phi) <<" " <<part <<" " <<cut <<" " <<0 <<" " <<Histogram::p_binning(p_) <<" " <<top <<" " <<cutvanti <<std::endl;
+		}
 	}
+	//std::cout<<"Filling W binning" <<std::endl;
 	if(W_binning(W_) != 0){ //All p with W binning
-		Fid_hist[0][part][cut][Histogram::W_binning(W_)][0][top][cutvanti]->Fill(phic,theta);//All sectors
-		Fid_hist[physics::get_sector(phi)][part][cut][Histogram::W_binning(W_)][0][top][cutvanti]->Fill(phic,theta);//Individual Sectors
+		Fid_fill_hist[physics::get_sector(phi)][part][cut][Histogram::W_binning(W_)][0][top][cutvanti]=true;
+		if(Fid_fill_hist[physics::get_sector(phi)][part][cut][Histogram::W_binning(W_)][0][top][cutvanti] == Fid_made_hist[physics::get_sector(phi)][part][cut][Histogram::W_binning(W_)][0][top][cutvanti]){
+			Fid_hist[0][part][cut][Histogram::W_binning(W_)][0][top][cutvanti]->Fill(phic,theta);//All sectors
+			Fid_hist[physics::get_sector(phi)][part][cut][Histogram::W_binning(W_)][0][top][cutvanti]->Fill(phic,theta);//Individual Sectors
+			//std::cout<<"We did it! ";
+		}else{
+			std::cout<<"would have segfaulted ";
+			std::cout<<std::endl <<"For Fid Plot: " <<physics::get_sector(phi) <<" " <<part <<" " <<cut <<" " <<Histogram::W_binning(W_) <<" " <<0 <<" " <<top <<" " <<cutvanti <<std::endl;
+		}
+		
 	}
+	//std::cout<<"Filling all p and w" <<std::endl;
 	//All W and All Momentum
-	Fid_hist[0][part][cut][0][0][top][cutvanti]->Fill(phic,theta);//All sectors, all W, all P
-	Fid_hist[physics::get_sector(phi)][part][cut][0][0][top][cutvanti]->Fill(phic,theta);//Individual sectors all W, all p
+	Fid_fill_hist[physics::get_sector(phi)][part][cut][0][0][top][cutvanti]=true;
+	if(Fid_fill_hist[physics::get_sector(phi)][part][cut][0][0][top][cutvanti] == Fid_made_hist[physics::get_sector(phi)][part][cut][0][0][top][cutvanti]){
+		Fid_hist[0][part][cut][0][0][top][cutvanti]->Fill(phic,theta);//All sectors, all W, all P
+		Fid_hist[physics::get_sector(phi)][part][cut][0][0][top][cutvanti]->Fill(phic,theta);//Individual sectors all W, all p
+		//std::cout<<"We did it! ";
+	}else{
+		std::cout<<"would have segfaulted ";
+		std::cout<<std::endl <<"For Fid Plot: " <<physics::get_sector(phi) <<" " <<part <<" " <<cut <<" " <<0 <<" " <<0 <<" " <<top <<" " <<cutvanti <<std::endl;
+	}
 }
 
 void Histogram::Fid_Write(){
@@ -611,15 +639,37 @@ void Histogram::CC_Make(){
 	CartesianGenerator cart(space_dims);
 
 	while(cart.GetNextCombination()){
-		if((cart[2] == 10 && cart[4]!=0) || (cart[2]!=10 && cart[4] ==0)){
+		if((cart[2] == 10 && cart[4]!=0) || (cart[2]!=10 && cart[4] ==0)){//Making sure event selection lines up with topologies
 				sprintf(hname,"MinCC_%s_%s_%s_Seg%d_%s_%s",eid_cut[cart[2]],cut_ver[cart[5]],sec_list[cart[0]+1],cart[1]+1,CC_det_side[cart[3]],topologies[cart[4]]);
 				CC_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]] = std::make_shared<TH1F>(hname,hname, MinCCres, MinCCmin, MinCCmax);
+				CC_made_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]=true;//std::cout<<std::endl<<"Making CC plot: ";
+				//std::cout<<" Made CC plot: "<<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3] <<" " <<cart[4] <<" " <<cart[5] <<std::endl;
 		}
 	}
 }
 
 void Histogram::CC_Fill(int top, int sec, int segm, int nphe, int cut, int anti){
-	CC_hist[sec][segm][cut][detect::cc_lrc(segm)][top][anti]->Fill(nphe);
+	//std::cout<<std::endl <<"top: " <<top <<" sec: " <<sec <<" segm: " <<segm <<" nphe: " <<nphe <<" cut: " <<cut <<" anti: " <<anti <<std::endl;
+	//std::cout<<"filling plot";
+	//std::cout<<std::endl <<sec <<" " <<detect::cc_segment(segm) <<" " <<cut <<" " <<detect::cc_lrc(segm) <<" " <<top <<" " <<anti <<std::endl;
+	
+	if((cut == 10 && top!=0) || (cut!=10 && top ==0)){
+		if(((sec-1) < 6) && ((detect::cc_segment(segm)) <18)&& (cut < 11) && (detect::cc_lrc(segm)<4) && (top < 6) && (anti < 2)){
+			CC_fill_hist[sec-1][detect::cc_segment(segm)][cut][detect::cc_lrc(segm)][top][anti]=true;
+			if(CC_fill_hist[sec-1][detect::cc_segment(segm)][cut][detect::cc_lrc(segm)][top][anti] && CC_made_hist[sec-1][detect::cc_segment(segm)-1][cut][detect::cc_lrc(segm)][top][anti]){
+				CC_hist[sec-1][detect::cc_segment(segm)][cut][detect::cc_lrc(segm)][top][anti]->Fill(nphe);
+				CC_hist[sec-1][detect::cc_segment(segm)][cut][3][top][anti]->Fill(nphe);
+			}else{
+				//std::cout<<std::endl <<"Would have segfaulted in CC filling";
+				//std::cout<<std::endl <<"for CC Plot: " <<sec-1 <<" " <<detect::cc_segment(segm) <<" " <<cut <<" " <<detect::cc_lrc(segm) <<" " <<top <<" " <<anti <<std::endl;
+			}
+			
+		} else{
+			//std::cout<<std::endl<<"Tried to fill a nonexistant histogram";
+		}
+	}else{
+		//std::cout<<std::endl <<"You're trying to fill an event thing that doesn't correspond to the correct cut";
+	}
 
 }
 void Histogram::CC_Write(){

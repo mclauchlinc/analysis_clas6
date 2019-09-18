@@ -103,8 +103,16 @@ protected:
 	TH2F_ptr Fid_hist[7][4][11][30][12][6][2];//sector, species, cut, W binning, p binning, topology
 	TH2F_ptr SF_hist[10][30][7][6][2];//cuts, W Binning, Sector, topology
 	TH2F_ptr DT_hist[3][7][30][7][6][2]; //particle, cuts, W binning, sector, topology
-	TH1F_ptr CC_hist[6][18][11][3][6][2]; //Sector, segment, cut, side of detector, topology
+	TH1F_ptr CC_hist[6][18][11][4][6][2]; //Sector, segment, cut, side of detector, topology
 	TH1F_ptr MM_hist[5][3][2];//topology, cut, squared v linear
+
+	bool Fid_made_hist[7][4][11][30][12][6][2];
+	bool Fid_fill_hist[7][4][11][30][12][6][2];
+	bool Fid_write_hist[7][4][11][30][12][6][2];
+
+	bool CC_made_hist[6][18][11][4][6][2];
+	bool CC_fill_hist[6][18][11][4][6][2];
+	bool CC_write_hist[6][18][11][4][6][2];
 
 
 public:

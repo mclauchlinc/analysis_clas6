@@ -3,8 +3,9 @@
 
 forest::forest(int is_alive){
 	//The main Tree that will be made into a root file
-	
-	_the_tree = new TTree("TREEE","Tree to hold Event Fourvectors");//
+	char tree_name[100];
+
+	_the_tree = new TTree("k10","Tree to hold Event Fourvectors");//
 	//_the_tree->Branch("EventBranch",&the_event,"evnt/I:apart/I:px/F:py/F:pz/F:p0/F:pid/I:hel/I:top/I");
 	_the_tree->Branch("evnt",&_evnt,"evnt/I");
 	_the_tree->Branch("apart",&_apart,"apart/I");
@@ -17,7 +18,8 @@ forest::forest(int is_alive){
 	_the_tree->Branch("top",&_top,"top/I");
 	//The individual thread trees that will be merged
 	for(int thread_id = 0; thread_id < NUM_THREADS; thread_id++){
-		_a_tree[thread_id] = new TTree("TREEs","Tree to hold Thread Event Fourvectors");//
+		sprintf(tree_name<"t%d",thread_id);
+		_a_tree[thread_id] = new TTree(tree_name,"Tree to hold Thread Event Fourvectors");//
 		//_a_tree[thread_id]->Branch("EventBranch",&the_eventb,"evntb/I:apartb/I:pxb/F:pyb/F:pzb/F:p0b/F:pidb/I:helb/I:topb/I");
 		_a_tree[thread_id]->Branch("evnt",&(_evntb[thread_id]),"evnt/I");
 		_a_tree[thread_id]->Branch("apart",&(_apartb[thread_id]),"apart/I");

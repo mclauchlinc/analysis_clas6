@@ -7,6 +7,7 @@
 #include "constants.hpp"
 #include "branches.hpp"
 #include "eid.hpp"//Electron ID Cuts
+#include "cuts.hpp"
 //#include "hid.hpp"//Hadron ID Cuts
 
 //#include "ntuple.hpp"
