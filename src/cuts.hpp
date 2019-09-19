@@ -17,8 +17,8 @@ namespace cuts{
 	//Proton Formulae from Arjun
 	float dt_p_low(float p);
 	float dt_p_high(float p);
-	bool delta_t(int part, float p, float d0, float d, float t0, float t);
-
+	bool delta_t_cut(int part, float p, float d0, float d, float t0, float t);
+	
 	//CC Cuts
 	bool min_cc(int cc_segm, int cc_sect, int nphe);
 	

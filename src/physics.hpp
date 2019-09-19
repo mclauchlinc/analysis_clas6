@@ -16,7 +16,7 @@ namespace physics{
 	float WP(int set, std::shared_ptr<Branches> data);
 
 	float beta_calc(float m, std::shared_ptr<Branches> data, int i);
-	float MM_event(int set, TLorentzVector k1_mu, TLorentzVector k2_mu, TLorentzVector k3_mu, TLorentzVector k4_mu , int squared = 0);
+	float MM_event(int set, int squared, TLorentzVector k1_mu, TLorentzVector k2_mu, TLorentzVector k3_mu, TLorentzVector k4_mu={0.0,0.0,0.0,0.0});
 	float get_theta(float cz_);//in lab frame
 	float get_phi(float cx_, float cy_);//in lab frame
 	int get_sector(float phi_);//Phi must be from lab frame

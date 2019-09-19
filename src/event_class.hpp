@@ -53,6 +53,17 @@ private:
 	TLorentzVector _pip;
 	TLorentzVector _pim;
 
+	int good_electron = 0; 
+	int good_proton = 0;
+	int good_pip = 0; 
+	int good_pim = 0; 
+
+	int check_idx[3]={-99,-99,-99};
+
+	int pro_idx[12];
+	int pip_idx[12];
+	int pim_idx[12];
+
 	float _alpha1 = -99;
 	float _alpha2 = -99;
 	float _alpha3 = -99;
@@ -70,6 +81,25 @@ private:
 	float _Q2 = -99; 
 
 	int _helicity = 0; 
+
+	float MM_p = -99;
+	float MM_p2 = -99;
+	float MM_pip = -99;
+	float MM_pip2 = -99;
+	float MM_pim = -99;
+	float MM_pim2 = -99;
+	float MM_z = -99;
+	float MM_z2 = -99;
+
+	int ppip = 0; 
+
+	float d[3] = {-99.0,-99.0,-99.0};
+	float t[3] = {-99.0,-99.0,-99.0} ;
+	float cx[3] = {-99.0,-99.0,-99.0} ;
+	float cy[3] = {-99.0,-99.0,-99.0};
+	float cz[3] = {-99.0,-99.0,-99.0};
+	float _p[3] = {-99.0,-99.0,-99.0};
+	int h_sec[3] = {-99,-99,-99};
 	
 public:
 	Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogram> _hists, int run_type);
@@ -83,8 +113,15 @@ public:
 	float Get_top();
 	float Get_pid(int i);
 	bool is_valid();
-	//void Fill_Tree(forest tree, int event_n);
 
+	int Get_ppip();
+	//void Fill_Tree(forest tree, int event_n);
+	/*
+	void Assign_electron(float p, float cx, float cy, float cz);
+	void Assign_proton(float p, float cx, float cy, float cz);
+	void Assign_pip(float p, float cx, float cy, float cz);
+	void Assign_pim(float p, float cx, float cy, float cz);
+	*/
 
 
 };

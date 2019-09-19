@@ -52,7 +52,7 @@ float physics::beta_calc(float m, std::shared_ptr<Branches> data, int i){
 	return data->p(i)/TMath::Sqrt(m*m+data->p(i)*data->p(i));
 }
 
-float physics::MM_event(int set, TLorentzVector k1_mu, TLorentzVector k2_mu, TLorentzVector k3_mu, TLorentzVector k4_mu = {0.0,0.0,0.0,0.0}, int squared){
+float physics::MM_event(int set, int squared, TLorentzVector k1_mu, TLorentzVector k2_mu, TLorentzVector k3_mu, TLorentzVector k4_mu){
 	TLorentzVector k_mu = physics::Set_k_mu(set);
 	float MM = -99; 
 	if(squared == 0 ){
@@ -159,13 +159,13 @@ float physics::vert_h(float p, float d, float t, float m){
 float physics::delta_t(int part, float p, float d, float t, float d0, float t0){
 	float mass = -99; 
 	switch(part){
-		case 1:
+		case 0:
 			mass = mp; 
 		break;
-		case 2:
+		case 1:
 			mass = mpi;
 		break;
-		case 3:
+		case 2:
 			mass = mpi;
 		break;
 	}

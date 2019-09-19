@@ -64,12 +64,18 @@ int main(int argc, char **argv){
 	//a_forest->forest::mktree(NUM_THREADS+1);
 	std::future<bool> fut; 
 
+	int num_mixed_p_pip[NUM_THREADS]; 
+
+	for(int i = 0; i<NUM_THREADS; i++){
+		num_mixed_p_pip[i]=0;
+	}
+
 	//For each thread
 	for(int i = 0; i<NUM_THREADS; i++){
 		//Set the thread to run asynchronously
 		//The function running is the first argument
 		//The functions arguments are all remaining arguments
-		threads[i] = std::async(run_files, infilenames.at(i), filepath_map[argv[1]], hists, a_good_forest, i, data_set, file_num, _case);
+		threads[i] = std::async(run_files, infilenames.at(i), filepath_map[argv[1]], hists, a_good_forest, i, data_set, file_num, _case);//, num_mixed_p_pip[i]);
 		//run_files(infilenames.at(i), filepath_map[argv[1]], hists, a_good_forest, i, data_set, file_num, _case);
 		
 
@@ -81,11 +87,12 @@ int main(int argc, char **argv){
 	//a_good_forest->forest::scan_thread_tree(1);
 	
 	a_good_forest->forest::Grow_Forest();
+	//std::cout<<std::endl<<"Number of misIDed proton/pip particles: " <<num_mixed_p_pip[i] <<std::endl;
 
 	//For each thread to see how many events each thread successfully analyized
 	for(int i = 0; i<NUM_THREADS; i++){
 		events += threads[i].get();
-
+		//std::cout<<std::endl<<"Number of misIDed proton/pip particles: " <<num_mixed_p_pip[i] <<std::endl;
 	}
 
 	//Timer and Efficiency Counters

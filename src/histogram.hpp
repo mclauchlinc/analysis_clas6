@@ -114,6 +114,14 @@ protected:
 	bool CC_fill_hist[6][18][11][4][6][2];
 	bool CC_write_hist[6][18][11][4][6][2];
 
+	bool DT_made_hist[3][7][30][7][6][2];
+	bool DT_fill_hist[3][7][30][7][6][2];
+	bool DT_dir_hist[3][7][30][7][6][2];
+	bool DT_dir_made[3][8][2][8][6];
+
+	bool WQ2_made_hist[11][6];
+	bool WQ2_dir_made[11][6];
+
 
 public:
 	Histogram(const std::string& output_file);

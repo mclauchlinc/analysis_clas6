@@ -80,16 +80,17 @@ float cuts::dt_p_high(float p){
 	return DTH[0]+DTH[1]*p+DTH[2]*p*p+DTH[3]*p*p*p;
 }
 
-bool cuts::delta_t(int part, float p, float d0, float d, float t0, float t) //Note: d and t need the sc_index 
+bool cuts::delta_t_cut(int part, float p, float d0, float d, float t0, float t) //Note: d and t need the sc_index 
 {
 	bool pass = false;
-	
-	float dt = physics::delta_t(part, p, d, d0, t, t0);
+
+	float dt = physics::delta_t(part, p, d, t, d0, t0);
+	//std::cout<<std::endl <<"delta t cut: p: " <<p <<" dt: " <<dt <<" cut_low: " <<cuts::dt_p_low(p) <<" cut_high:" <<cuts::dt_p_high(p) <<std::endl;  
 	if(dt>cuts::dt_p_low(p) && dt<cuts::dt_p_high(p) )
 	{
 		pass = true;
 	}
-	return false;
+	return pass;
 }
 
 bool cuts::min_cc(int cc_segm, int cc_sect, int nphe){
