@@ -64,6 +64,7 @@ int main(int argc, char **argv){
 	//a_forest->forest::mktree(NUM_THREADS+1);
 	std::future<bool> fut; 
 
+
 	int num_mixed_p_pip[NUM_THREADS]; 
 
 	for(int i = 0; i<NUM_THREADS; i++){

@@ -9,6 +9,8 @@
 #include "branches.hpp"
 
 namespace physics{
+	void Print_4Vec(TLorentzVector k1);
+	bool Check_4Vec(TLorentzVector k1);
 	TLorentzVector Make_4Vector(float p, float cx, float cy, float cz, float m);
 	TLorentzVector Set_k_mu(int set);
 	int event_helicity(std::shared_ptr<Branches> data, int plate_stat);

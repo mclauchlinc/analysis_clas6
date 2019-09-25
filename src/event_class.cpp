@@ -95,7 +95,7 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 				_hists->Histogram::SF_Fill(0,data->Branches::p(0),data->Branches::etot(0),6,1,_W,sector[0]);
 				_hists->Histogram::CC_Fill(0,data->Branches::cc_sect(0),data->Branches::cc_segm(0),data->Branches::nphe(0),6,1);
 			}
-			if(sf_e_pass && cc_e_pass){
+			if(sf_e_pass && cc_e_pass){//SF and Min CC
 				_hists->Histogram::WQ2_Fill(0,7,_W,_Q2);
 				_hists->Histogram::Fid_Fill(0,theta[0],phi[0],0,7,0,_W,data->Branches::p(0));
 				_hists->Histogram::SF_Fill(0,data->Branches::p(0),data->Branches::etot(0),7,0,_W,sector[0]);
@@ -105,12 +105,12 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 				_hists->Histogram::SF_Fill(0,data->Branches::p(0),data->Branches::etot(0),7,1,_W,sector[0]);
 				_hists->Histogram::CC_Fill(0,data->Branches::cc_sect(0),data->Branches::cc_segm(0),data->Branches::nphe(0),7,1);
 			}
-			if(fid_e_pass && cc_e_pass && sf_e_pass){
+			if(fid_e_pass && cc_e_pass && sf_e_pass){//EID
 				_hists->Histogram::WQ2_Fill(0,8,_W,_Q2);
 				_hists->Histogram::Fid_Fill(0,theta[0],phi[0],0,8,0,_W,data->Branches::p(0));
 				_hists->Histogram::SF_Fill(0,data->Branches::p(0),data->Branches::etot(0),8,0,_W,sector[0]);
 				_hists->Histogram::CC_Fill(0,data->Branches::cc_sect(0),data->Branches::cc_segm(0),data->Branches::nphe(0),8,0);
-				_elec = physics::Make_4Vector(data->Branches::p(0),data->Branches::p(0),data->Branches::cy(0),data->Branches::cz(0),me);
+				_elec = physics::Make_4Vector(data->Branches::p(0),data->Branches::cx(0),data->Branches::cy(0),data->Branches::cz(0),me);
 				good_electron++;
 			}else{
 				_hists->Histogram::Fid_Fill(0,theta[0],phi[0],0,8,1,_W,data->Branches::p(0));
@@ -192,49 +192,50 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 						_hists->Histogram::DT_Fill(0,part,data->Branches::p(h), data->Branches::sc_r(h), data->Branches::sc_t(h), data->Branches::sc_r(0), data->Branches::sc_t(0),4,0,_W,sector[h]);
 						switch(part){
 							case 0:
-							_prot = physics::Make_4Vector(data->Branches::p(h),data->Branches::p(h),data->Branches::cy(h),data->Branches::cz(h),mp);
-							good_proton++;
-							pro_idx[p_loop]=h;
-							p_loop++;
+							//_prot = physics::Make_4Vector(data->Branches::p(h),data->Branches::cx(h),data->Branches::cy(h),data->Branches::cz(h),mp);
+							good_pro++;//Number of identified protons
 							//std::cout<<" assign pro idx:" <<h <<std::endl;
-							d[0] = data->Branches::sc_r(h);
-							t[0] = data->Branches::sc_t(h);
-							cx[0] = data->Branches::cx(h);
-							cy[0] = data->Branches::cy(h);
-							cz[0] = data->Branches::cz(h);
-							_p[0] = data->Branches::p(h);
-							h_sec[0] = sector[h];
-							check_idx[0] = h; 
+							dpro[p_loop] = data->Branches::sc_r(h);
+							tpro[p_loop] = data->Branches::sc_t(h);
+							cxpro[p_loop] = data->Branches::cx(h);
+							cypro[p_loop] = data->Branches::cy(h);
+							czpro[p_loop] = data->Branches::cz(h);
+							ppro[p_loop] = data->Branches::p(h);
+							h_secpro[p_loop] = sector[h];
+							check_idx[p_loop] = h; 
+							pro_idx[p_loop] = h;
+							//std::cout<<"Sector Comparison for Proton: " <<sector[h] <<" " <<h_secpro[p_loop] <<std::endl; 
+							p_loop++;
 							break;
 							case 1:
-							_pip = physics::Make_4Vector(data->Branches::p(h),data->Branches::p(h),data->Branches::cy(h),data->Branches::cz(h),mpi);
-							good_pip++;
-							pip_idx[pip_loop]=h;
-							pip_loop++;
+							//_pip = physics::Make_4Vector(data->Branches::p(h),data->Branches::cx(h),data->Branches::cy(h),data->Branches::cz(h),mpi);
+							good_pip++;//number of Identified pip
 							//std::cout<<" assign pip idx:" <<h <<std::endl;
-							d[1] = data->Branches::sc_r(h);
-							t[1] = data->Branches::sc_t(h);
-							cx[1] = data->Branches::cx(h);
-							cy[1] = data->Branches::cy(h);
-							cz[1] = data->Branches::cz(h);
-							_p[1] = data->Branches::p(h);
-							h_sec[1] = sector[h];
+							dpip[pip_loop] = data->Branches::sc_r(h);
+							tpip[pip_loop] = data->Branches::sc_t(h);
+							cxpip[pip_loop] = data->Branches::cx(h);
+							cypip[pip_loop] = data->Branches::cy(h);
+							czpip[pip_loop] = data->Branches::cz(h);
+							ppip[pip_loop] = data->Branches::p(h);
+							h_secpip[pip_loop] = sector[h];
+							pip_idx[pip_loop]=h;
 							check_idx[1] = h; 
+							pip_loop++;
 							break;
 							case 2:
-							_pim = physics::Make_4Vector(data->Branches::p(h),data->Branches::p(h),data->Branches::cy(h),data->Branches::cz(h),mpi);
-							good_pim=h;
-							pim_idx[pim_loop]=h;
-							pim_loop++;
+							//_pim = physics::Make_4Vector(data->Branches::p(h),data->Branches::cx(h),data->Branches::cy(h),data->Branches::cz(h),mpi);
+							good_pim++;//number of identified pim
 							check_idx[2] = h; 
 							//std::cout<<" assign pim idx:" <<h <<std::endl;
-							d[2] = data->Branches::sc_r(h);
-							t[2] = data->Branches::sc_t(h);
-							cx[2] = data->Branches::cx(h);
-							cy[2] = data->Branches::cy(h);
-							cz[2] = data->Branches::cz(h);
-							_p[2] = data->Branches::p(h);
-							h_sec[2] = sector[h];
+							dpim[pim_loop] = data->Branches::sc_r(h);
+							tpim[pim_loop] = data->Branches::sc_t(h);
+							cxpim[pim_loop] = data->Branches::cx(h);
+							cypim[pim_loop] = data->Branches::cy(h);
+							czpim[pim_loop] = data->Branches::cz(h);
+							ppim[pim_loop] = data->Branches::p(h);
+							h_secpim[pim_loop] = sector[h];
+							pim_idx[pim_loop]=h;
+							pim_loop++;
 							break;
 						}
 					}else{
@@ -263,13 +264,14 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 		bool have_pip = false;
 		bool have_pim = false;
 
-		if(check_idx[2]==good_pim){
+		//This just goes with the first identified particle of that type
+		if(check_idx[2]==pim_idx[0]){
 			have_pim = true; 
 		}
-		if(check_idx[1]==good_pip){
+		if(check_idx[1]==pip_idx[0]){
 			have_pip = true; 
 		}
-		if(check_idx[0]==good_proton){
+		if(check_idx[0]==pro_idx[0]){
 			have_prot = true; 
 		}
 
@@ -280,38 +282,627 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 		//std::cout<<std::endl <<"p_loop: " <<p_loop << "   pip_loop: " <<pip_loop <<std::endl;
 		//std::cout<<"good_proton: " <<good_proton << "   good_pip: " <<good_pip <<std::endl;
 		
-
-		/*TLorentzVector test_p,test_pip;
-		if(good_proton >1){//Detected more than 1 proton?
-			if(good_pip > 1){//Detected more than 1 pip?
-				for(int i = 0 ; i< p_loop ; i++){//Look at all indexes for proton
-					for( int j = 0; j < pip_loop; j++){//Look at all indexes for proton
-						if( i == j ){//Same particle IDed as both proton and pip
-							double_id= true; 
-							double_idx = i; 
-							num_double_id++; 
+		//Resolve Multiple Identification Issues as well as double measurement for proton/pip
+		TLorentzVector test_pro,test_pip,test_pim; // Four vectors for measuring our fun Missing Masses
+		//Proton Missing Topology Look 
+		if(good_electron == 1){//Need to have a good electron for the event
+			if(good_pro == 0 && good_pim >0 && good_pip >0){
+				if( good_pip > 1){
+					if(good_pim > 1){//Multiple pi+ and pi-
+						for(int i = 0; i < good_pip; i++){
+							for( int j = 0; j < good_pim; j++){
+								test_pip = physics::Make_4Vector(ppip[i],cxpip[i],cypip[i],czpip[i],mpi);
+								test_pim = physics::Make_4Vector(ppim[j],cxpim[j],cypim[j],czpim[j],mpi);
+								if((physics::MM_event(0,0,_elec,test_pip,test_pim) > (p_center-p_sig))&&(physics::MM_event(0,0,_elec,test_pip,test_pim) < (p_center+p_sig))){
+									_pim = test_pim;
+									_pip = test_pip;
+									top_possible[0]=true;
+									d[2] = dpim[j];
+									t[2] = tpim[j];
+									cx[2] = cxpim[j]; 
+									cy[2]  = cypim[j];
+									cz[2] = czpim[j];
+									_p[2] = ppim[j];
+									h_sec[2] = h_secpim[j];
+									d[1] = dpip[j];
+									t[1] = tpip[j];
+									cx[1] = cxpip[j]; 
+									cy[1]  = cypip[j];
+									cz[1] = czpip[j];
+									_p[1] = ppip[j];
+									h_sec[1] = h_secpip[j];
+								}
+							}
+						}
+					}else{//Multiple pi+, but only 1 good pi-
+						_pim = physics::Make_4Vector(ppim[0],cxpim[0],cypim[0],czpim[0],mpi);
+						for(int i = 0; i < good_pip; i++){
+							test_pip = physics::Make_4Vector(ppip[i],cxpip[i],cypip[i],czpip[i],mpi);
+							if((physics::MM_event(0,0,_elec,test_pip,_pim) > (p_center-p_sig))&&(physics::MM_event(0,0,_elec,test_pip,_pim) < (p_center+p_sig))){
+								_pip = test_pip;
+								top_possible[0]=true;
+								d[2] = dpim[0];
+								t[2] = tpim[0];
+								cx[2] = cxpim[0]; 
+								cy[2]  = cypim[0];
+								cz[2] = czpim[0];
+								_p[2] = ppim[0];
+								h_sec[2] = h_secpim[0];
+								d[1] = dpip[i];
+								t[1] = tpip[i];
+								cx[1] = cxpip[i]; 
+								cy[1]  = cypip[i];
+								cz[1] = czpip[i];
+								_p[1] = ppip[i];
+								h_sec[1] = h_secpip[i];
+							}
+						}
+					}
+				}else{
+					if(good_pim > 1){//Multiple pi-, but only 1 good pi+
+						_pip = physics::Make_4Vector(ppip[0],cxpip[0],cypip[0],czpip[0],mpi);
+						for(int i = 0; i < good_pim; i++){
+							test_pim = physics::Make_4Vector(ppim[i],cxpim[i],cypim[i],czpim[i],mpi);
+							if((physics::MM_event(0,0,_elec,_pip,test_pim) > (p_center-p_sig))&&(physics::MM_event(0,0,_elec,_pip,test_pim) < (p_center+p_sig))){
+								_pim = test_pim;
+								top_possible[0]=true;
+								d[2] = dpim[i];
+								t[2] = tpim[i];
+								cx[2] = cxpim[i]; 
+								cy[2]  = cypim[i];
+								cz[2] = czpim[i];
+								_p[2] = ppim[i];
+								h_sec[2] = h_secpim[i];
+								d[1] = dpip[0];
+								t[1] = tpip[0];
+								cx[1] = cxpip[0]; 
+								cy[1]  = cypip[0];
+								cz[1] = czpip[0];
+								_p[1] = ppip[0];
+								h_sec[1] = h_secpip[0];
+							}
+						}
+					}else{//We have just one pi+ candidate and one pi- candidate so no need to do MM cuts to legitimize them
+						_pim = physics::Make_4Vector(ppim[0],cxpim[0],cypim[0],czpim[0],mpi);
+						_pip = physics::Make_4Vector(ppip[0],cxpip[0],cypip[0],czpip[0],mpi);
+						top_possible[0]=true;
+						d[2] = dpim[0];
+						t[2] = tpim[0];
+						cx[2] = cxpim[0]; 
+						cy[2]  = cypim[0];
+						cz[2] = czpim[0];
+						_p[2] = ppim[0];
+						h_sec[2] = h_secpim[0];
+						d[1] = dpip[0];
+						t[1] = tpip[0];
+						cx[1] = cxpip[0]; 
+						cy[1]  = cypip[0];
+						cz[1] = czpip[0];
+						_p[1] = ppip[0];
+						h_sec[1] = h_secpip[0];
+					}
+				}
+			}
+			//Pip Missing Topology Look 
+			if(good_pro > 0 && good_pim >0 && good_pip ==0){
+				if( good_pro > 1){
+					if(good_pim > 1){//Multiple proton and pi-
+						for(int i = 0; i < good_pro; i++){
+							for( int j = 0; j < good_pim; j++){
+								test_pro = physics::Make_4Vector(ppro[i],cxpro[i],cypro[i],czpro[i],mp);
+								test_pim = physics::Make_4Vector(ppim[j],cxpim[j],cypim[j],czpim[j],mpi);
+								if((physics::MM_event(0,0,_elec,test_pro,test_pim) > (p_center-p_sig))&&(physics::MM_event(0,0,_elec,test_pro,test_pim) < (p_center+p_sig))){
+									_pim = test_pim;
+									_pro = test_pro;
+									top_possible[1]=true;
+									d[2] = dpim[j];
+									t[2] = tpim[j];
+									cx[2] = cxpim[j]; 
+									cy[2]  = cypim[j];
+									cz[2] = czpim[j];
+									_p[2] = ppim[j];
+									h_sec[2] = h_secpim[j];
+									d[0] = dpro[i];
+									t[0] = tpro[i];
+									cx[0] = cxpro[i]; 
+									cy[0]  = cypro[i];
+									cz[0] = czpro[i];
+									_p[0] = ppro[i];
+									h_sec[0] = h_secpro[i];
+								}
+							}
+						}
+					}else{//Multiple proton, but only 1 good pi-
+						_pim = physics::Make_4Vector(ppim[0],cxpim[0],cypim[0],czpim[0],mpi);
+						for(int i = 0; i < good_pro; i++){
+							test_pro = physics::Make_4Vector(ppro[i],cxpro[i],cypro[i],czpro[i],mp);
+							if((physics::MM_event(0,0,_elec,test_pro,_pim) > (p_center-p_sig))&&(physics::MM_event(0,0,_elec,test_pro,_pim) < (p_center+p_sig))){
+								_pro = test_pro;
+								top_possible[1]=true;
+								d[2] = dpim[0];
+								t[2] = tpim[0];
+								cx[2] = cxpim[0]; 
+								cy[2]  = cypim[0];
+								cz[2] = czpim[0];
+								_p[2] = ppim[0];
+								h_sec[2] = h_secpim[0];
+								d[0] = dpro[i];
+								t[0] = tpro[i];
+								cx[0] = cxpro[i]; 
+								cy[0]  = cypro[i];
+								cz[0] = czpro[i];
+								_p[0] = ppro[i];
+								h_sec[0] = h_secpro[i];
+							}
+						}
+					}
+				}else{
+					if(good_pim > 1){//Multiple pi-, but only 1 good proton
+						_pro = physics::Make_4Vector(ppro[0],cxpro[0],cypro[0],czpro[0],mp);
+						for(int i = 0; i < good_pim; i++){
+							test_pim = physics::Make_4Vector(ppim[i],cxpim[i],cypim[i],czpim[i],mpi);
+							if((physics::MM_event(0,0,_elec,_pro,test_pim) > (p_center-p_sig))&&(physics::MM_event(0,0,_elec,_pro,test_pim) < (p_center+p_sig))){
+								_pim = test_pim;
+								top_possible[1]=true;
+								d[2] = dpim[i];
+								t[2] = tpim[i];
+								cx[2] = cxpim[i]; 
+								cy[2]  = cypim[i];
+								cz[2] = czpim[i];
+								_p[2] = ppim[i];
+								h_sec[2] = h_secpim[i];
+								d[0] = dpro[0];
+								t[0] = tpro[0];
+								cx[0] = cxpro[0]; 
+								cy[0]  = cypro[0];
+								cz[0] = czpro[0];
+								_p[0] = ppro[0];
+								h_sec[0] = h_secpro[0];
+							}
+						}
+					}else{//We have just one proton candidate and one pi- candidate so no need to do MM cuts to legitimize them
+						_pim = physics::Make_4Vector(ppim[0],cxpim[0],cypim[0],czpim[0],mpi);
+						_pro = physics::Make_4Vector(ppro[0],cxpro[0],cypro[0],czpro[0],mp);
+						top_possible[1]=true;
+						d[2] = dpim[0];
+						t[2] = tpim[0];
+						cx[2] = cxpim[0]; 
+						cy[2]  = cypim[0];
+						cz[2] = czpim[0];
+						_p[2] = ppim[0];
+						h_sec[2] = h_secpim[0];
+						d[0] = dpro[0];
+						t[0] = tpro[0];
+						cx[0] = cxpro[0]; 
+						cy[0]  = cypro[0];
+						cz[0] = czpro[0];
+						_p[0] = ppro[0];
+						h_sec[0] = h_secpro[0];
+					}
+				}
+			}
+			//Pim Missing Topology Look 
+			if(good_pro > 0 && good_pim ==0 && good_pip >0){
+				if( good_pro > 1){
+					if(good_pip > 1){//Multiple proton and pi+
+						for(int i = 0; i < good_pro; i++){
+							for( int j = 0; j < good_pip; j++){
+								test_pro = physics::Make_4Vector(ppro[i],cxpro[i],cypro[i],czpro[i],mp);
+								test_pip = physics::Make_4Vector(ppip[j],cxpip[j],cypip[j],czpip[j],mpi);
+								if((physics::MM_event(0,0,_elec,test_pro,test_pip) > (p_center-p_sig))&&(physics::MM_event(0,0,_elec,test_pro,test_pip) < (p_center+p_sig)) && (pro_idx[i]!=pip_idx[j])){
+									_pip = test_pip;
+									_pro = test_pro;
+									top_possible[2]=true;
+									d[1] = dpip[j];
+									t[1] = tpip[j];
+									cx[1] = cxpip[j]; 
+									cy[1]  = cypip[j];
+									cz[1] = czpip[j];
+									_p[1] = ppip[j];
+									h_sec[1] = h_secpip[j];
+									d[0] = dpro[i];
+									t[0] = tpro[i];
+									cx[0] = cxpro[i]; 
+									cy[0]  = cypro[i];
+									cz[0] = czpro[i];
+									_p[0] = ppro[i];
+									h_sec[0] = h_secpro[i];
+								}
+							}
+						}
+					}else{//Multiple proton, but only 1 good pi+
+						_pip = physics::Make_4Vector(ppip[0],cxpip[0],cypip[0],czpip[0],mpi);
+						for(int i = 0; i < good_pro; i++){
+							test_pro = physics::Make_4Vector(ppro[i],cxpro[i],cypro[i],czpro[i],mp);
+							if((physics::MM_event(0,0,_elec,test_pro,_pip) > (p_center-p_sig))&&(physics::MM_event(0,0,_elec,test_pro,_pip) < (p_center+p_sig))&& (pro_idx[i]!=pip_idx[0])){
+								_pro = test_pro;
+								top_possible[2]=true;
+								d[1] = dpip[0];
+								t[1] = tpip[0];
+								cx[1] = cxpip[0]; 
+								cy[1]  = cypip[0];
+								cz[1] = czpip[0];
+								_p[1] = ppip[0];
+								h_sec[1] = h_secpip[0];
+								d[0] = dpro[i];
+								t[0] = tpro[i];
+								cx[0] = cxpro[i]; 
+								cy[0]  = cypro[i];
+								cz[0] = czpro[i];
+								_p[0] = ppro[i];
+								h_sec[0] = h_secpro[i];
+							}
+						}
+					}
+				}else{
+					if(good_pip > 1){//Multiple pi+, but only 1 good proton
+						_pro = physics::Make_4Vector(ppro[0],cxpro[0],cypro[0],czpro[0],mp);
+						for(int i = 0; i < good_pip; i++){
+							test_pip = physics::Make_4Vector(ppip[i],cxpip[i],cypip[i],czpip[i],mpi);
+							if((physics::MM_event(0,0,_elec,_pro,test_pip) > (p_center-p_sig))&&(physics::MM_event(0,0,_elec,_pro,test_pip) < (p_center+p_sig))&& (pro_idx[0]!=pip_idx[i])){
+								_pip = test_pip;
+								top_possible[2]=true;
+								d[1] = dpip[i];
+								t[1] = tpip[i];
+								cx[1] = cxpip[i]; 
+								cy[1]  = cypip[i];
+								cz[1] = czpip[i];
+								_p[1] = ppip[i];
+								h_sec[1] = h_secpip[i];
+								d[0] = dpro[0];
+								t[0] = tpro[0];
+								cx[0] = cxpro[0]; 
+								cy[0]  = cypro[0];
+								cz[0] = czpro[0];
+								_p[0] = ppro[0];
+								h_sec[0] = h_secpro[0];
+							}
+						}
+					}else{//We have just one proton candidate and one pi+ candidate so no need to do MM cuts to legitimize them
+						if(pro_idx[0] != pip_idx[0]){
+							_pip = physics::Make_4Vector(ppip[0],cxpip[0],cypip[0],czpip[0],mpi);
+							_pro = physics::Make_4Vector(ppro[0],cxpro[0],cypro[0],czpro[0],mp);
+							top_possible[2]=true;
+							d[1] = dpip[0];
+							t[1] = tpip[0];
+							cx[1] = cxpip[0]; 
+							cy[1]  = cypip[0];
+							cz[1] = czpip[0];
+							_p[1] = ppip[0];
+							h_sec[1] = h_secpip[0];
+							d[0] = dpro[0];
+							t[0] = tpro[0];
+							cx[0] = cxpro[0]; 
+							cy[0]  = cypro[0];
+							cz[0] = czpro[0];
+							_p[0] = ppro[0];
+							h_sec[0] = h_secpro[0];
+						}else{//They've been identified as the same particle, but we've also not measured a pi- therefore this event just cannot count for anything
+							top_possible[2]=false;
 						}
 					}
 				}
-				if(num_double_id < 1){//IF there were no double IDs then default to the first proton or pip measured
-					_pip = physics::Make_4Vector(data->Branches::p(pip_idx[0]),data->Branches::p(pip_idx[0]),data->Branches::cy(pip_idx[0]),data->Branches::cz(pip_idx[0]),mpi);
-					_prot = physics::Make_4Vector(data->Branches::p(pro_idx[0]),data->Branches::p(pro_idx[0]),data->Branches::cy(pro_idx[0]),data->Branches::cz(pro_idx[0]),mp);
-				}else{
-					//This shouldn't be too big of an issue
-					if(num_double_id > 1){
-						ppip++;//WIll see how big an issue this is
+			}
+			//Zero Missing Topology Look 
+			if(good_pro >0 && good_pip > 0 && good_pim >0){
+				if(good_pro>1){//More than 1 IDed Proton
+					if(good_pip > 1){//More than 1 IDed Proton and Pi+
+						if(good_pim>1){//More than 1 IDed Proton, Pi+, and Pi-
+							for(int i = 0; i<p_loop; i++){
+								for(int j = 0; j<pip_loop; j++){
+									for(int k = 0; k<pim_loop; k++){
+										test_pro = physics::Make_4Vector(ppro[i],cxpro[i],cypro[i],czpro[i],mp);
+										test_pip = physics::Make_4Vector(ppip[j],cxpip[j],cypip[j],czpip[j],mpi);
+										test_pim = physics::Make_4Vector(ppim[k],cxpim[k],cypim[k],czpim[k],mpi);
+										if((physics::MM_event(0,1,_elec,test_pro,test_pip,test_pim) > (MM_zero_center2-MM_zero_sigma2))&&(physics::MM_event(0,1,_elec,test_pro,test_pip,test_pim) < (MM_zero_center2+MM_zero_sigma2))){
+											if(pro_idx[i]!= pip_idx[j]){
+												_pro = test_pro;
+												_pip = test_pip;
+												_pim = test_pim;
+												top_possible[3] = true;
+												d[1] = dpip[j];
+												t[1] = tpip[j];
+												cx[1] = cxpip[j]; 
+												cy[1]  = cypip[j];
+												cz[1] = czpip[j];
+												_p[1] = ppip[j];
+												h_sec[1] = h_secpip[j];
+												d[0] = dpro[i];
+												t[0] = tpro[i];
+												cx[0] = cxpro[i]; 
+												cy[0]  = cypro[i];
+												cz[0] = czpro[i];
+												_p[0] = ppro[i];
+												h_sec[0] = h_secpro[i];
+												d[2] = dpim[k];
+												t[2] = tpim[k];
+												cx[2] = cxpim[k]; 
+												cy[2]  = cypim[k];
+												cz[2] = czpim[k];
+												_p[2] = ppim[k];
+												h_sec[2] = h_secpim[k];
+											}
+										}
+									}
+								}
+							}
+						}else{//More than 1 IDed Proton and Pi+, but 1 good Pi-
+							for(int i = 0; i<p_loop; i++){
+								for(int j = 0; j<pip_loop; j++){
+									test_pro = physics::Make_4Vector(ppro[i],cxpro[i],cypro[i],czpro[i],mp);
+									test_pip = physics::Make_4Vector(ppip[j],cxpip[j],cypip[j],czpip[j],mpi);
+									_pim = physics::Make_4Vector(ppim[0],cxpim[0],cypim[0],czpim[0],mpi);
+									if((physics::MM_event(0,1,_elec,test_pro,test_pip,_pim) > (MM_zero_center2-MM_zero_sigma2))&&(physics::MM_event(0,1,_elec,test_pro,test_pip,_pim) < (MM_zero_center2+MM_zero_sigma2))){
+										if(pro_idx[i]!= pip_idx[j]){
+											_pro = test_pro;
+											_pip = test_pip;
+											top_possible[3] = true;
+											d[1] = dpip[j];
+											t[1] = tpip[j];
+											cx[1] = cxpip[j]; 
+											cy[1]  = cypip[j];
+											cz[1] = czpip[j];
+											_p[1] = ppip[j];
+											h_sec[1] = h_secpip[j];
+											d[0] = dpro[i];
+											t[0] = tpro[i];
+											cx[0] = cxpro[i]; 
+											cy[0]  = cypro[i];
+											cz[0] = czpro[i];
+											_p[0] = ppro[i];
+											h_sec[0] = h_secpro[i];
+											d[2] = dpim[0];
+											t[2] = tpim[0];
+											cx[2] = cxpim[0]; 
+											cy[2]  = cypim[0];
+											cz[2] = czpim[0];
+											_p[2] = ppim[0];
+											h_sec[2] = h_secpim[0];
+										}
+									}
+								}
+							}
+						}
+					}else{
+						if(good_pim>1){//More than 1 IDed Proton and Pi-, but 1 good Pi+
+							for(int i = 0; i<p_loop; i++){
+								for(int j = 0; j<pim_loop; j++){
+									test_pro = physics::Make_4Vector(ppro[i],cxpro[i],cypro[i],czpro[i],mp);
+									test_pim = physics::Make_4Vector(ppim[j],cxpim[j],cypim[j],czpim[j],mpi);
+									_pip = physics::Make_4Vector(ppip[0],cxpip[0],cypip[0],czpip[0],mpi);
+									if((physics::MM_event(0,1,_elec,test_pro,_pip,test_pim) > (MM_zero_center2-MM_zero_sigma2))&&(physics::MM_event(0,1,_elec,test_pro,_pip,test_pim) < (MM_zero_center2+MM_zero_sigma2))){
+										if(pro_idx[i]!= pip_idx[0]){
+											_pro = test_pro;
+											_pim = test_pim;
+											top_possible[3] = true;
+											d[1] = dpip[0];
+											t[1] = tpip[0];
+											cx[1] = cxpip[0]; 
+											cy[1]  = cypip[0];
+											cz[1] = czpip[0];
+											_p[1] = ppip[0];
+											h_sec[1] = h_secpip[0];
+											d[0] = dpro[i];
+											t[0] = tpro[i];
+											cx[0] = cxpro[i]; 
+											cy[0]  = cypro[i];
+											cz[0] = czpro[i];
+											_p[0] = ppro[i];
+											h_sec[0] = h_secpro[i];
+											d[2] = dpim[j];
+											t[2] = tpim[j];
+											cx[2] = cxpim[j]; 
+											cy[2]  = cypim[j];
+											cz[2] = czpim[j];
+											_p[2] = ppim[j];
+											h_sec[2] = h_secpim[j];
+										}
+									}
+								}
+							}
+						}else{//More than 1 IDed Proton, but 1 good pi+ and pi-
+							for(int i = 0; i<p_loop; i++){
+								test_pro = physics::Make_4Vector(ppro[i],cxpro[i],cypro[i],czpro[i],mp);
+								_pim = physics::Make_4Vector(ppim[0],cxpim[0],cypim[0],czpim[0],mpi);
+								_pip = physics::Make_4Vector(ppip[0],cxpip[0],cypip[0],czpip[0],mpi);
+								if((physics::MM_event(0,1,_elec,test_pro,_pip,_pim) > (MM_zero_center2-MM_zero_sigma2))&&(physics::MM_event(0,1,_elec,test_pro,_pip,_pim) < (MM_zero_center2+MM_zero_sigma2))){
+									if(pro_idx[i]!= pip_idx[0]){
+										_pro = test_pro;
+										top_possible[3] = true;
+										d[1] = dpip[0];
+										t[1] = tpip[0];
+										cx[1] = cxpip[0]; 
+										cy[1]  = cypip[0];
+										cz[1] = czpip[0];
+										_p[1] = ppip[0];
+										h_sec[1] = h_secpip[0];
+										d[0] = dpro[i];
+										t[0] = tpro[i];
+										cx[0] = cxpro[i]; 
+										cy[0]  = cypro[i];
+										cz[0] = czpro[i];
+										_p[0] = ppro[i];
+										h_sec[0] = h_secpro[i];
+										d[2] = dpim[0];
+										t[2] = tpim[0];
+										cx[2] = cxpim[0]; 
+										cy[2]  = cypim[0];
+										cz[2] = czpim[0];
+										_p[2] = ppim[0];
+										h_sec[2] = h_secpim[0];
+									}
+								}
+							}
+						}
 					}
-					if(num_double_id == 1){
-						test_pip = physics::Make_4Vector(data->Branches::p(pip_idx[double_idx]),data->Branches::p(pip_idx[double_idx]),data->Branches::cy(pip_idx[double_idx]),data->Branches::cz(pip_idx[double_idx]),mpi);
-						test_p = physics::Make_4Vector(data->Branches::p(pro_idx[double_idx]),data->Branches::p(pro_idx[double_idx]),data->Branches::cy(pro_idx[double_idx]),data->Branches::cz(pro_idx[double_idx]),mp);
+				}else{//1 good proton
+					if(good_pip > 1){//1 good proton, but multiple pi+
+						if(good_pim>1){//1 good proton, but multiple pi+ and pi-
+							for(int i = 0; i<pip_loop; i++){
+								for(int j = 0; j<pim_loop; j++){
+									test_pip = physics::Make_4Vector(ppip[i],cxpip[i],cypip[i],czpip[i],mpi);
+									test_pim = physics::Make_4Vector(ppim[j],cxpim[j],cypim[j],czpim[j],mpi);
+									_pro = physics::Make_4Vector(ppro[0],cxpro[0],cypro[0],czpro[0],mp);
+									if((physics::MM_event(0,1,_elec,_pro,test_pip,test_pim) > (MM_zero_center2-MM_zero_sigma2))&&(physics::MM_event(0,1,_elec,_pro,test_pip,test_pim) < (MM_zero_center2+MM_zero_sigma2))){
+										if(pro_idx[0]!= pip_idx[i]){
+											_pip = test_pip;
+											_pim = test_pim;
+											top_possible[3] = true;
+											d[1] = dpip[i];
+											t[1] = tpip[i];
+											cx[1] = cxpip[i]; 
+											cy[1]  = cypip[i];
+											cz[1] = czpip[i];
+											_p[1] = ppip[i];
+											h_sec[1] = h_secpip[i];
+											d[0] = dpro[0];
+											t[0] = tpro[0];
+											cx[0] = cxpro[0]; 
+											cy[0]  = cypro[0];
+											cz[0] = czpro[0];
+											_p[0] = ppro[0];
+											h_sec[0] = h_secpro[0];
+											d[2] = dpim[j];
+											t[2] = tpim[j];
+											cx[2] = cxpim[j]; 
+											cy[2]  = cypim[j];
+											cz[2] = czpim[j];
+											_p[2] = ppim[j];
+											h_sec[2] = h_secpim[j];
+										}
+									}
+								}
+							}
+						}else{//1 good proton and pi-, but multiple pi+
+							for(int i = 0; i<pip_loop; i++){
+								test_pip = physics::Make_4Vector(ppip[i],cxpip[i],cypip[i],czpip[i],mpi);
+								_pim = physics::Make_4Vector(ppim[0],cxpim[0],cypim[0],czpim[0],mpi);
+								_pro = physics::Make_4Vector(ppro[0],cxpro[0],cypro[0],czpro[0],mp);
+								if((physics::MM_event(0,1,_elec,_pro,test_pip,_pim) > (MM_zero_center2-MM_zero_sigma2))&&(physics::MM_event(0,1,_elec,_pro,test_pip,_pim) < (MM_zero_center2+MM_zero_sigma2))){
+									if(pro_idx[i]!= pip_idx[0]){
+										_pip = test_pip;
+										top_possible[3] = true;
+										d[1] = dpip[i];
+										t[1] = tpip[i];
+										cx[1] = cxpip[i]; 
+										cy[1]  = cypip[i];
+										cz[1] = czpip[i];
+										_p[1] = ppip[i];
+										h_sec[1] = h_secpip[i];
+										d[0] = dpro[0];
+										t[0] = tpro[0];
+										cx[0] = cxpro[0]; 
+										cy[0]  = cypro[0];
+										cz[0] = czpro[0];
+										_p[0] = ppro[0];
+										h_sec[0] = h_secpro[0];
+										d[2] = dpim[0];
+										t[2] = tpim[0];
+										cx[2] = cxpim[0]; 
+										cy[2]  = cypim[0];
+										cz[2] = czpim[0];
+										_p[2] = ppim[0];
+										h_sec[2] = h_secpim[0];
+									}
+								}
+							}
+						}
+					}else{//1 good proton and pi+
+						if(good_pim>1){//1 good proton and pi+, but multiple pi-
+							for(int i = 0; i<pip_loop; i++){
+								test_pim = physics::Make_4Vector(ppim[i],cxpim[i],cypim[i],czpim[i],mpi);
+								_pip = physics::Make_4Vector(ppip[0],cxpip[0],cypip[0],czpip[0],mpi);
+								_pro = physics::Make_4Vector(ppro[0],cxpro[0],cypro[0],czpro[0],mp);
+								if((physics::MM_event(0,1,_elec,_pro,_pip,test_pim) > (MM_zero_center2-MM_zero_sigma2))&&(physics::MM_event(0,1,_elec,_pro,_pip,test_pim) < (MM_zero_center2+MM_zero_sigma2))){
+									if(pro_idx[0]!= pip_idx[0]){
+										_pim = test_pim;
+										top_possible[3] = true;
+										d[1] = dpip[i];
+										t[1] = tpip[i];
+										cx[1] = cxpip[i]; 
+										cy[1]  = cypip[i];
+										cz[1] = czpip[i];
+										_p[1] = ppip[i];
+										h_sec[1] = h_secpip[i];
+										d[0] = dpro[0];
+										t[0] = tpro[0];
+										cx[0] = cxpro[0]; 
+										cy[0]  = cypro[0];
+										cz[0] = czpro[0];
+										_p[0] = ppro[0];
+										h_sec[0] = h_secpro[0];
+										d[2] = dpim[0];
+										t[2] = tpim[0];
+										cx[2] = cxpim[0]; 
+										cy[2]  = cypim[0];
+										cz[2] = czpim[0];
+										_p[2] = ppim[0];
+										h_sec[2] = h_secpim[0];
+									}
+								}
+							}
+						}else{//1 good proton and pi+ and pi-
+							if(pro_idx[0]!=pip_idx[0]){
+								top_possible[3]=true;
+								d[1] = dpip[0];
+								t[1] = tpip[0];
+								cx[1] = cxpip[0]; 
+								cy[1]  = cypip[0];
+								cz[1] = czpip[0];
+								_p[1] = ppip[0];
+								h_sec[1] = h_secpip[0];
+								d[0] = dpro[0];
+								t[0] = tpro[0];
+								cx[0] = cxpro[0]; 
+								cy[0]  = cypro[0];
+								cz[0] = czpro[0];
+								_p[0] = ppro[0];
+								h_sec[0] = h_secpro[0];
+								d[2] = dpim[0];
+								t[2] = tpim[0];
+								cx[2] = cxpim[0]; 
+								cy[2]  = cypim[0];
+								cz[2] = czpim[0];
+								_p[2] = ppim[0];
+								h_sec[2] = h_secpim[0];
+								_pip = physics::Make_4Vector(ppip[0],cxpip[0],cypip[0],czpip[0],mpi);
+								_pro = physics::Make_4Vector(ppro[0],cxpro[0],cypro[0],czpro[0],mp);
+								_pim = physics::Make_4Vector(ppim[0],cxpim[0],cypim[0],czpim[0],mpi);
+							}else{
+								top_possible[3]=false;
+							}
+						}
 					}
 				}
-			}else if(good_pip==1){	
-				_pip = physics::Make_4Vector(data->Branches::p(pip_idx[0]),data->Branches::p(pip_idx[0]),data->Branches::cy(pip_idx[0]),data->Branches::cz(pip_idx[0]),mpi);
 			}
-		}else if(good_proton==1){
-			_prot = physics::Make_4Vector(data->Branches::p(pro_idx[0]),data->Branches::p(pro_idx[0]),data->Branches::cy(pro_idx[0]),data->Branches::cz(pro_idx[0]),mp);
-		}*/
+		}	
+
+		//Check to see that four vectors have been properly assigned
+		for(int w = 0; w < 4; w++){
+			if(top_possible[w]){
+				switch(w){
+					case 0: 
+					_assigned_4vecs = (physics::Check_4Vec(_elec)&&physics::Check_4Vec(_pip)&&physics::Check_4Vec(_pim));
+					break;
+					case 1: 
+					_assigned_4vecs = (physics::Check_4Vec(_elec)&&physics::Check_4Vec(_pro)&&physics::Check_4Vec(_pim));
+					break;
+					case 2: 
+					_assigned_4vecs = (physics::Check_4Vec(_elec)&&physics::Check_4Vec(_pip)&&physics::Check_4Vec(_pro));
+					break;
+					case 3: 
+					_assigned_4vecs = (physics::Check_4Vec(_elec)&&physics::Check_4Vec(_pip)&&physics::Check_4Vec(_pim)&&physics::Check_4Vec(_pro));
+					break;
+				}
+				if(_assigned_4vecs == false){
+					std::cout<<std::endl<<"Improperly Filled Four Vectors for " <<topologies[w+1] <<" elec: " <<physics::Check_4Vec(_elec) <<" pro: " <<physics::Check_4Vec(_pro) <<" pip: " <<physics::Check_4Vec(_pip) <<" pim: " <<physics::Check_4Vec(_pim)<<std::endl;
+				}
+			}
+		}
+		
+		
+
+
 		
 		bool topo[4]={false,false,false,false};
 		int idx=-99; 
@@ -320,20 +911,26 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 		//Event_Class Selection
 		if(good_electron == 1){//Good Electron
 			//P Missing
-			if((have_pim) && have_pip){//Good Pip and Pim
+			if(top_possible[0]){//Good Pip and Pim
+				//physics::Print_4Vec(_elec);
+				//physics::Print_4Vec(_pip);
+				//physics::Print_4Vec(_pim);
 				MM_p = physics::MM_event(0,0,_elec,_pip,_pim);
 				MM_p2 = physics::MM_event(0,1,_elec,_pip,_pim);
+				//std::cout<<"MM squared for proton missing topology: " <<MM_p2 <<std::endl;
 				_hists->Histogram::MM_Fill(0,MM_p,0,0);
 				_hists->Histogram::MM_Fill(0,MM_p2,0,1);
-				_hists->Histogram::MM_Fill(4,MM_p,0,0);
-				_hists->Histogram::MM_Fill(4,MM_p2,0,1);
+				//_hists->Histogram::MM_Fill(4,MM_p,0,0);
+				//_hists->Histogram::MM_Fill(4,MM_p2,0,1);
 				if((MM_p > (p_center-p_sig))&&(MM_p < (p_center+p_sig))){//Missing Mass Cut on Proton Mass
 					_hists->Histogram::MM_Fill(0,MM_p,1,0);
 					_hists->Histogram::MM_Fill(0,MM_p2,1,1);
-					_hists->Histogram::MM_Fill(4,MM_p,1,0);
-					_hists->Histogram::MM_Fill(4,MM_p2,1,1);
+					//_hists->Histogram::MM_Fill(4,MM_p,1,0);
+					//_hists->Histogram::MM_Fill(4,MM_p2,1,1);
 					topo[0]=true;
-					_prot = _beam + _target - _elec - _pip - _pim; 
+					if(!top_possible[3]){
+						_pro = _beam + _target - _elec - _pip - _pim; 
+					}
 					_hists->Histogram::WQ2_Fill(1,10,_W,_Q2);
 					_hists->Histogram::Fid_Fill(1,theta[0],phi[0],0,10,0,_W,data->Branches::p(0));
 					_hists->Histogram::SF_Fill(1,data->Branches::p(0),data->Branches::etot(0),10,0,_W,sector[0]);
@@ -349,14 +946,14 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 							par = 2; 
 							break;
 						}
-						_hists->Histogram::Fid_Fill(1,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,0,_W,data->Branches::p(idx));
-						_hists->Histogram::DT_Fill(1,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,0,_W,h_sec[par]);
+						_hists->Histogram::Fid_Fill(1,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,0,_W,_p[par]);
+						_hists->Histogram::DT_Fill(1,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,0,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));
 					}
 				}else{
 					_hists->Histogram::MM_Fill(0,MM_p,2,0);
 					_hists->Histogram::MM_Fill(0,MM_p2,2,1);
-					_hists->Histogram::MM_Fill(4,MM_p,2,0);
-					_hists->Histogram::MM_Fill(4,MM_p2,2,1);
+					//_hists->Histogram::MM_Fill(4,MM_p,2,0);
+					//_hists->Histogram::MM_Fill(4,MM_p2,2,1);
 					_hists->Histogram::WQ2_Fill(1,10,_W,_Q2);
 					_hists->Histogram::Fid_Fill(1,theta[0],phi[0],0,10,1,_W,data->Branches::p(0));
 					_hists->Histogram::SF_Fill(1,data->Branches::p(0),data->Branches::etot(0),10,1,_W,sector[0]);
@@ -372,26 +969,28 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 							par = 2; 
 							break;
 						}
-						_hists->Histogram::Fid_Fill(1,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,1,_W,data->Branches::p(idx));
-						_hists->Histogram::DT_Fill(1,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,1,_W,h_sec[par]);
+						_hists->Histogram::Fid_Fill(1,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,1,_W,_p[par]);
+						_hists->Histogram::DT_Fill(1,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,1,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));
 					}
 				}
 			}
 			//Pip Missing
-			if((have_prot) && (have_pim)){//Good proton and Pim
-				MM_pip = physics::MM_event(0,0,_elec,_prot,_pim);
-				MM_pip2 = physics::MM_event(0,1,_elec,_prot,_pim);
+			if(top_possible[1]){//Good proton and Pim
+				MM_pip = physics::MM_event(0,0,_elec,_pro,_pim);
+				MM_pip2 = physics::MM_event(0,1,_elec,_pro,_pim);
 				_hists->Histogram::MM_Fill(1,MM_pip,0,0);
 				_hists->Histogram::MM_Fill(1,MM_pip2,0,1);
-				_hists->Histogram::MM_Fill(4,MM_pip,0,0);
-				_hists->Histogram::MM_Fill(4,MM_pip2,0,1);
+				//_hists->Histogram::MM_Fill(4,MM_pip,0,0);
+				//_hists->Histogram::MM_Fill(4,MM_pip2,0,1);
 				if((MM_pip > (pip_center-pip_sig))&&(MM_pip < (pip_center+pip_sig))){//Missing Mass Cut on proton Mass
 					_hists->Histogram::MM_Fill(1,MM_pip,1,0);
 					_hists->Histogram::MM_Fill(1,MM_pip2,1,1);
-					_hists->Histogram::MM_Fill(4,MM_pip,1,0);
-					_hists->Histogram::MM_Fill(4,MM_pip2,1,1);
+					//_hists->Histogram::MM_Fill(4,MM_pip,1,0);
+					//_hists->Histogram::MM_Fill(4,MM_pip2,1,1);
 					topo[1]=true;
-					_pip = _beam + _target - _elec - _prot - _pim; 
+					if(!top_possible[3]){
+						_pip = _beam + _target - _elec - _pro - _pim; 
+					}
 					//Fill Event Selection 
 					//Electron
 					_hists->Histogram::WQ2_Fill(2,10,_W,_Q2);
@@ -410,14 +1009,14 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 							par = 2; 
 							break;
 						}
-						_hists->Histogram::Fid_Fill(2,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,0,_W,data->Branches::p(idx));
-						_hists->Histogram::DT_Fill(2,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,0,_W,h_sec[par]);
+						_hists->Histogram::Fid_Fill(2,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,0,_W,_p[par]);
+						_hists->Histogram::DT_Fill(2,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,0,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));
 					}
 				}else{
 					_hists->Histogram::MM_Fill(1,MM_pip,2,0);
 					_hists->Histogram::MM_Fill(1,MM_pip2,2,1);
-					_hists->Histogram::MM_Fill(4,MM_pip,2,0);
-					_hists->Histogram::MM_Fill(4,MM_pip2,2,1);
+					//_hists->Histogram::MM_Fill(4,MM_pip,2,0);
+					//_hists->Histogram::MM_Fill(4,MM_pip2,2,1);
 					_hists->Histogram::WQ2_Fill(2,10,_W,_Q2);
 					_hists->Histogram::Fid_Fill(2,theta[0],phi[0],0,10,1,_W,data->Branches::p(0));
 					_hists->Histogram::SF_Fill(2,data->Branches::p(0),data->Branches::etot(0),10,1,_W,sector[0]);
@@ -433,30 +1032,32 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 							par = 2; 
 							break;
 						}
-						_hists->Histogram::Fid_Fill(2,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,1,_W,data->Branches::p(idx));
-						_hists->Histogram::DT_Fill(2,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,1,_W,h_sec[par]);
+						_hists->Histogram::Fid_Fill(2,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,1,_W,_p[par]);
+						_hists->Histogram::DT_Fill(2,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,1,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));
 					}
 				}
 			}
 			//Pim Missing //Need to introduce some proton/Pion discrimination here, but will leave for now
-			if((have_prot) && (have_pip) && !double_id){//Good Proton and Pip
-				MM_pim = physics::MM_event(0,0,_elec,_prot,_pip);
-				MM_pim2 = physics::MM_event(0,1,_elec,_prot,_pip);
+			if(top_possible[2]){//Good Proton and Pip
+				MM_pim = physics::MM_event(0,0,_elec,_pro,_pip);
+				MM_pim2 = physics::MM_event(0,1,_elec,_pro,_pip);
 				_hists->Histogram::MM_Fill(2,MM_pim,0,0);
 				_hists->Histogram::MM_Fill(2,MM_pim2,0,1);
-				_hists->Histogram::MM_Fill(4,MM_pim,0,0);
-				_hists->Histogram::MM_Fill(4,MM_pim2,0,1);
+				//_hists->Histogram::MM_Fill(4,MM_pim,0,0);
+				//_hists->Histogram::MM_Fill(4,MM_pim2,0,1);
 				if((MM_pim > (pim_center-pim_sig))&&(MM_pim < (pim_center+pim_sig))){//Missing Mass Cut on Proton Mass
 					_hists->Histogram::MM_Fill(2,MM_pim,1,0);
 					_hists->Histogram::MM_Fill(2,MM_pim2,1,1);
-					_hists->Histogram::MM_Fill(4,MM_pim,1,0);
-					_hists->Histogram::MM_Fill(4,MM_pim2,1,1);
+					//_hists->Histogram::MM_Fill(4,MM_pim,1,0);
+					//_hists->Histogram::MM_Fill(4,MM_pim2,1,1);
 					topo[2]=true;
 					_hists->Histogram::WQ2_Fill(3,10,_W,_Q2);
 					_hists->Histogram::Fid_Fill(3,theta[0],phi[0],0,10,0,_W,data->Branches::p(0));
 					_hists->Histogram::SF_Fill(3,data->Branches::p(0),data->Branches::etot(0),10,0,_W,sector[0]);
 					_hists->Histogram::CC_Fill(3,data->Branches::cc_sect(0),data->Branches::cc_segm(0),data->Branches::nphe(0),10,0);
-					_pim = _beam + _target - _elec - _prot - _pip; 
+					if(!top_possible[3]){
+						_pim = _beam + _target - _elec - _pro - _pip; 
+					}
 					for(int i = 0; i<2; i++){
 						switch(i){
 							case 0:
@@ -468,14 +1069,14 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 							par = 1; 
 							break;
 						}
-						_hists->Histogram::Fid_Fill(3,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,0,_W,data->Branches::p(idx));
-						_hists->Histogram::DT_Fill(3,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,0,_W,h_sec[par]);
+						_hists->Histogram::Fid_Fill(3,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,0,_W,_p[par]);
+						_hists->Histogram::DT_Fill(3,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,0,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));
 					}
 				}else{
 					_hists->Histogram::MM_Fill(2,MM_pim,2,0);
 					_hists->Histogram::MM_Fill(2,MM_pim2,2,1);
-					_hists->Histogram::MM_Fill(4,MM_pim,2,0);
-					_hists->Histogram::MM_Fill(4,MM_pim2,2,1);
+					//_hists->Histogram::MM_Fill(4,MM_pim,2,0);
+					//_hists->Histogram::MM_Fill(4,MM_pim2,2,1);
 					_hists->Histogram::WQ2_Fill(3,10,_W,_Q2);
 					_hists->Histogram::Fid_Fill(3,theta[0],phi[0],0,10,1,_W,data->Branches::p(0));
 					_hists->Histogram::SF_Fill(3,data->Branches::p(0),data->Branches::etot(0),10,1,_W,sector[0]);
@@ -491,24 +1092,24 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 							par = 1; 
 							break;
 						}
-						_hists->Histogram::Fid_Fill(3,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,1,_W,data->Branches::p(idx));
-						_hists->Histogram::DT_Fill(3,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,1,_W,h_sec[par]);
+						_hists->Histogram::Fid_Fill(3,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,1,_W,_p[par]);
+						_hists->Histogram::DT_Fill(3,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,1,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));
 					}
 				}
 			}
 			//None Missing
-			if((have_prot)&&(have_pim)&&(have_pip) && !double_id){//Good Proton Pip and Pim 
-				MM_z = physics::MM_event(0,0,_elec,_prot,_pip,_pim);
-				MM_z2 = physics::MM_event(0,1,_elec,_prot,_pip,_pim);
+			if(top_possible[3]){//Good Proton Pip and Pim 
+				MM_z = physics::MM_event(0,0,_elec,_pro,_pip,_pim);
+				MM_z2 = physics::MM_event(0,1,_elec,_pro,_pip,_pim);
 				_hists->Histogram::MM_Fill(3,MM_z,0,0);
 				_hists->Histogram::MM_Fill(3,MM_z2,0,1);
-				_hists->Histogram::MM_Fill(4,MM_z,0,0);
-				_hists->Histogram::MM_Fill(4,MM_z2,0,1);
+				//_hists->Histogram::MM_Fill(4,MM_z,0,0);
+				//_hists->Histogram::MM_Fill(4,MM_z2,0,1);
 				if((MM_z2 > (MM_zero_center2-MM_zero_sigma2))&&(MM_z2 < (MM_zero_center2+MM_zero_sigma2))){//Missing Mass Cut on Proton Mass
 					_hists->Histogram::MM_Fill(3,MM_z,1,0);
 					_hists->Histogram::MM_Fill(3,MM_z2,1,1);
-					_hists->Histogram::MM_Fill(4,MM_z,1,0);
-					_hists->Histogram::MM_Fill(4,MM_z2,1,1);
+					//_hists->Histogram::MM_Fill(4,MM_z,1,0);
+					//_hists->Histogram::MM_Fill(4,MM_z2,1,1);
 					topo[3]=true;
 					_hists->Histogram::WQ2_Fill(4,10,_W,_Q2);
 					_hists->Histogram::Fid_Fill(4,theta[0],phi[0],0,10,0,_W,data->Branches::p(0));
@@ -529,14 +1130,14 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 							par = 2;
 							break;
 						}
-						_hists->Histogram::Fid_Fill(4,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,0,_W,data->Branches::p(idx));
-						_hists->Histogram::DT_Fill(4,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,0,_W,h_sec[par]);
+						_hists->Histogram::Fid_Fill(4,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,0,_W,_p[par]);
+						_hists->Histogram::DT_Fill(4,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,0,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));
 					}
 				}else{
 					_hists->Histogram::MM_Fill(3,MM_z,2,0);
 					_hists->Histogram::MM_Fill(3,MM_z2,2,1);
-					_hists->Histogram::MM_Fill(4,MM_z,2,0);
-					_hists->Histogram::MM_Fill(4,MM_z2,2,1);
+					//_hists->Histogram::MM_Fill(4,MM_z,2,0);
+					//_hists->Histogram::MM_Fill(4,MM_z2,2,1);
 					_hists->Histogram::WQ2_Fill(4,10,_W,_Q2);
 					_hists->Histogram::Fid_Fill(4,theta[0],phi[0],0,10,1,_W,data->Branches::p(0));
 					_hists->Histogram::SF_Fill(4,data->Branches::p(0),data->Branches::etot(0),10,1,_W,sector[0]);
@@ -556,19 +1157,19 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 							par = 2;
 							break;
 						}
-						_hists->Histogram::Fid_Fill(4,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,1,_W,data->Branches::p(idx));
-						_hists->Histogram::DT_Fill(4,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,1,_W,h_sec[par]);
+						_hists->Histogram::Fid_Fill(4,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,1,_W,_p[par]);
+						_hists->Histogram::DT_Fill(4,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,1,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));
 					}
 				}
 			}
 		}
-		//Assign topology of the event
+		//Assign topology of the event and fill things for combined topologies
 		if(topo[3]){
 			_top = 4; 
 		}else{
 			for(int o =0;o<3;o++){
 				if(topo[o]){
-					_top = topo[o]+1;
+					_top = o+1;
 				}
 			}
 		}
@@ -594,20 +1195,27 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 					break;
 				}
 				if(topo[3]){
-					_hists->Histogram::Fid_Fill(5,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,0,_W,data->Branches::p(idx));
-					_hists->Histogram::DT_Fill(5,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,0,_W,h_sec[par]);
+					_hists->Histogram::Fid_Fill(5,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,0,_W,_p[par]);
+					_hists->Histogram::DT_Fill(5,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,0,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));
+					//std::cout<<std::endl<<"None Missing" <<std::endl;
 				}else if(topo[0] && i !=0){
-					_hists->Histogram::Fid_Fill(5,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,0,_W,data->Branches::p(idx));
-					_hists->Histogram::DT_Fill(5,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,0,_W,h_sec[par]);
+					_hists->Histogram::Fid_Fill(5,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,0,_W,_p[par]);
+					_hists->Histogram::DT_Fill(5,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,0,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));
+					//std::cout<<"p Missing" <<std::endl;
+					//std::cout<<"look at vals for particle "<<species[par+1] <<": _p: " <<_p[par] <<" d: " <<d[par] <<" t: " <<t[par] <<" sec: " <<physics::get_sector(physics::get_phi(cx[par],cy[par]));
 				}else if(topo[2] && i!=1){
-					_hists->Histogram::Fid_Fill(5,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,0,_W,data->Branches::p(idx));
-					_hists->Histogram::DT_Fill(5,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,0,_W,h_sec[par]);	
+					_hists->Histogram::Fid_Fill(5,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,0,_W,_p[par]);
+					_hists->Histogram::DT_Fill(5,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,0,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));	
+					//std::cout<<std::endl<<"pip Missing" <<std::endl;
+					//std::cout<<"look at vals for particle "<<species[par+1] <<": _p: " <<_p[par] <<" d: " <<d[par] <<" t: " <<t[par] <<" sec: " <<physics::get_sector(physics::get_phi(cx[par],cy[par]));
 				}else if(topo[3] && i!=2){
-					_hists->Histogram::Fid_Fill(5,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,0,_W,data->Branches::p(idx));
-					_hists->Histogram::DT_Fill(5,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,0,_W,h_sec[par]);
+					_hists->Histogram::Fid_Fill(5,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,0,_W,_p[par]);
+					_hists->Histogram::DT_Fill(5,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,0,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));
+					//std::cout<<std::endl<<"pim Missing" <<std::endl;
+					//std::cout<<"look at vals for particle "<<species[par+1] <<": _p: " <<_p[par] <<" d: " <<d[par] <<" t: " <<t[par] <<" sec: " <<physics::get_sector(physics::get_phi(cx[par],cy[par]));
 				}
 			}
-		}else{
+		}else if(top_possible[0] || top_possible[1] || top_possible[2] || top_possible[3]){//Didn't pass event selection, but still had the relevant particles detected
 			_hists->Histogram::Fid_Fill(5,theta[0],phi[0],0,10,1,_W,data->Branches::p(0));
 			_hists->Histogram::SF_Fill(5,data->Branches::p(0),data->Branches::etot(0),10,1,_W,sector[0]);
 			_hists->Histogram::CC_Fill(5,data->Branches::cc_sect(0),data->Branches::cc_segm(0),data->Branches::nphe(0),10,1);
@@ -626,18 +1234,18 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 					par = 2;
 					break;
 				}
-				if(topo[3]){
-					_hists->Histogram::Fid_Fill(5,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,1,_W,data->Branches::p(idx));
-					_hists->Histogram::DT_Fill(5,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,1,_W,h_sec[par]);
-				}else if(topo[0] && i !=0){
-					_hists->Histogram::Fid_Fill(5,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,1,_W,data->Branches::p(idx));
-					_hists->Histogram::DT_Fill(5,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,1,_W,h_sec[par]);
-				}else if(topo[2] && i!=1){
-					_hists->Histogram::Fid_Fill(5,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,1,_W,data->Branches::p(idx));
-					_hists->Histogram::DT_Fill(5,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,1,_W,h_sec[par]);	
-				}else if(topo[3] && i!=2){
-					_hists->Histogram::Fid_Fill(5,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,1,_W,data->Branches::p(idx));
-					_hists->Histogram::DT_Fill(5,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,1,_W,h_sec[par]);
+				if(top_possible[3]){//All topologies
+					_hists->Histogram::Fid_Fill(5,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,1,_W,_p[par]);
+					_hists->Histogram::DT_Fill(5,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,1,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));
+				}else if(top_possible[0] && i!=0){
+					_hists->Histogram::Fid_Fill(5,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,1,_W,_p[par]);
+					_hists->Histogram::DT_Fill(5,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,1,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));
+				}else if(top_possible[1] && i!=1){
+					_hists->Histogram::Fid_Fill(5,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,1,_W,_p[par]);
+					_hists->Histogram::DT_Fill(5,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,1,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));	
+				}else if(top_possible[2] && i!=2){
+					_hists->Histogram::Fid_Fill(5,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,1,_W,_p[par]);
+					_hists->Histogram::DT_Fill(5,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,1,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));
 				}
 			}
 		}
@@ -655,7 +1263,7 @@ float Event_Class::Get_px(int i){
 			_px = _elec[0];
 		break;
 		case 1:
-			_px = _prot[0];
+			_px = _pro[0];
 		break;
 		case 2:
 			_px = _pip[0];
@@ -674,7 +1282,7 @@ float Event_Class::Get_py(int i){
 			_py = _elec[1];
 		break;
 		case 1:
-			_py = _prot[1];
+			_py = _pro[1];
 		break;
 		case 2:
 			_py = _pip[1];
@@ -694,7 +1302,7 @@ float Event_Class::Get_pz(int i)
 			_pz = _elec[2];
 		break;
 		case 1:
-			_pz = _prot[2];
+			_pz = _pro[2];
 		break;
 		case 2:
 			_pz = _pip[2];
@@ -714,7 +1322,7 @@ float Event_Class::Get_p0(int i)
 			_p0 = _elec[3];
 		break;
 		case 1:
-			_p0 = _prot[3];
+			_p0 = _pro[3];
 		break;
 		case 2:
 			_p0 = _pip[3];
@@ -760,8 +1368,8 @@ bool Event_Class::is_valid(){
 	return _valid; 
 }
 
-int Event_Class::Get_ppip(){
-	return ppip;
+int Event_Class::Get_ppip(int idx){
+	return ppip[idx];
 }
 
 /*
@@ -778,10 +1386,10 @@ void Fill_Tree(forest tree, int Event_Class_n){
 			tree.forest::fill_pid(ELECTRON, i);
 		break;
 		case 1:
-			tree.forest::fill_px(_prot[0], i);
-			tree.forest::fill_py(_prot[1], i);
-			tree.forest::fill_pz(_prot[2], i);
-			tree.forest::fill_p0(_prot[3], i);
+			tree.forest::fill_px(_pro[0], i);
+			tree.forest::fill_py(_pro[1], i);
+			tree.forest::fill_pz(_pro[2], i);
+			tree.forest::fill_p0(_pro[3], i);
 			tree.forest::fill_pid(PROTON, i);
 		break;
 		case 2:

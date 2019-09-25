@@ -1,6 +1,18 @@
 #include "physics.hpp"
 
 
+void physics::Print_4Vec(TLorentzVector k1){
+	std::cout<<std::endl <<"Four Vector= px: " <<k1[0] <<" py: " <<k1[1] <<" pz: " <<k1[2] <<" E: " <<k1[3]; 
+}
+
+bool physics::Check_4Vec(TLorentzVector k1){
+	bool pass = false; 
+	if(k1[3]>0){//A non zero energy which all particles should have
+		pass = true; 
+	}
+	return pass; 
+}
+
 TLorentzVector physics::Make_4Vector(float p, float cx, float cy, float cz, float m){
 	TVector3 k_mu_3(p*cx, p*cy, p*cz);
 	TLorentzVector k_mu;

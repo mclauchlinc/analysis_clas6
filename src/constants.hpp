@@ -291,5 +291,6 @@ static const char * W_dep_list[] = {"No_W_Dep","W_Dep"};
 static const char * CC_det_side[] = {"Left","Coince","Right","All"};
 static const char * basic_cut[] = {"pre","cut","anti"};
 static const char * MM_sq[] = {"linear","squared"};
+static const char * par_cut[4][11] = {{"pre","sanity","fid","sf","min_cc","fid+sf","fid+cc","sf+cc","eid","bank","event"},{"pre","sanity","fid","dt","hid","bank","event"},{"pre","sanity","fid","dt","hid","bank","event"},{"pre","sanity","fid","dt","hid","bank","event"}};
 
 #endif

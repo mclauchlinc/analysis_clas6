@@ -43,26 +43,25 @@ private:
 	//int _gpart = 0; //Number of tagged particles in the Event_Class
 	bool _valid = false; //Valid trigger electron from eid 
 	int _top = 0; //Topology this fits under {bad, pmiss, pipmiss,pimmiss,zeromiss }->{0,1,2,3,4}
+	bool _assigned_4vecs = false; 
 
 	//All four vectors in the center of mass frame 
 	TLorentzVector _beam;
 	TLorentzVector _elec;
 	TLorentzVector _gamma;
 	TLorentzVector _target;
-	TLorentzVector _prot;
+	TLorentzVector _pro;
 	TLorentzVector _pip;
 	TLorentzVector _pim;
 
 	int good_electron = 0; 
-	int good_proton = 0;
+	int good_pro = 0;
 	int good_pip = 0; 
 	int good_pim = 0; 
 
-	int check_idx[3]={-99,-99,-99};
 
-	int pro_idx[12];
-	int pip_idx[12];
-	int pim_idx[12];
+
+	int check_idx[3] = {-99,-99,-99};
 
 	float _alpha1 = -99;
 	float _alpha2 = -99;
@@ -91,15 +90,44 @@ private:
 	float MM_z = -99;
 	float MM_z2 = -99;
 
-	int ppip = 0; 
 
-	float d[3] = {-99.0,-99.0,-99.0};
-	float t[3] = {-99.0,-99.0,-99.0} ;
-	float cx[3] = {-99.0,-99.0,-99.0} ;
-	float cy[3] = {-99.0,-99.0,-99.0};
-	float cz[3] = {-99.0,-99.0,-99.0};
-	float _p[3] = {-99.0,-99.0,-99.0};
-	int h_sec[3] = {-99,-99,-99};
+	//Variables for multiple particles being Identified
+	float dpro[20] = {NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN};
+	float tpro[20] = {NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN} ;
+	float cxpro[20] = {NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN} ;
+	float cypro[20] = {NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN};
+	float czpro[20] = {NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN};
+	float ppro[20] = {NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN};
+	int h_secpro[20] = {-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99};
+	int pro_idx[20] = {-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99};
+
+	float dpip[20] = {NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN};
+	float tpip[20] = {NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN};
+	float cxpip[20] = {NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN};
+	float cypip[20] = {NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN};
+	float czpip[20] = {NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN};
+	float ppip[20] = {NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN};
+	int h_secpip[20] = {-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99};
+	int pip_idx[20] = {-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99};
+
+	float dpim[20] = {NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN};
+	float tpim[20] = {NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN};
+	float cxpim[20] = {NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN};
+	float cypim[20] = {NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN};
+	float czpim[20] = {NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN};
+	float ppim[20] = {NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN,NAN};
+	int h_secpim[20] = {-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99};
+	int pim_idx[20] = {-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99};
+
+	float d[3]= {NAN,NAN,NAN}; 
+	float t[3]= {NAN,NAN,NAN};
+	float cx[3]= {NAN,NAN,NAN}; 
+	float cy[3]= {NAN,NAN,NAN};
+	float cz[3]= {NAN,NAN,NAN};
+	float _p[3]= {NAN,NAN,NAN};
+	int h_sec[3]= {-99,-99,-99};
+
+	bool top_possible[4]= {false,false,false,false};
 	
 public:
 	Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogram> _hists, int run_type);
@@ -114,7 +142,7 @@ public:
 	float Get_pid(int i);
 	bool is_valid();
 
-	int Get_ppip();
+	int Get_ppip(int idx);
 	//void Fill_Tree(forest tree, int event_n);
 	/*
 	void Assign_electron(float p, float cx, float cy, float cz);

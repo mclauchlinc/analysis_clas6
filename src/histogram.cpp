@@ -175,8 +175,8 @@ void Histogram::Fid_Make(){
 			}else{
 				sprintf(par_cut,"%s_%s",hid_cut[cart[2]],cut_ver[cart[6]]);
 			}
-			if(cart[3] == 0){//All W bins
-				if((cart[5] == 0) && (cart[2] != (length-1)) && (cart[4]!=0)){//Specific Momentum Bins
+			if(cart[3] == 0){//No W dependence
+				if((cart[5] == 0) && (cart[2] != (length-1)) && (cart[4]!=0)){//Specific Momentum Bins and no topolgy dependence 
 					//if((cart[1]!=0 && (cart[2] == 0 || cart[2]==3)) || (cart[1]==0 && (cart[2]==0 || cart[2] == 7))){//Isolated cuts for particles
 						sprintf(hname,"%s_Fid_%s_%s_W:ALL_%s_%s",species[cart[1]],sec_list[cart[0]],par_cut,p_cut,topologies[cart[5]]);//constants.hpp
 						Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]] = std::make_shared<TH2F>(hname,hname, FIDxres, FIDxmin, FIDxmax, FIDyres, FIDymin, FIDymax);
@@ -184,11 +184,22 @@ void Histogram::Fid_Make(){
 						Fid_made_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]=true;
 					//}
 				}
-				if(cart[4]==0 && (((cart[2] != (length-1) || cart[5]==0)) || (cart[2]== (length-1) && cart[5]!=0 ))) {//No momentum dependence and correct event stuff
-					sprintf(hname,"%s_Fid_%s_%s_W:ALL_%s_%s",species[cart[1]],sec_list[cart[0]],par_cut,p_cut,topologies[cart[5]]);//constants.hpp
-					Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]] = std::make_shared<TH2F>(hname,hname, FIDxres, FIDxmin, FIDxmax, FIDyres, FIDymin, FIDymax);
-					Fid_made_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]=true;
-					num_hist++;
+				if(cart[4]==0) {//No momentum dependence
+					if(cart[2]!= (length-1)){//No event selection 
+						if(cart[5]==0){
+							sprintf(hname,"%s_Fid_%s_%s_W:ALL_%s_%s",species[cart[1]],sec_list[cart[0]],par_cut,p_cut,topologies[cart[5]]);//constants.hpp
+							Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]] = std::make_shared<TH2F>(hname,hname, FIDxres, FIDxmin, FIDxmax, FIDyres, FIDymin, FIDymax);
+							Fid_made_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]=true;
+							num_hist++;
+						}
+					}else{//Event selection 
+						if(cart[5]!=0){
+							sprintf(hname,"%s_Fid_%s_%s_W:ALL_%s_%s",species[cart[1]],sec_list[cart[0]],par_cut,p_cut,topologies[cart[5]]);//constants.hpp
+							Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]] = std::make_shared<TH2F>(hname,hname, FIDxres, FIDxmin, FIDxmax, FIDyres, FIDymin, FIDymax);
+							Fid_made_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]=true;
+							num_hist++;
+						}
+					}
 				}
 			}else{//Specific W Bins
 				if(cart[5]==0 && cart[4]==0 && cart[1] != (length-1) ){ //No event selection or momentum dependence
@@ -215,7 +226,7 @@ void Histogram::Fid_Fill(int top, float theta, float phi, int part, int cut, int
 	//std::cout<<"Filling p binning" <<std::endl;
 	if(p_binning(p_) != 0 && top==0){ //All W with p binning
 		Fid_fill_hist[physics::get_sector(phi)][part][cut][0][Histogram::p_binning(p_)][0][cutvanti]=true;
-		if(Fid_fill_hist[physics::get_sector(phi)][part][cut][0][Histogram::p_binning(p_)][0][cutvanti] == Fid_made_hist[physics::get_sector(phi)][part][cut][0][Histogram::p_binning(p_)][0][cutvanti]){
+		if(Fid_made_hist[physics::get_sector(phi)][part][cut][0][Histogram::p_binning(p_)][0][cutvanti]){
 			Fid_hist[0][part][cut][0][Histogram::p_binning(p_)][0][cutvanti]->Fill(phic,theta);//All Sectors
 			Fid_hist[physics::get_sector(phi)][part][cut][0][Histogram::p_binning(p_)][0][cutvanti]->Fill(phic,theta);//Individual Sectors
 			//std::cout<<"We did it! ";
@@ -227,7 +238,7 @@ void Histogram::Fid_Fill(int top, float theta, float phi, int part, int cut, int
 	//std::cout<<"Filling W binning" <<std::endl;
 	if(W_binning(W_) != 0 && top==0){ //All p with W binning
 		Fid_fill_hist[physics::get_sector(phi)][part][cut][Histogram::W_binning(W_)][0][0][cutvanti]=true;
-		if(Fid_fill_hist[physics::get_sector(phi)][part][cut][Histogram::W_binning(W_)][0][0][cutvanti] == Fid_made_hist[physics::get_sector(phi)][part][cut][Histogram::W_binning(W_)][0][0][cutvanti]){
+		if(Fid_made_hist[physics::get_sector(phi)][part][cut][Histogram::W_binning(W_)][0][0][cutvanti]){
 			Fid_hist[0][part][cut][Histogram::W_binning(W_)][0][0][cutvanti]->Fill(phic,theta);//All sectors
 			Fid_hist[physics::get_sector(phi)][part][cut][Histogram::W_binning(W_)][0][0][cutvanti]->Fill(phic,theta);//Individual Sectors
 			//std::cout<<"We did it! ";
@@ -248,33 +259,69 @@ void Histogram::Fid_Fill(int top, float theta, float phi, int part, int cut, int
 		std::cout<<"would have segfaulted ";
 		std::cout<<std::endl <<"For Fid Plot: " <<physics::get_sector(phi) <<" " <<part <<" " <<cut <<" " <<0 <<" " <<0 <<" " <<top <<" " <<cutvanti <<std::endl;
 	}
+	if(cut == 6 && (top == 3 || top == 4) && cutvanti ==1 ){
+		//std::cout<<std::endl <<"For Fid plots sector is: " <<physics::get_sector(phi) <<" from phi: " <<phi <<std::endl;
+	}
 }
 
 void Histogram::Fid_Write(){
+	char dir_name[100];
 	TDirectory* dir_Fid = RootOutputFile->mkdir("Fiducial Plots");
 	dir_Fid->cd();
-	TDirectory* ele_fid = dir_Fid->mkdir("Electron Fiducial Plots");
-	TDirectory* pro_fid = dir_Fid->mkdir("Proton Fiducial Plots");
-	TDirectory* pip_fid = dir_Fid->mkdir("Pi+ Fiducial Plots");
-	TDirectory* pim_fid = dir_Fid->mkdir("Pi- Fiducial Plots");
-	TDirectory* ele_fid_w = ele_fid->mkdir("Electron Fid W-Dependence");
-	TDirectory* ele_fid_p = ele_fid->mkdir("Electron Fid P-Dependence");
-	TDirectory* pro_fid_w = pro_fid->mkdir("Proton Fid W-Dependence");
-	TDirectory* pro_fid_p = pro_fid->mkdir("Proton Fid P-Dependence");
-	TDirectory* pip_fid_w = pip_fid->mkdir("Pi+ Fid W-Dependence");
-	TDirectory* pip_fid_p = pip_fid->mkdir("Pi+ Fid P-Dependence");
-	TDirectory* pim_fid_w = pim_fid->mkdir("Pi- Fid W-Dependence");
-	TDirectory* pim_fid_p = pim_fid->mkdir("Pi- Fid P-Dependence");
-	TDirectory* ele_fid_s = ele_fid->mkdir("Electron Fid Sec-Dependence");
-	TDirectory* pro_fid_s = pro_fid->mkdir("Proton Fid Sec-Dependence");
-	TDirectory* pip_fid_s = pip_fid->mkdir("Pi+ Fid Sec-Dependence");
-	TDirectory* pim_fid_s = pim_fid->mkdir("Pi- Fid Sec-Dependence");
+	TDirectory* par_fid[4];
+	TDirectory* par_fid_p[4][10];
+	TDirectory* par_fid_W[4][10];
+	TDirectory* par_fid_cut[4][11];
+	TDirectory* par_fid_top[4][5];
+	TDirectory* par_fid_sec[4][11][8][7];
+	int dir_len = 0; 
+
+	for(int i = 0; i<4; i++){
+		sprintf(dir_name,"%s Fid Plots",species[i]);
+		par_fid[i]= dir_Fid->mkdir(dir_name);
+		if(i ==0){
+			dir_len = 11;
+		}else{
+			dir_len = 7; 
+		}
+		for(int j = 0; j<dir_len; j++){
+			sprintf(dir_name,"%s Fid %s",species[i],par_cut[i][j]);
+			par_fid_cut[i][j]=par_fid[i]->mkdir(dir_name);
+			for(int l = 0; l<7; l++){
+				sprintf(dir_name,"%s Fid %s %s",species[i],par_cut[i][j],sec_list[l]);
+				par_fid_sec[i][j][0][l] = par_fid_cut[i][j]->mkdir(dir_name);
+			}
+			if(j!=(dir_len-1)){
+				sprintf(dir_name,"%s Fid %s W Dep",species[i],par_cut[i][j]);
+				par_fid_W[i][j] = par_fid_cut[i][j]->mkdir(dir_name);
+				
+				sprintf(dir_name,"%s Fid %s P Dep",species[i],par_cut[i][j]);
+				par_fid_p[i][j] = par_fid_cut[i][j]->mkdir(dir_name);
+				
+				for(int l = 0; l<7; l++){
+					sprintf(dir_name,"%s Fid %s P Dep %s",species[i],par_cut[i][j],sec_list[l]);
+					par_fid_sec[i][j][2][l] = par_fid_p[i][j]->mkdir(dir_name);
+					sprintf(dir_name,"%s Fid %s W Dep %s",species[i],par_cut[i][j],sec_list[l]);
+					par_fid_sec[i][j][1][l] = par_fid_W[i][j]->mkdir(dir_name);
+				}
+			}else{
+				for(int k = 0; k < 5; k++){
+					sprintf(dir_name,"%s Fid Event: %s",species[i],topologies[k+1]);
+					par_fid_top[i][k] = par_fid_cut[i][k]->mkdir(dir_name);
+					for(int l = 0; l<7; l++){
+						sprintf(dir_name,"%s Fid %s %s %s",species[i],par_cut[i][j],sec_list[l],topologies[k+1]);
+						par_fid_sec[i][j][3+k][l] = par_fid_cut[i][j]->mkdir(dir_name);
+					}
+				}
+			}	
+		}
+	}
 
 	
 	std::vector<long> space_dims(7);
 	space_dims[0] = 7; //Sector
 	space_dims[1] = 4; //species
-	space_dims[2] = 10;//cuts
+	space_dims[2] = 11;//cuts
 	space_dims[3] = 30;//W Binning
 	space_dims[4] = 12;//Momentum binning
 	space_dims[5] = 6; //Topology
@@ -291,100 +338,73 @@ void Histogram::Fid_Write(){
 	bool s_dep = false; 
 
 	while(cart.GetNextCombination()){
-		p_dep = false;
-		w_dep = false;
-		s_dep = false;
-		if(cart[3] == 0){
-			w_dep = false;
-		}else {
-			w_dep = true; 
-		}
-		if(cart[4] == 0 || w_dep){
-			p_dep = false;
-		}else{
-			p_dep = true;
-		}
-		if( cart[0] == 0 || w_dep || p_dep){
-			s_dep = false;
-		} else{
-			s_dep = true; 
-		}
-		switch(cart[1]){
-			case 0:
-				ele_fid->cd();
-				if(p_dep){
-					ele_fid_p->cd();
-				}else if(w_dep){
-					ele_fid_w->cd();
-				}else if(s_dep){
-					ele_fid_s->cd();
-				}
-			break;
-			case 1:
-				pro_fid->cd();
-				if(p_dep){
-					pro_fid_p->cd();
-				}else if(w_dep){
-					pro_fid_w->cd();
-				}
-				else if(s_dep){
-					pro_fid_s->cd();
-				}
-			break;
-			case 2:
-				pip_fid->cd();
-				if(p_dep){
-					pip_fid_p->cd();
-				}else if(w_dep){
-					pip_fid_w->cd();
-				}
-				else if(s_dep){
-					pip_fid_s->cd();
-				}
-			break;
-			case 3:
-				pim_fid->cd();
-				if(p_dep){
-					pim_fid_p->cd();
-				}else if(w_dep){
-					pim_fid_w->cd();
-				}else if(s_dep){
-					pim_fid_s->cd();
-				}
-			break;
-		}
+		par_fid[cart[1]]->cd();
 
 		//Just making sure we aren't looking in places that don't exist 
 		if(cart[1] == 0){ //Dealing with the different numbers of cuts for electrons vs. hadrons
 			//fid_cuts = eid_cut;
-			length = 10; 
+			length = 10; //number of cuts outside of event selection 
 		}else{
 			//fid_cuts = hid_cut; 
-			length = 6; 
+			length = 6;  //number of cuts outside of event selection 
 		}
-		if(cart[2]<length){
+
+		
+		if(cart[2]<(length)){
+			par_fid_cut[cart[1]][cart[2]]->cd();//Just the cuts
 			if(cart[3] == 0){//All W bins
-				if(cart[5] == 0 && cart[1] != (length-1) && cart[4]!=0){//Specific Momentum Bins
-					if((cart[1]!=0 && (cart[1] == 0 || cart[1]==3)) || (cart[1]==0 && (cart[1]==0 || cart[1] == 7))){//Isolated cuts for particles
+				if(cart[4]!=0){//Specific Momentum Bins
+					par_fid_p[cart[1]][cart[2]]->cd();
+					if(cart[5]==0){//Isolated cuts for particles
+						if(Fid_made_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]){
+							par_fid_sec[cart[1]][cart[2]][2][cart[0]]->cd();
+							Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]->SetXTitle("{phi} (degrees)");
+							Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]->SetYTitle("{theta} (degrees)");
+							Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]->SetOption("COLZ");
+							Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]->Write();
+						}else{
+							std::cout<<std::endl <<"Would have segfaulted Fid plot " <<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3] <<" " <<cart[4] <<" " <<cart[5] <<" " <<cart[6] <<std::endl;
+						}
+					}
+				}else if(cart[5]==0){//All P bins
+					if(Fid_made_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]){
+						par_fid_sec[cart[1]][cart[2]][0][cart[0]]->cd();
 						Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]->SetXTitle("{phi} (degrees)");
 						Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]->SetYTitle("{theta} (degrees)");
 						Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]->SetOption("COLZ");
 						Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]->Write();
+					}else{
+						std::cout<<std::endl <<"Would have segfaulted Fid plot " <<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3] <<" " <<cart[4] <<" " <<cart[5] <<" " <<cart[6] <<std::endl;
 					}
 				}
-				if(cart[4]==0 && (((cart[1] != (length-1) || cart[5]==0)) || (cart[1]== (length-1) && cart[5]!=0 ))) {//No momentum dependence and correct event stuff
-					Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]->SetXTitle("{phi} (degrees)");
-					Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]->SetYTitle("{theta} (degrees)");
-					Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]->SetOption("COLZ");
-					Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]->Write();
-				}
 			}else{//Specific W Bins
-				if(cart[5]==0 && cart[4]==0 && cart[1] != (length-1) ){ //No event selection or momentum dependence
-					if((cart[1]!=0 && (cart[1] == 0 || cart[1]==3)) || (cart[1]==0 && (cart[1]==0 || cart[1] == 7))){//Isolated cuts for particles
+				par_fid_W[cart[1]][cart[2]]->cd();
+				if(cart[4]==0 ){ //No momentum dependence
+					if(cart[5]==0){//No event selection 
+						if(Fid_made_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]){
+							par_fid_sec[cart[1]][cart[2]][1][cart[0]]->cd();
+							Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]->SetXTitle("{phi} (degrees)");
+							Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]->SetYTitle("{theta} (degrees)");
+							Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]->SetOption("COLZ");
+							Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]->Write();
+						}else{
+							std::cout<<std::endl <<"Would have segfaulted Fid plot " <<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3] <<" " <<cart[4] <<" " <<cart[5] <<" " <<cart[6] <<std::endl;
+						}					
+					}
+				}
+			}
+		}else if(cart[2]==(length)){
+			par_fid_cut[cart[1]][cart[2]]->cd();//Just the cuts
+			if(cart[5]!=0){//Event Selection topologies
+				if(cart[4]==0 && cart[3]==0){
+					if(Fid_made_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]){
+						par_fid_sec[cart[1]][cart[2]][2+cart[5]][cart[0]]->cd();
 						Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]->SetXTitle("{phi} (degrees)");
 						Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]->SetYTitle("{theta} (degrees)");
 						Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]->SetOption("COLZ");
-						Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]->Write();					
+						Fid_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]][cart[6]]->Write();
+					}else{
+						std::cout<<std::endl <<"Would have segfaulted Fid plot " <<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3] <<" " <<cart[4] <<" " <<cart[5] <<" " <<cart[6] <<std::endl;
 					}
 				}
 			}
@@ -548,22 +568,26 @@ void Histogram::DT_Make(){
 
 void Histogram::DT_Fill(int top, int part, float p, float d, float t, float d0, float t0, int cut, int anti, float W_, int sec){
 	float dt = physics::delta_t(part, p, d, t, d0, t0);
-	if(cut!=6){//No event selection in the W variance. 
-		if(DT_made_hist[part][cut][Histogram::W_binning(W_)][0][top][anti]){
-			DT_hist[part][cut][Histogram::W_binning(W_)][0][top][anti]->Fill(p,dt);
-		}else{
-			std::cout<<"DT Would have segfaulted filling: " <<part <<" " <<cut <<" " <<Histogram::W_binning(W_) <<" " <<sec <<" " <<top <<" " <<anti <<std::endl;
+	if(sec < 7){
+		if(cut!=6){//No event selection in the W variance. 
+			if(DT_made_hist[part][cut][Histogram::W_binning(W_)][0][top][anti]){
+				DT_hist[part][cut][Histogram::W_binning(W_)][0][top][anti]->Fill(p,dt);
+			}else{
+				std::cout<<"DT Would have segfaulted filling: " <<part <<" " <<cut <<" " <<Histogram::W_binning(W_) <<" " <<sec <<" " <<top <<" " <<anti <<std::endl;
+			}
 		}
-	}
-	if(DT_made_hist[part][cut][0][sec][top][anti]){
-		DT_hist[part][cut][0][sec][top][anti]->Fill(p,dt);
+		if(DT_made_hist[part][cut][0][sec][top][anti]){
+			DT_hist[part][cut][0][sec][top][anti]->Fill(p,dt);
+		}else{
+			std::cout<<"DT Would have segfaulted filling: " <<part <<" " <<cut <<" " <<0 <<" " <<sec <<" " <<top <<" " <<anti <<std::endl;
+		}
+		if(DT_made_hist[part][cut][0][0][top][anti]){
+			DT_hist[part][cut][0][0][top][anti]->Fill(p,dt);
+		}else{
+			std::cout<<"DT Would have segfaulted filling: " <<part <<" " <<cut <<" " <<0 <<" " <<0 <<" " <<top <<" " <<anti <<std::endl;
+		}
 	}else{
-		std::cout<<"DT Would have segfaulted filling: " <<part <<" " <<cut <<" " <<0 <<" " <<sec <<" " <<top <<" " <<anti <<std::endl;
-	}
-	if(DT_made_hist[part][cut][0][0][top][anti]){
-		DT_hist[part][cut][0][0][top][anti]->Fill(p,dt);
-	}else{
-		std::cout<<"DT Would have segfaulted filling: " <<part <<" " <<cut <<" " <<0 <<" " <<0 <<" " <<top <<" " <<anti <<std::endl;
+		std::cout<<"DT would have had weird nonexistant sectors " <<std::endl;
 	}
 }
 void Histogram::DT_Write(){
@@ -836,7 +860,7 @@ void Histogram::CC_Write(){
 void Histogram::MM_Make(){
 	char hname[100];
 	std::vector<long> space_dims(3);
-	space_dims[0] = 5;  //Topology
+	space_dims[0] = 4;  //Topology
 	space_dims[1] = 3;  //Cuts {pre, cut, anti}
 	space_dims[2] = 2; //squared vs linear
 
@@ -854,8 +878,8 @@ void Histogram::MM_Write(){
 	char dir_name[100];
 	TDirectory * MM_plot = RootOutputFile->mkdir("MM plots");
 	MM_plot->cd();
-	TDirectory * MM_dir[5][3];
-	for(int i = 0; i < 5; i++ ){
+	TDirectory * MM_dir[4][3];//top, cut
+	for(int i = 0; i < 4; i++ ){
 		sprintf(dir_name,"MM %s",topologies[i+1]);
 		MM_dir[i][0] = MM_plot->mkdir(dir_name);
 		for(int j = 1; j <3; j++){
@@ -863,7 +887,7 @@ void Histogram::MM_Write(){
 			MM_dir[i][j] = MM_dir[i][0]->mkdir(dir_name);
 		}
 	}
-	for(int i = 0; i < 5; i++ ){//Topology
+	for(int i = 0; i < 4; i++ ){//Topology without "All"
 		MM_dir[i][0]->cd();
 		for(int j = 1; j <3; j++){//linear vs squared
 			MM_dir[i][j]->cd();
