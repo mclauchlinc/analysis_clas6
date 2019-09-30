@@ -8,6 +8,7 @@
 #include "branches.hpp"
 #include "eid.hpp"//Electron ID Cuts
 #include "cuts.hpp"
+#include "particle.hpp"
 //#include "hid.hpp"//Hadron ID Cuts
 
 //#include "ntuple.hpp"
@@ -59,7 +60,7 @@ private:
 	int good_pip = 0; 
 	int good_pim = 0; 
 
-
+	bool pim_is_ele = false; 
 
 	int check_idx[3] = {-99,-99,-99};
 

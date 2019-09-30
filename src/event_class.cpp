@@ -25,8 +25,8 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 			//std::cout<<"momentum " <<i <<": " <<_p[i]<<std::endl;
 		}
 
-		_W = physics::WP(0,data);
-		_Q2 = physics::Qsquared(0,data);
+		_W = physics::WP(0,data);//The first index is e16 vs e1f
+		_Q2 = physics::Qsquared(0,data);//The first index is e16 vs e1f
 		//Pre ID Filling
 			//Event-Wide
 			//Electrons
@@ -192,50 +192,60 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 						_hists->Histogram::DT_Fill(0,part,data->Branches::p(h), data->Branches::sc_r(h), data->Branches::sc_t(h), data->Branches::sc_r(0), data->Branches::sc_t(0),4,0,_W,sector[h]);
 						switch(part){
 							case 0:
-							//_prot = physics::Make_4Vector(data->Branches::p(h),data->Branches::cx(h),data->Branches::cy(h),data->Branches::cz(h),mp);
-							good_pro++;//Number of identified protons
-							//std::cout<<" assign pro idx:" <<h <<std::endl;
-							dpro[p_loop] = data->Branches::sc_r(h);
-							tpro[p_loop] = data->Branches::sc_t(h);
-							cxpro[p_loop] = data->Branches::cx(h);
-							cypro[p_loop] = data->Branches::cy(h);
-							czpro[p_loop] = data->Branches::cz(h);
-							ppro[p_loop] = data->Branches::p(h);
-							h_secpro[p_loop] = sector[h];
-							check_idx[p_loop] = h; 
-							pro_idx[p_loop] = h;
-							//std::cout<<"Sector Comparison for Proton: " <<sector[h] <<" " <<h_secpro[p_loop] <<std::endl; 
-							p_loop++;
+								//_prot = physics::Make_4Vector(data->Branches::p(h),data->Branches::cx(h),data->Branches::cy(h),data->Branches::cz(h),mp);
+								good_pro++;//Number of identified protons
+								//std::cout<<" assign pro idx:" <<h <<std::endl;
+								dpro[p_loop] = data->Branches::sc_r(h);
+								tpro[p_loop] = data->Branches::sc_t(h);
+								cxpro[p_loop] = data->Branches::cx(h);
+								cypro[p_loop] = data->Branches::cy(h);
+								czpro[p_loop] = data->Branches::cz(h);
+								ppro[p_loop] = data->Branches::p(h);
+								h_secpro[p_loop] = sector[h];
+								check_idx[p_loop] = h; 
+								pro_idx[p_loop] = h;
+								//std::cout<<"Sector Comparison for Proton: " <<sector[h] <<" " <<h_secpro[p_loop] <<std::endl; 
+								p_loop++;
 							break;
 							case 1:
-							//_pip = physics::Make_4Vector(data->Branches::p(h),data->Branches::cx(h),data->Branches::cy(h),data->Branches::cz(h),mpi);
-							good_pip++;//number of Identified pip
-							//std::cout<<" assign pip idx:" <<h <<std::endl;
-							dpip[pip_loop] = data->Branches::sc_r(h);
-							tpip[pip_loop] = data->Branches::sc_t(h);
-							cxpip[pip_loop] = data->Branches::cx(h);
-							cypip[pip_loop] = data->Branches::cy(h);
-							czpip[pip_loop] = data->Branches::cz(h);
-							ppip[pip_loop] = data->Branches::p(h);
-							h_secpip[pip_loop] = sector[h];
-							pip_idx[pip_loop]=h;
-							check_idx[1] = h; 
-							pip_loop++;
+								//_pip = physics::Make_4Vector(data->Branches::p(h),data->Branches::cx(h),data->Branches::cy(h),data->Branches::cz(h),mpi);
+								good_pip++;//number of Identified pip
+								//std::cout<<" assign pip idx:" <<h <<std::endl;
+								dpip[pip_loop] = data->Branches::sc_r(h);
+								tpip[pip_loop] = data->Branches::sc_t(h);
+								cxpip[pip_loop] = data->Branches::cx(h);
+								cypip[pip_loop] = data->Branches::cy(h);
+								czpip[pip_loop] = data->Branches::cz(h);
+								ppip[pip_loop] = data->Branches::p(h);
+								h_secpip[pip_loop] = sector[h];
+								pip_idx[pip_loop]=h;
+								check_idx[1] = h; 
+								pip_loop++;
 							break;
 							case 2:
-							//_pim = physics::Make_4Vector(data->Branches::p(h),data->Branches::cx(h),data->Branches::cy(h),data->Branches::cz(h),mpi);
-							good_pim++;//number of identified pim
-							check_idx[2] = h; 
-							//std::cout<<" assign pim idx:" <<h <<std::endl;
-							dpim[pim_loop] = data->Branches::sc_r(h);
-							tpim[pim_loop] = data->Branches::sc_t(h);
-							cxpim[pim_loop] = data->Branches::cx(h);
-							cypim[pim_loop] = data->Branches::cy(h);
-							czpim[pim_loop] = data->Branches::cz(h);
-							ppim[pim_loop] = data->Branches::p(h);
-							h_secpim[pim_loop] = sector[h];
-							pim_idx[pim_loop]=h;
-							pim_loop++;
+								//Electron Contamination 
+								if(cuts::min_cc(data->Branches::cc_segm(h),data->Branches::cc_sect(h),data->Branches::nphe(h))){//Min CC Cut
+									if(cuts::sf_cut(data->Branches::p(h),data->Branches::etot(h),data->Branches::cx(h),data->Branches::cy(h))){//SF Cut
+										//if(cuts::fid_cut(h,data->Branches::p(h),data->Branches::cx(h),data->Branches::cy(h),data->Branches::cz(h))){//Electron Fiducial //I don't know that this should be necessary because it doesn't work towards e-pim separation 
+											pim_is_ele = true;//Defined quantity for Event object  
+										//}
+									}
+								}
+								if(!pim_is_ele){
+									//_pim = physics::Make_4Vector(data->Branches::p(h),data->Branches::cx(h),data->Branches::cy(h),data->Branches::cz(h),mpi);
+									good_pim++;//number of identified pim
+									check_idx[2] = h; 
+									//std::cout<<" assign pim idx:" <<h <<std::endl;
+									dpim[pim_loop] = data->Branches::sc_r(h);
+									tpim[pim_loop] = data->Branches::sc_t(h);
+									cxpim[pim_loop] = data->Branches::cx(h);
+									cypim[pim_loop] = data->Branches::cy(h);
+									czpim[pim_loop] = data->Branches::cz(h);
+									ppim[pim_loop] = data->Branches::p(h);
+									h_secpim[pim_loop] = sector[h];
+									pim_idx[pim_loop]=h;
+									pim_loop++;
+								}
 							break;
 						}
 					}else{
@@ -928,6 +938,7 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 					//_hists->Histogram::MM_Fill(4,MM_p,1,0);
 					//_hists->Histogram::MM_Fill(4,MM_p2,1,1);
 					topo[0]=true;
+					std::cout<<std::endl <<"PRO Missing topology passed";
 					if(!top_possible[3]){
 						_pro = _beam + _target - _elec - _pip - _pim; 
 					}
@@ -935,17 +946,7 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 					_hists->Histogram::Fid_Fill(1,theta[0],phi[0],0,10,0,_W,data->Branches::p(0));
 					_hists->Histogram::SF_Fill(1,data->Branches::p(0),data->Branches::etot(0),10,0,_W,sector[0]);
 					_hists->Histogram::CC_Fill(1,data->Branches::cc_sect(0),data->Branches::cc_segm(0),data->Branches::nphe(0),10,0);
-					for(int i = 0; i<2; i++){
-						switch(i){
-							case 0:
-							idx = pip_idx[0];
-							par = 1; 
-							break;
-							case 1:
-							idx = pim_idx[0];
-							par = 2; 
-							break;
-						}
+					for(int par = 1; par<3; par++){
 						_hists->Histogram::Fid_Fill(1,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,0,_W,_p[par]);
 						_hists->Histogram::DT_Fill(1,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,0,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));
 					}
@@ -958,17 +959,7 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 					_hists->Histogram::Fid_Fill(1,theta[0],phi[0],0,10,1,_W,data->Branches::p(0));
 					_hists->Histogram::SF_Fill(1,data->Branches::p(0),data->Branches::etot(0),10,1,_W,sector[0]);
 					_hists->Histogram::CC_Fill(1,data->Branches::cc_sect(0),data->Branches::cc_segm(0),data->Branches::nphe(0),10,1);
-					for(int i = 0; i<2; i++){
-						switch(i){
-							case 0:
-							idx = pip_idx[0];
-							par = 1; 
-							break;
-							case 1:
-							idx = pim_idx[0];
-							par = 2; 
-							break;
-						}
+					for(int par = 1; par<3; par++){
 						_hists->Histogram::Fid_Fill(1,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,1,_W,_p[par]);
 						_hists->Histogram::DT_Fill(1,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,1,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));
 					}
@@ -988,6 +979,7 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 					//_hists->Histogram::MM_Fill(4,MM_pip,1,0);
 					//_hists->Histogram::MM_Fill(4,MM_pip2,1,1);
 					topo[1]=true;
+					std::cout<<std::endl <<"PIP Missing topology passed";
 					if(!top_possible[3]){
 						_pip = _beam + _target - _elec - _pro - _pim; 
 					}
@@ -1001,11 +993,9 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 					for(int i = 0; i<2; i++){
 						switch(i){
 							case 0:
-							idx = pro_idx[0];
 							par = 0; 
 							break;
 							case 1:
-							idx = pim_idx[0];
 							par = 2; 
 							break;
 						}
@@ -1024,11 +1014,9 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 					for(int i = 0; i<2; i++){
 						switch(i){
 							case 0:
-							idx = pro_idx[0];
 							par = 0; 
 							break;
 							case 1:
-							idx = pim_idx[0];
 							par = 2; 
 							break;
 						}
@@ -1051,6 +1039,7 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 					//_hists->Histogram::MM_Fill(4,MM_pim,1,0);
 					//_hists->Histogram::MM_Fill(4,MM_pim2,1,1);
 					topo[2]=true;
+					std::cout<<std::endl <<"PIM Missing topology passed";
 					_hists->Histogram::WQ2_Fill(3,10,_W,_Q2);
 					_hists->Histogram::Fid_Fill(3,theta[0],phi[0],0,10,0,_W,data->Branches::p(0));
 					_hists->Histogram::SF_Fill(3,data->Branches::p(0),data->Branches::etot(0),10,0,_W,sector[0]);
@@ -1058,17 +1047,7 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 					if(!top_possible[3]){
 						_pim = _beam + _target - _elec - _pro - _pip; 
 					}
-					for(int i = 0; i<2; i++){
-						switch(i){
-							case 0:
-							idx = pro_idx[0];
-							par = 0; 
-							break;
-							case 1:
-							idx = pip_idx[0];
-							par = 1; 
-							break;
-						}
+					for(int par = 0; par<2; par++){
 						_hists->Histogram::Fid_Fill(3,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,0,_W,_p[par]);
 						_hists->Histogram::DT_Fill(3,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,0,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));
 					}
@@ -1081,17 +1060,7 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 					_hists->Histogram::Fid_Fill(3,theta[0],phi[0],0,10,1,_W,data->Branches::p(0));
 					_hists->Histogram::SF_Fill(3,data->Branches::p(0),data->Branches::etot(0),10,1,_W,sector[0]);
 					_hists->Histogram::CC_Fill(3,data->Branches::cc_sect(0),data->Branches::cc_segm(0),data->Branches::nphe(0),10,1);
-					for(int i = 0; i<2; i++){
-						switch(i){
-							case 0:
-							idx = pro_idx[0];
-							par = 0; 
-							break;
-							case 1:
-							idx = pip_idx[0];
-							par = 1; 
-							break;
-						}
+					for(int par = 0; par<2; par++){
 						_hists->Histogram::Fid_Fill(3,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,1,_W,_p[par]);
 						_hists->Histogram::DT_Fill(3,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,1,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));
 					}
@@ -1111,25 +1080,12 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 					//_hists->Histogram::MM_Fill(4,MM_z,1,0);
 					//_hists->Histogram::MM_Fill(4,MM_z2,1,1);
 					topo[3]=true;
+					std::cout<<std::endl <<"ZERO Missing topology passed";
 					_hists->Histogram::WQ2_Fill(4,10,_W,_Q2);
 					_hists->Histogram::Fid_Fill(4,theta[0],phi[0],0,10,0,_W,data->Branches::p(0));
 					_hists->Histogram::SF_Fill(4,data->Branches::p(0),data->Branches::etot(0),10,0,_W,sector[0]);
 					_hists->Histogram::CC_Fill(4,data->Branches::cc_sect(0),data->Branches::cc_segm(0),data->Branches::nphe(0),10,0);
-					for(int i = 0; i<3; i++){
-						switch(i){
-							case 0:
-							idx = pro_idx[0];
-							par = 0; 
-							break;
-							case 1:
-							idx = pip_idx[0];
-							par = 1; 
-							break;
-							case 2:
-							idx = pim_idx[0];
-							par = 2;
-							break;
-						}
+					for(int par = 0; par<3; par++){
 						_hists->Histogram::Fid_Fill(4,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,0,_W,_p[par]);
 						_hists->Histogram::DT_Fill(4,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,0,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));
 					}
@@ -1166,14 +1122,17 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 		//Assign topology of the event and fill things for combined topologies
 		if(topo[3]){
 			_top = 4; 
+			std::cout<<std::endl <<"All topology is go";
 		}else{
 			for(int o =0;o<3;o++){
 				if(topo[o]){
 					_top = o+1;
+					std::cout<<std::endl <<_top <<" topology is go";
 				}
 			}
 		}
 		if(_top!=0){
+			std::cout<<" and we made it into the combined event selection?" <<std::endl;
 			_valid = true;
 			_hists->Histogram::WQ2_Fill(5,10,_W,_Q2);
 			_hists->Histogram::Fid_Fill(5,theta[0],phi[0],0,10,0,_W,data->Branches::p(0));
@@ -1234,16 +1193,16 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 					par = 2;
 					break;
 				}
-				if(top_possible[3]){//All topologies
+				if(top_possible[3]){//None Missing Topology
 					_hists->Histogram::Fid_Fill(5,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,1,_W,_p[par]);
 					_hists->Histogram::DT_Fill(5,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,1,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));
-				}else if(top_possible[0] && i!=0){
+				}else if(top_possible[0] && i!=0){//Pro Missing
 					_hists->Histogram::Fid_Fill(5,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,1,_W,_p[par]);
 					_hists->Histogram::DT_Fill(5,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,1,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));
-				}else if(top_possible[1] && i!=1){
+				}else if(top_possible[1] && i!=1){//Pip Missing
 					_hists->Histogram::Fid_Fill(5,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,1,_W,_p[par]);
 					_hists->Histogram::DT_Fill(5,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,1,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));	
-				}else if(top_possible[2] && i!=2){
+				}else if(top_possible[2] && i!=2){//Pim Missing
 					_hists->Histogram::Fid_Fill(5,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,1,_W,_p[par]);
 					_hists->Histogram::DT_Fill(5,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,1,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));
 				}
