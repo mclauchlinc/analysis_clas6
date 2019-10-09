@@ -1,16 +1,16 @@
 #include "particle.hpp"
 
-Particle::Particle(bool is_hadron, int par_idx){
-	if(is_hadron){
-		hadron = true; 
-	}else{
-		hadron = false; 
-	}
-	idx = par_idx; 
+Particle::Particle(){
 }
 
 
-void Particle::Fill_Particle(std::shared_ptr<Branches> data){
+void Particle::Fill_Particle(std::shared_ptr<Branches> data, int par_idx){
+	idx = par_idx; 
+	if(idx > 0){
+		hadron = true;
+	}else{
+		hadron = false;
+	}
 	//Hits in Detector Systems
 	dc = data->Branches::dc(idx);
 	cc = data->Branches::dc(idx);
@@ -21,7 +21,8 @@ void Particle::Fill_Particle(std::shared_ptr<Branches> data){
 	cy = data->Branches::cy(idx);
 	cz = data->Branches::cz(idx);
 	p = data->Branches::p(idx);
-	ec_energy = data->Branches::etot(idx);
+	etot = data->Branches::etot(idx);
+	bank = data->Branches::id(idx);
 	
 	cc_segm = data->Branches::cc_segm(idx);
 	cc_sect = data->Branches::cc_sect(idx);
@@ -29,14 +30,14 @@ void Particle::Fill_Particle(std::shared_ptr<Branches> data){
 	phi = physics::get_phi(cx,cy);
 	theta = physics::get_theta(cz);
 	sector = physics::get_sector(phi);
-	sf = ec_energy/p; 
+	sf = etot/p; 
 	if(hadron){
 		sc_r = data->Branches::sc_r(idx);
 		sc_t = data->Branches::sc_t(idx);
 		sc_r0 = data->Branches::sc_r(0);
 		sc_t0 = data->Branches::sc_t(0);
 		for(int i = 0; i<3; i++){
-			dt[i] = physics::delta_t(i,p,sc_r,sc_t,sc_r0,sc_t0);
+			dt_t[i] = physics::delta_t(i,p,sc_r,sc_t,sc_r0,sc_t0);
 		}
 	}else{
 		pim_ele = false;
@@ -62,7 +63,7 @@ void Particle::EID_Cuts(){
 			sf_pass = false;
 		}
 		//Min CC cuts
-		if(min_cc(cc_segm,cc_sect,nphe)){
+		if(cuts::min_cc(cc_segm,cc_sect,nphe)){
 			cc_pass = true; 
 		}else{
 			cc_pass = false; 
@@ -113,7 +114,7 @@ void Particle::HID_Cuts(){
 				fid_pass[i+1] = false; 
 			}
 			//Delta T cut
-			if(cuts::delta_t(i,p,sc_r,sc_t,sc_r0,sc_t0)){
+			if(cuts::delta_t_cut(i,p,sc_r,sc_t,sc_r0,sc_t0)){
 				dt_pass[i] = true;
 			}else{
 				dt_pass[i] = false;
@@ -139,6 +140,19 @@ void Particle::HID_Cuts(){
 	}
 }
 
+bool Particle::Is_Elec(){
+	return pid[0];
+}
+bool Particle::Is_Pro(){
+	return pid[1];
+}
+bool Particle::Is_Pip(){
+	return pid[2];
+}
+bool Particle::Is_Pim(){
+	return pid[3];
+}
+
 void Particle::Pro_Pip_Resolved(int par){//Requires HID_Cuts to have been performed
 	switch(par){
 		case 0:
@@ -156,7 +170,74 @@ void Particle::Pro_Pip_Resolved(int par){//Requires HID_Cuts to have been perfor
 			dt = dt_t[1];
 		break;
 		default:
-		std::cout<<"Improperly Entered a parameter"
+		std::cout<<"Improperly Entered a parameter";
 		break; 
 	}
+}
+
+bool Particle::Is_fid_pass(int par){
+	return fid_pass[par];
+}
+
+bool Particle::Is_cc_pass(){
+	return cc_pass;
+}
+
+bool Particle::Is_min_ec_pass(){
+	return min_ec_pass;
+}
+
+bool Particle::Is_dt_pass(int par){
+	return dt_pass[par];
+}
+
+bool Particle::Is_sanity_pass(int par){
+	return sanity_pass[par];
+}
+
+bool Particle::Is_sf_pass(){
+	return sf_pass;
+}
+
+bool Particle::Pro_Pip_Prob(){
+	return pro_pip;
+}
+
+int Particle::par_idx(){
+	return idx;
+}
+int Particle::par_nphe(){
+	return nphe;
+}
+int Particle::par_id(){
+	return id;
+}
+int Particle::par_sector(){
+	return sector;
+}
+int Particle::par_cc_sector(){
+	return cc_sect;
+}
+int Particle::par_cc_segm(){
+	return cc_segm;
+}
+
+float Particle::par_dt(int par){
+	return dt_t[par];
+}
+float Particle::par_theta(){
+	return theta;
+}
+float Particle::par_phi(){
+	return phi;
+}
+float Particle::par_etot(){
+	return etot;
+}
+float Particle::par_p(){
+	return p;
+}
+
+TLorentzVector Particle::Par_4Vec(){
+	return k1;
 }

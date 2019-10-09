@@ -157,3 +157,32 @@ bool cuts::sf_cut(Float_t p, Float_t etot, Float_t cx, Float_t cy, int r)
 	}
 	return pass_sf;
 }
+
+bool cuts::MM_cut(int top_, float MM){
+	bool pass = false;
+	float top = NAN;
+	float bot = NAN;
+	switch(top_){
+		case 0:
+			top = p_center + p_sig;
+			bot = p_center - p_sig; 
+		break;
+		case 1:
+			top = pip_center + pip_sig;
+			bot = pip_center - pip_sig; 
+		break;
+		case 2:
+			top = pim_center + pim_sig;
+			bot = pim_center - pim_sig; 
+		break;
+		case 3:
+			top = MM_zero_center2 + MM_zero_sigma2;
+			bot = MM_zero_center2 - MM_zero_sigma2; 
+		break;
+	}
+	if((MM > bot) && (MM < top)){
+		pass = true;
+	}
+	return pass; 
+}
+

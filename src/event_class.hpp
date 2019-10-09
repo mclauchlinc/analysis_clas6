@@ -8,7 +8,7 @@
 #include "branches.hpp"
 #include "eid.hpp"//Electron ID Cuts
 #include "cuts.hpp"
-#include "particle.hpp"
+//#include "particle.hpp"
 //#include "hid.hpp"//Hadron ID Cuts
 
 //#include "ntuple.hpp"
@@ -131,7 +131,7 @@ private:
 	bool top_possible[4]= {false,false,false,false};
 	
 public:
-	Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogram> _hists, int run_type);
+	Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogram> _hists, int run_type, int data_set = 0);
 	//~Event_Class();
 
 	float Get_px(int i);

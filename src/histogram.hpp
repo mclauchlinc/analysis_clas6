@@ -11,6 +11,7 @@
 #include "CartesianGenerator.hpp"
 #include "physics.hpp"
 #include "detectors.hpp"
+//#include "particle.hpp"
 //#include "variables.h"
 //#include "CartesianGenerator.hh"
 
@@ -37,8 +38,8 @@ protected:
 	 int WQ2yres = 20;
 
 	//Electron Sampling Fraction
-	 int SFxres = 100;
-	 int SFyres = 100;
+	 int SFxres = 300;
+	 int SFyres = 200;
 	 double SFxmin = 0.0;
 	 double SFymin = 0.0;
 	 double SFxmax = 6.0;
@@ -58,8 +59,8 @@ protected:
 	 double FIDxmax = 30.0;
 	 double FIDymax = 180.0;
 	//Delta_t
-	 int DTxres = 25;//300;
-	 int DTyres = 100;
+	 int DTxres = 100;//300;
+	 int DTyres = 200;
 	 double DTxmin = 0.0;
 	 double DTymin = -5.0;//-4.0;
 	 double DTxmax = 4.5;//7.0;
@@ -145,6 +146,7 @@ public:
 	//Delta T Cuts
 	void DT_Make();
 	void DT_Fill(int top, int part, float p, float d, float t, float d0, float t0, int cut, int anti, float W_, int sec);
+	void DT_Fill(int top, int part, float p, float dt, int cut, int anti, float W_, int sec);
 	void DT_Write();
 	//Min CC Cuts
 	void CC_Make();
@@ -165,6 +167,8 @@ public:
 	void Alpha_Fill(int top, float alpha, float W_, float Q2_);
 	void Alpha_Write();
 	*/
+	//void Fill_EID(std::shared_ptr<Particle> par);
+	//void Fill_HID(std::shared_ptr<Particle>  par);
 };
 
 

@@ -75,6 +75,16 @@ float physics::MM_event(int set, int squared, TLorentzVector k1_mu, TLorentzVect
 	return  MM;
 }
 
+float physics::MM_event(int squared, TLorentzVector k0_mu, TLorentzVector k1_mu, TLorentzVector k2_mu, TLorentzVector k3_mu, TLorentzVector k4_mu){
+	float MM = NAN; 
+	if(squared == 0 ){
+		MM = (k0_mu + p_mu - k1_mu - k2_mu - k3_mu - k4_mu).Mag();
+	} else{
+		MM = (k0_mu + p_mu - k1_mu - k2_mu - k3_mu - k4_mu).Mag2();
+	}
+	return  MM;
+}
+
 float physics::get_theta(float cz_){
 	float degree = 180.0/TMath::Pi();
 	return TMath::ACos(cz_)*degree;

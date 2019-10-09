@@ -18,7 +18,7 @@ namespace cuts{
 	float dt_p_low(float p);
 	float dt_p_high(float p);
 	bool delta_t_cut(int part, float p, float d0, float d, float t0, float t);
-	
+
 	//CC Cuts
 	bool min_cc(int cc_segm, int cc_sect, int nphe);
 	
@@ -29,6 +29,8 @@ namespace cuts{
 	float sf_high(Float_t p, int sidx, int r=1);
 	bool sf_cut(Float_t p, Float_t etot, Float_t cx, Float_t cy, int r = 1);
 
+	//Missing Mass Cuts
+	bool MM_cut(int top, float MM);
 
 }
 

@@ -590,6 +590,31 @@ void Histogram::DT_Fill(int top, int part, float p, float d, float t, float d0, 
 		std::cout<<"DT would have had weird nonexistant sectors " <<std::endl;
 	}
 }
+			
+void Histogram::DT_Fill(int top, int part, float p, float dt, int cut, int anti, float W_, int sec){
+	if(sec < 7){
+		if(cut!=6){//No event selection in the W variance. 
+			if(DT_made_hist[part][cut][Histogram::W_binning(W_)][0][top][anti]){
+				DT_hist[part][cut][Histogram::W_binning(W_)][0][top][anti]->Fill(p,dt);
+			}else{
+				std::cout<<"DT Would have segfaulted filling: " <<part <<" " <<cut <<" " <<Histogram::W_binning(W_) <<" " <<sec <<" " <<top <<" " <<anti <<std::endl;
+			}
+		}
+		if(DT_made_hist[part][cut][0][sec][top][anti]){
+			DT_hist[part][cut][0][sec][top][anti]->Fill(p,dt);
+		}else{
+			std::cout<<"DT Would have segfaulted filling: " <<part <<" " <<cut <<" " <<0 <<" " <<sec <<" " <<top <<" " <<anti <<std::endl;
+		}
+		if(DT_made_hist[part][cut][0][0][top][anti]){
+			DT_hist[part][cut][0][0][top][anti]->Fill(p,dt);
+		}else{
+			std::cout<<"DT Would have segfaulted filling: " <<part <<" " <<cut <<" " <<0 <<" " <<0 <<" " <<top <<" " <<anti <<std::endl;
+		}
+	}else{
+		std::cout<<"DT would have had weird nonexistant sectors " <<std::endl;
+	}
+}
+
 void Histogram::DT_Write(){
 	char dir_name[100]; 
 	TDirectory* DT_plot = RootOutputFile->mkdir("DT_plots");
@@ -901,4 +926,112 @@ void Histogram::MM_Write(){
 	}
 
 }
+/*
+void Histogram::Fill_EID(std::shared_ptr<Particle> par, float W_, float Q2_){
+	bool san, fid, cc, sf;
+	if(par->Particle::Is_sanity_pass(0)){
+		Histogram::WQ2_Fill(0,1,W_,Q2_);
+		Histogram::Fid_Fill(0,par->Particle::par_theta(),par->Particle::par_phi(),0,1,0,W_,par->Particle::par_p());
+		Histogram::SF_Fill(0,par->Particle::par_p(),par->Particle::par_etot(),1,0,W_,sector[0]);
+		Histogram::CC_Fill(0,par->Particle::par_cc_sect(),par->Particle::par_cc_segm(),par->Particle::par_nphe(),1,0);
+		if(par->Particle::Is_fid_pass(0)){
+			fid = true;
+			Histogram::WQ2_Fill(0,2,W_,Q2_);
+			Histogram::Fid_Fill(0,Particle::par_theta(),par->Particle::par_phi(),0,2,0,W_,par->Particle::par_p());
+			Histogram::SF_Fill(0,par->Particle::par_p(),par->Particle::par_etot(),2,0,W_,sector[0]);
+			Histogram::CC_Fill(0,par->Particle::par_cc_sect(),par->Particle::par_cc_segm(),par->Particle::par_nphe(),2,0);
+		}else{
+			fid = false;
+			Histogram::Fid_Fill(0,Particle::par_theta(),par->Particle::par_phi(),0,2,1,W_,par->Particle::par_p());
+			Histogram::SF_Fill(0,par->Particle::par_p(),par->Particle::par_etot(),2,1,W_,sector[0]);
+			Histogram::CC_Fill(0,par->Particle::par_cc_sect(),par->Particle::par_cc_segm(),par->Particle::par_nphe(),2,1);
+		}
+		if(par->Particle::Is_cc_pass()){
+			cc = true;
+			Histogram::WQ2_Fill(0,4,W_,Q2_);
+			Histogram::Fid_Fill(0,Particle::par_theta(),par->Particle::par_phi(),0,4,0,W_,par->Particle::par_p());
+			Histogram::SF_Fill(0,par->Particle::par_p(),par->Particle::par_etot(),4,0,W_,sector[0]);
+			Histogram::CC_Fill(0,par->Particle::par_cc_sect(),par->Particle::par_cc_segm(),par->Particle::par_nphe(),4,0);
+		}else{
+			cc = false;
+			Histogram::Fid_Fill(0,Particle::par_theta(),par->Particle::par_phi(),0,4,1,W_,par->Particle::par_p());
+			Histogram::SF_Fill(0,par->Particle::par_p(),par->Particle::par_etot(),4,1,W_,sector[0]);
+			Histogram::CC_Fill(0,par->Particle::par_cc_sect(),par->Particle::par_cc_segm(),par->Particle::par_nphe(),4,1);
+		}
+		if(par->Is_sf_pass() && par->Is_min_cc_pass()){
+			sf = true;
+			Histogram::WQ2_Fill(0,3,W_,Q2_);
+			Histogram::Fid_Fill(0,par->Particle::par_theta(),par->Particle::par_phi(),0,3,0,W_,par->Particle::par_p());
+			Histogram::SF_Fill(0,par->Particle::par_p(),par->Particle::par_etot(),3,0,W_,sector[0]);
+			Histogram::CC_Fill(0,par->Particle::par_cc_sect(),par->Particle::par_cc_segm(),par->Particle::par_nphe(),3,0);
+		}else{
+			sf = false;
+			Histogram::Fid_Fill(0,par->Particle::par_theta(),par->Particle::par_phi(),0,3,1,W_,par->Particle::par_p());
+			Histogram::SF_Fill(0,par->Particle::par_p(),par->Particle::par_etot(),3,1,W_,sector[0]);
+			Histogram::CC_Fill(0,par->Particle::par_cc_sect(),par->Particle::par_cc_segm(),par->Particle::par_nphe(),3,1);
+		}
+		if(fid && sf){
+			Histogram::WQ2_Fill(0,5,W_,Q2_);
+			Histogram::Fid_Fill(0,Particle::par_theta(),par->Particle::par_phi(),0,5,0,W_,par->Particle::par_p());
+			Histogram::SF_Fill(0,par->Particle::par_p(),par->Particle::par_etot(),5,0,W_,sector[0]);
+			Histogram::CC_Fill(0,par->Particle::par_cc_sect(),par->Particle::par_cc_segm(),par->Particle::par_nphe(),5,0);
+		}else{
+			Histogram::Fid_Fill(0,Particle::par_theta(),par->Particle::par_phi(),0,5,1,W_,par->Particle::par_p());
+			Histogram::SF_Fill(0,par->Particle::par_p(),par->Particle::par_etot(),5,1,W_,sector[0]);
+			Histogram::CC_Fill(0,par->Particle::par_cc_sect(),par->Particle::par_cc_segm(),par->Particle::par_nphe(),5,1);
+		}
+		if(fid && cc){
+			Histogram::WQ2_Fill(0,6,W_,Q2_);
+			Histogram::Fid_Fill(0,Particle::par_theta(),par->Particle::par_phi(),0,6,0,W_,par->Particle::par_p());
+			Histogram::SF_Fill(0,par->Particle::par_p(),par->Particle::par_etot(),6,0,W_,sector[0]);
+			Histogram::CC_Fill(0,par->Particle::par_cc_sect(),par->Particle::par_cc_segm(),par->Particle::par_nphe(),6,0);
+		}else{
+			Histogram::Fid_Fill(0,Particle::par_theta(),par->Particle::par_phi(),0,6,1,W_,par->Particle::par_p());
+			Histogram::SF_Fill(0,par->Particle::par_p(),par->Particle::par_etot(),6,1,W_,sector[0]);
+			Histogram::CC_Fill(0,par->Particle::par_cc_sect(),par->Particle::par_cc_segm(),par->Particle::par_nphe(),6,1);
+		}
+		if(sf && cc){
+			Histogram::WQ2_Fill(0,7,W_,Q2_);
+			Histogram::Fid_Fill(0,Particle::par_theta(),par->Particle::par_phi(),0,7,0,W_,par->Particle::par_p());
+			Histogram::SF_Fill(0,par->Particle::par_p(),par->Particle::par_etot(),7,0,W_,sector[0]);
+			Histogram::CC_Fill(0,par->Particle::par_cc_sect(),par->Particle::par_cc_segm(),par->Particle::par_nphe(),7,0);
+		}else{
+			Histogram::Fid_Fill(0,Particle::par_theta(),par->Particle::par_phi(),0,7,1,W_,par->Particle::par_p());
+			Histogram::SF_Fill(0,par->Particle::par_p(),par->Particle::par_etot(),7,1,W_,sector[0]);
+			Histogram::CC_Fill(0,par->Particle::par_cc_sect(),par->Particle::par_cc_segm(),par->Particle::par_nphe(),7,1);
+		}
+		if(sf && fid && cc){
+			Histogram::WQ2_Fill(0,8,W_,Q2_);
+			Histogram::Fid_Fill(0,Particle::par_theta(),par->Particle::par_phi(),0,8,0,W_,par->Particle::par_p());
+			Histogram::SF_Fill(0,par->Particle::par_p(),par->Particle::par_etot(),8,0,W_,sector[0]);
+			Histogram::CC_Fill(0,par->Particle::par_cc_sect(),par->Particle::par_cc_segm(),par->Particle::par_nphe(),8,0);
+			_elec = physics::Make_4Vector(par->Particle::par_p(),data->Branches::cx(0),data->Branches::cy(0),data->Branches::cz(0),me);
+			good_electron++;
+		}else{
+			Histogram::Fid_Fill(0,Particle::par_theta(),par->Particle::par_phi(),0,8,1,W_,par->Particle::par_p());
+			Histogram::SF_Fill(0,par->Particle::par_p(),par->Particle::par_etot(),8,1,W_,sector[0]);
+			Histogram::CC_Fill(0,par->Particle::par_cc_sect(),par->Particle::par_cc_segm(),par->Particle::par_nphe(),8,1);
+		}
+		if(par->Particle::Bank()==ELECTRON){
+			Histogram::WQ2_Fill(0,9,W_,Q2_);
+			Histogram::Fid_Fill(0,Particle::par_theta(),par->Particle::par_phi(),0,9,0,W_,par->Particle::par_p());
+			Histogram::SF_Fill(0,par->Particle::par_p(),par->Particle::par_etot(),9,0,W_,sector[0]);
+			Histogram::CC_Fill(0,par->Particle::par_cc_sect(),par->Particle::par_cc_segm(),par->Particle::par_nphe(),9,0);
+		}
+		else{
+			Histogram::Fid_Fill(0,Particle::par_theta(),par->Particle::par_phi(),0,9,1,W_,par->Particle::par_p());
+			Histogram::SF_Fill(0,par->Particle::par_p(),par->Particle::par_etot(),9,1,W_,sector[0]);
+			Histogram::CC_Fill(0,par->Particle::par_cc_sect(),par->Particle::par_cc_segm(),par->Particle::par_nphe(),9,1);
+		}
+	}else{
+		san = false;
+		Histogram::Fid_Fill(0,Particle::par_theta(),par->Particle::par_phi(),0,1,1,W_,par->Particle::par_p());
+		Histogram::SF_Fill(0,par->Particle::par_p(),par->Particle::par_etot(),1,1,W_,sector[0]);
+		Histogram::CC_Fill(0,par->Particle::par_cc_sect(),par->Particle::par_cc_segm(),par->Particle::par_nphe(),1,1);
+	}
+}
+
+void Histogram::Fill_HID(std::shared_ptr<Particle> par){
+
+}*/
 
