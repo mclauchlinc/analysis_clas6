@@ -1,7 +1,7 @@
 #include "event_class.hpp"
 
 
-Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogram> _hists, int run_type, int data_set){ 
+Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogram> _hists, int run_type, int plate_info, int data_set){ 
 	bool fid_e_pass = false;
 	bool sf_e_pass = false;
 	bool cc_e_pass = false;
@@ -10,6 +10,8 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 	float phi[num_parts];
 	float sector[num_parts];
 	float p_[num_parts];
+
+	_helicity = physics::event_helicity(data,plate_info);
 
 	switch(data_set){
 		case 0:
@@ -414,7 +416,7 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 						for( int j = 0; j < good_pim; j++){
 							test_pro = physics::Make_4Vector(ppro[i],cxpro[i],cypro[i],czpro[i],mp);
 							test_pim = physics::Make_4Vector(ppim[j],cxpim[j],cypim[j],czpim[j],mpi);
-							if((physics::MM_event(0,0,_elec,test_pro,test_pim) > (p_center-p_sig))&&(physics::MM_event(0,0,_elec,test_pro,test_pim) < (p_center+p_sig))){
+							if((physics::MM_event(0,0,_elec,test_pro,test_pim) > (pip_center-pip_sig))&&(physics::MM_event(0,0,_elec,test_pro,test_pim) < (pip_center+pip_sig))){
 								_pim = test_pim;
 								_pro = test_pro;
 								top_possible[1]=true;
@@ -439,7 +441,7 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 					_pim = physics::Make_4Vector(ppim[0],cxpim[0],cypim[0],czpim[0],mpi);
 					for(int i = 0; i < good_pro; i++){
 						test_pro = physics::Make_4Vector(ppro[i],cxpro[i],cypro[i],czpro[i],mp);
-						if((physics::MM_event(0,0,_elec,test_pro,_pim) > (p_center-p_sig))&&(physics::MM_event(0,0,_elec,test_pro,_pim) < (p_center+p_sig))){
+						if((physics::MM_event(0,0,_elec,test_pro,_pim) > (pip_center-pip_sig))&&(physics::MM_event(0,0,_elec,test_pro,_pim) < (pip_center+pip_sig))){
 							_pro = test_pro;
 							top_possible[1]=true;
 							d[2] = dpim[0];
@@ -464,7 +466,7 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 					_pro = physics::Make_4Vector(ppro[0],cxpro[0],cypro[0],czpro[0],mp);
 					for(int i = 0; i < good_pim; i++){
 						test_pim = physics::Make_4Vector(ppim[i],cxpim[i],cypim[i],czpim[i],mpi);
-						if((physics::MM_event(0,0,_elec,_pro,test_pim) > (p_center-p_sig))&&(physics::MM_event(0,0,_elec,_pro,test_pim) < (p_center+p_sig))){
+						if((physics::MM_event(0,0,_elec,_pro,test_pim) > (pip_center-pip_sig))&&(physics::MM_event(0,0,_elec,_pro,test_pim) < (pip_center+pip_sig))){
 							_pim = test_pim;
 							top_possible[1]=true;
 							d[2] = dpim[i];
@@ -512,7 +514,7 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 						for( int j = 0; j < good_pip; j++){
 							test_pro = physics::Make_4Vector(ppro[i],cxpro[i],cypro[i],czpro[i],mp);
 							test_pip = physics::Make_4Vector(ppip[j],cxpip[j],cypip[j],czpip[j],mpi);
-							if((physics::MM_event(0,0,_elec,test_pro,test_pip) > (p_center-p_sig))&&(physics::MM_event(0,0,_elec,test_pro,test_pip) < (p_center+p_sig)) && (pro_idx[i]!=pip_idx[j])){
+							if((physics::MM_event(0,0,_elec,test_pro,test_pip) > (pim_center-pim_sig))&&(physics::MM_event(0,0,_elec,test_pro,test_pip) < (pim_center+pim_sig)) && (pro_idx[i]!=pip_idx[j])){
 								_pip = test_pip;
 								_pro = test_pro;
 								top_possible[2]=true;
@@ -537,7 +539,7 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 					_pip = physics::Make_4Vector(ppip[0],cxpip[0],cypip[0],czpip[0],mpi);
 					for(int i = 0; i < good_pro; i++){
 						test_pro = physics::Make_4Vector(ppro[i],cxpro[i],cypro[i],czpro[i],mp);
-						if((physics::MM_event(0,0,_elec,test_pro,_pip) > (p_center-p_sig))&&(physics::MM_event(0,0,_elec,test_pro,_pip) < (p_center+p_sig))&& (pro_idx[i]!=pip_idx[0])){
+						if((physics::MM_event(0,0,_elec,test_pro,_pip) > (pim_center-pim_sig))&&(physics::MM_event(0,0,_elec,test_pro,_pip) < (pim_center+pim_sig))&& (pro_idx[i]!=pip_idx[0])){
 							_pro = test_pro;
 							top_possible[2]=true;
 							d[1] = dpip[0];
@@ -562,7 +564,7 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 					_pro = physics::Make_4Vector(ppro[0],cxpro[0],cypro[0],czpro[0],mp);
 					for(int i = 0; i < good_pip; i++){
 						test_pip = physics::Make_4Vector(ppip[i],cxpip[i],cypip[i],czpip[i],mpi);
-						if((physics::MM_event(0,0,_elec,_pro,test_pip) > (p_center-p_sig))&&(physics::MM_event(0,0,_elec,_pro,test_pip) < (p_center+p_sig))&& (pro_idx[0]!=pip_idx[i])){
+						if((physics::MM_event(0,0,_elec,_pro,test_pip) > (pim_center-pim_sig))&&(physics::MM_event(0,0,_elec,_pro,test_pip) < (pim_center+pim_sig))&& (pro_idx[0]!=pip_idx[i])){
 							_pip = test_pip;
 							top_possible[2]=true;
 							d[1] = dpip[i];
@@ -924,6 +926,7 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 	}
 	
 	bool topo[4]={false,false,false,false};
+	int part;
 
 	//Event_Class Selection
 	if(good_electron == 1){//Good Electron
@@ -946,9 +949,9 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 				//_hists->Histogram::MM_Fill(4,MM_p2,1,1);
 				topo[0]=true;
 				//std::cout<<std::endl <<"PRO Missing topology passed";
-				if(!top_possible[3]){
+				/*if(!top_possible[3]){
 					_pro = _beam + _target - _elec - _pip - _pim; 
-				}
+				}*/
 				_hists->Histogram::WQ2_Fill(1,10,_W,_Q2);
 				_hists->Histogram::Fid_Fill(1,physics::get_theta(data->Branches::cz(0)),physics::get_phi(data->Branches::cx(0),data->Branches::cy(0)),0,10,0,_W,data->Branches::p(0));
 				_hists->Histogram::SF_Fill(1,data->Branches::p(0),data->Branches::etot(0),10,0,_W,sector[0]);
@@ -987,9 +990,9 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 				//_hists->Histogram::MM_Fill(4,MM_pip2,1,1);
 				topo[1]=true;
 				//std::cout<<std::endl <<"PIP Missing topology passed";
-				if(!top_possible[3]){
+				/*if(!top_possible[3]){
 					_pip = _beam + _target - _elec - _pro - _pim; 
-				}
+				}*/
 				//Fill Event Selection 
 				//Electron
 				_hists->Histogram::WQ2_Fill(2,10,_W,_Q2);
@@ -1000,14 +1003,14 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 				for(int i = 0; i<2; i++){
 					switch(i){
 						case 0:
-						par = 0; 
+						part = 0; 
 						break;
 						case 1:
-						par = 2; 
+						part = 2; 
 						break;
 					}
-					_hists->Histogram::Fid_Fill(2,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,0,_W,_p[par]);
-					_hists->Histogram::DT_Fill(2,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,0,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));
+					_hists->Histogram::Fid_Fill(2,physics::get_theta(cz[part]),physics::get_phi(cx[part],cy[part]),part+1,6,0,_W,_p[part]);
+					_hists->Histogram::DT_Fill(2,part,_p[part], d[part], t[part], data->Branches::sc_r(0), data->Branches::sc_t(0),6,0,_W,physics::get_sector(physics::get_phi(cx[part],cy[part])));
 				}
 			}else{
 				_hists->Histogram::MM_Fill(1,MM_pip,2,0);
@@ -1021,14 +1024,14 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 				for(int i = 0; i<2; i++){
 					switch(i){
 						case 0:
-						par = 0; 
+						part = 0; 
 						break;
 						case 1:
-						par = 2; 
+						part = 2; 
 						break;
 					}
-					_hists->Histogram::Fid_Fill(2,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,1,_W,_p[par]);
-					_hists->Histogram::DT_Fill(2,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,1,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));
+					_hists->Histogram::Fid_Fill(2,physics::get_theta(cz[part]),physics::get_phi(cx[part],cy[part]),part+1,6,1,_W,_p[part]);
+					_hists->Histogram::DT_Fill(2,part,_p[part], d[part], t[part], data->Branches::sc_r(0), data->Branches::sc_t(0),6,1,_W,physics::get_sector(physics::get_phi(cx[part],cy[part])));
 				}
 			}
 		}
@@ -1051,9 +1054,9 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 				_hists->Histogram::Fid_Fill(3,physics::get_theta(data->Branches::cz(0)),physics::get_phi(data->Branches::cx(0),data->Branches::cy(0)),0,10,0,_W,data->Branches::p(0));
 				_hists->Histogram::SF_Fill(3,data->Branches::p(0),data->Branches::etot(0),10,0,_W,sector[0]);
 				_hists->Histogram::CC_Fill(3,data->Branches::cc_sect(0),data->Branches::cc_segm(0),data->Branches::nphe(0),10,0);
-				if(!top_possible[3]){
+				/*if(!top_possible[3]){
 					_pim = _beam + _target - _elec - _pro - _pip; 
-				}
+				}*/
 				for(int par = 0; par<2; par++){
 					_hists->Histogram::Fid_Fill(3,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,0,_W,_p[par]);
 					_hists->Histogram::DT_Fill(3,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,0,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));
@@ -1105,21 +1108,7 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 				_hists->Histogram::Fid_Fill(4,physics::get_theta(data->Branches::cz(0)),physics::get_phi(data->Branches::cx(0),data->Branches::cy(0)),0,10,1,_W,data->Branches::p(0));
 				_hists->Histogram::SF_Fill(4,data->Branches::p(0),data->Branches::etot(0),10,1,_W,sector[0]);
 				_hists->Histogram::CC_Fill(4,data->Branches::cc_sect(0),data->Branches::cc_segm(0),data->Branches::nphe(0),10,1);
-				for(int i = 0; i<3; i++){
-					switch(i){
-						case 0:
-						idx = pro_idx[0];
-						par = 0; 
-						break;
-						case 1:
-						idx = pip_idx[0];
-						par = 1; 
-						break;
-						case 2:
-						idx = pim_idx[0];
-						par = 2;
-						break;
-					}
+				for(int par = 0; par<3; par++){
 					_hists->Histogram::Fid_Fill(4,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,1,_W,_p[par]);
 					_hists->Histogram::DT_Fill(4,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,1,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));
 				}
@@ -1137,7 +1126,19 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 				//std::cout<<std::endl <<_top <<" topology is go";
 			}
 		}
+		switch(_top){
+			case 1:
+				_pro = _beam + _target - _elec - _pip - _pim;
+			break;
+			case 2:
+				_pip = _beam + _target - _elec - _pro - _pim;
+			break;
+			case 3:
+				_pim = _beam + _target - _elec - _pro - _pip;
+			break;
+		}
 	}
+
 	if(_top!=0){
 		//std::cout<<" and we made it into the combined event selection?" <<std::endl;
 		_valid = true;

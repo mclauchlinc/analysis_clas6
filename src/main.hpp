@@ -18,7 +18,7 @@ int file_num = -1;//The initial assignment for the number of files in the progra
 
 
 
-size_t run(std::shared_ptr<TChain> _chain, std::shared_ptr<Histogram> _hists, std::shared_ptr<forest> a_forest, int thread_id, int run_type){//, int &num_ppip){
+size_t run(std::shared_ptr<TChain> _chain, std::shared_ptr<Histogram> _hists, std::shared_ptr<forest> a_forest, int thread_id, int run_type, int plate_){//, int &num_ppip){
 	//Number of events in this thread
 	size_t num_of_events = (int) _chain->GetEntries();
 	//Print out information about the thread
@@ -44,7 +44,7 @@ size_t run(std::shared_ptr<TChain> _chain, std::shared_ptr<Histogram> _hists, st
 		total_com++; 
 
 		//Analyze the event and look for particle ID and topology 
-		auto event = std::make_shared<Event_Class>(data,_hists,run_type,0);//All event selection happens in here 
+		auto event = std::make_shared<Event_Class>(data,_hists,run_type,plate_);//All event selection happens in here 
 		//num_ppip += event->Event_Class::Get_ppip();
 		if(event->Event_Class::is_valid()){//event->Event::is_valid()){ //changed this out just to see if it will create the files
 			good_event++;
@@ -54,7 +54,7 @@ size_t run(std::shared_ptr<TChain> _chain, std::shared_ptr<Histogram> _hists, st
 }
 
 
-size_t run_files(std::vector<std::string> inputs, std::string list_file, std::shared_ptr<Histogram> hists, std::shared_ptr<forest> bforest, int thread_id, int run_type, int max, int _case){//, int &num_ppip){
+size_t run_files(std::vector<std::string> inputs, std::string list_file, std::shared_ptr<Histogram> hists, std::shared_ptr<forest> bforest, int thread_id, int run_type, int max, int _case, int plate_){//, int &num_ppip){
 	//Called once per thread
 	//Make a new chain to process for this thread
 	auto chain = std::make_shared<TChain>("h10");
@@ -69,7 +69,7 @@ size_t run_files(std::vector<std::string> inputs, std::string list_file, std::sh
 
 	
 	//Run the function over each thread
-	return run(chain,hists,bforest,thread_id,run_type);//,num_ppip);
+	return run(chain,hists,bforest,thread_id,run_type,plate_);//,num_ppip);
 }
 
 #endif

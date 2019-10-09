@@ -249,6 +249,7 @@ static const std::string list3 = "three";
 static const std::string list4 = "four";
 static const std::string list3p = "three+";
 static const std::string list3n = "three-";
+static const std::string list3h = "threeh";
 
 //Paths for file names
 static const std::string path1 = "/home/mclauchlinc/Desktop/analysis/nick_convert_e16.txt";

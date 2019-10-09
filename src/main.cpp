@@ -15,9 +15,12 @@ int main(int argc, char **argv){
 
 	//for threading
 	std::vector<std::vector<std::string>> infilenames(NUM_THREADS);
+	std::vector<std::vector<std::string>> infilenames2(NUM_THREADS);//For two lists of plate stuff
 
 	int data_set = 0; //{e1-6,e1f, e1-6 sim, e1f sim} ->{1,2,3,4}
 	int _case = 0; //For file entry
+	int plate_stat = 0;//Status of the half wave plate
+	bool hel_runs = false;
 
 	/*
 	When running this analysis you have several options
@@ -32,10 +35,24 @@ int main(int argc, char **argv){
         output_name = argv[3]; //variables.h
         std::cout<<"Argument assignment complete" <<std::endl;
        	//Should make a mapping of input paths to data types
-        for(int i = 0; i <NUM_THREADS; i++){
-       		infilenames[i] = fun::read_file_list(filepath_map[argv[1]],i);//constants.hpp for map, functions.hpp for function
+       	_case = 1; 
+       	if(argv[1]!=list3h){
+       		for(int i = 0; i <NUM_THREADS; i++){
+	       		infilenames[i] = fun::read_file_list(filepath_map[argv[1]],i);//constants.hpp for map, functions.hpp for function
+	       	}
+	        if(argv[1] == list3p){
+	       		plate_stat = 1; 
+	        }else if(argv[1] == list3n){
+	       		plate_stat = -1; 
+	        }
+       	}else{
+       		hel_runs = true;
+       		for(int i = 0; i <NUM_THREADS; i++){
+	       		infilenames[i] = fun::read_file_list(filepath_map[list3p],i);//constants.hpp for map, functions.hpp for function
+	       		infilenames2[i] = fun::read_file_list(filepath_map[list3n],i);//constants.hpp for map, functions.hpp for function
+	       		plate_stat = 1;
+	       	}
        	}
-       _case = 1; 
 	}
 	//Case 2
 	if(argc >4){
@@ -50,6 +67,7 @@ int main(int argc, char **argv){
 
 	// Make a set of threads (Futures are special threads which return a value)
   	std::future<size_t> threads[NUM_THREADS];
+  	std::future<size_t> threads2[NUM_THREADS];
 
 	//Define variable for total number of events
 	size_t events = 0; 
@@ -76,7 +94,7 @@ int main(int argc, char **argv){
 		//Set the thread to run asynchronously
 		//The function running is the first argument
 		//The functions arguments are all remaining arguments
-		threads[i] = std::async(run_files, infilenames.at(i), filepath_map[argv[1]], hists, a_good_forest, i, data_set, file_num, _case);//, num_mixed_p_pip[i]);
+		threads[i] = std::async(run_files, infilenames.at(i), filepath_map[list3p], hists, a_good_forest, i, data_set, file_num, _case, plate_stat);//, num_mixed_p_pip[i]);
 		//run_files(infilenames.at(i), filepath_map[argv[1]], hists, a_good_forest, i, data_set, file_num, _case);
 		
 
@@ -84,6 +102,22 @@ int main(int argc, char **argv){
 	}
 	for(int j = 0; j<NUM_THREADS; j++){
 		threads[j].wait(); 
+	}
+	if(hel_runs){
+		//For each thread for other plate config
+		for(int i = 0; i<NUM_THREADS; i++){
+			//Set the thread to run asynchronously
+			//The function running is the first argument
+			//The functions arguments are all remaining arguments
+			threads2[i] = std::async(run_files, infilenames2.at(i), filepath_map[list3n], hists, a_good_forest, i, data_set, file_num, _case, -plate_stat);//, num_mixed_p_pip[i]);
+			//run_files(infilenames.at(i), filepath_map[argv[1]], hists, a_good_forest, i, data_set, file_num, _case);
+			
+
+			 //This is running the analysis 
+		}
+		for(int j = 0; j<NUM_THREADS; j++){
+			threads2[j].wait(); 
+		}
 	}
 	//a_good_forest->forest::scan_thread_tree(1);
 	

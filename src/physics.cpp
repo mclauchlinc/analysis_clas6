@@ -38,7 +38,7 @@ int physics::event_helicity(std::shared_ptr<Branches> data, int plate_stat){
 	if(data->evntclas2() >= 1000) eh = 1; 
 	if(data->evntclas2() <= -1000) eh = -1; 
 	if(data->evntclas2() < 1000 && data->evntclas2() > -1000) eh = 0; 
-	if(plate_stat == 0 ) eh = 1; 
+	//if(plate_stat == 0 ) eh = 1; 
 	return plate_stat*eh; 
 }
 
