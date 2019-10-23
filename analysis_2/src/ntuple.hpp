@@ -15,38 +15,27 @@
 //Output Event files which will contain event selected information 
 class forest{
 private:
-	Int_t _evnt = 0; //The #event for the given file
-	Int_t _apart = 6;//The particle in each event  
-	Int_t _bpart = 3; 
-	Float_t _px[6] = {NAN,NAN,NAN,NAN,NAN,NAN};//{beam,target,e',p',pip,pim}
-	Float_t _py[6]= {NAN,NAN,NAN,NAN,NAN,NAN}; //{beam,target,e',p',pip,pim}
-	Float_t _pz[6]= {NAN,NAN,NAN,NAN,NAN,NAN};//{beam,target,e',p',pip,pim}
-	Float_t _p0[6]= {NAN,NAN,NAN,NAN,NAN,NAN};////{beam,target,e',p',pip,pim}Energy of the particle 
-	Int_t _pid[6]= {0,0,0,0,0,0};//particle ID 
-	Int_t _hel= 0; //helicity
-	Int_t _top= 0; //Topology {pmiss,pipmiss,pimmiss,zero} -> {1,2,3,4}
-	Int_t _fc_tot = 0;
-	Float_t _MM[3]= {NAN,NAN,NAN};//{p/pip,p/pim,pip/pim}
-	Float_t _theta[3]{NAN,NAN,NAN};//{p,pip,pim}
-	Float_t _alpha[3]{NAN,NAN,NAN};//[{pim,p},{pp,pip}],[{p,pp},{pip,pim}],[{pip,p},{pp,pim}]
-	Int_t _run_type= 0;//{1,2,3,4}->{e16,e1f,e16sim,e1f sim} 
+	Int_t _evnt; //The #event for the given file
+	Int_t _apart;//The particle in each event  
+	Float_t _px[4]; 
+	Float_t _py[4]; 
+	Float_t _pz[4];
+	Float_t _p0[4];//Energy of the particle 
+	Int_t _pid[4];//particle ID 
+	Int_t _hel; //helicity
+	Int_t _top; //Topology {pmiss,pipmiss,pimmiss,zero} -> {1,2,3,4}
+	Int_t _fc_tot;
 
 	//Variables for the individual threads
 	Int_t _evntb[NUM_THREADS]; //The #event for the given file
-	Int_t _apartb[NUM_THREADS];//The particle in each event
-	Int_t _bpartb[NUM_THREADS];  
-	Float_t _pxb[NUM_THREADS][6];
-	Float_t _pyb[NUM_THREADS][6]; 
-	Float_t _pzb[NUM_THREADS][6];
-	Float_t _p0b[NUM_THREADS][6];//Energy of the particle 
-	Int_t _pidb[NUM_THREADS][6];//particle ID 
+	Int_t _apartb[NUM_THREADS];//The particle in each event  
+	Float_t _pxb[NUM_THREADS][4]; 
+	Float_t _pyb[NUM_THREADS][4]; 
+	Float_t _pzb[NUM_THREADS][4];
+	Float_t _p0b[NUM_THREADS][4];//Energy of the particle 
+	Int_t _pidb[NUM_THREADS][4];//particle ID 
 	Int_t _helb[NUM_THREADS]; //helicity
 	Int_t _topb[NUM_THREADS]; //Topology {pmiss,pipmiss,pimmiss,zero} -> {1,2,3,4}
-	Int_t _fc_totb[NUM_THREADS];
-	Float_t _MMb[NUM_THREADS][3];//{p/pip,p/pim,pip/pim}
-	Float_t _thetab[NUM_THREADS][3];//{p,pip,pim}
-	Float_t _alphab[NUM_THREADS][3];//[{pim,p},{pp,pip}],[{p,pp},{pip,pim}],[{pip,p},{pp,pim}]
-	Int_t _run_typeb[NUM_THREADS];//{1,2,3,4}->{e16,e1f,e16sim,e1f sim} 
 	/*
 	Int_t _evntc[NUM_THREADS]; //The #event for the given file
 	Int_t _apartc[NUM_THREADS];//The particle in each event  

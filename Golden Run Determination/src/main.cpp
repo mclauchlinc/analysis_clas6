@@ -48,7 +48,6 @@ int main(int argc, char **argv){
 	       		plate_stat = -1; 
 	        }
        	}else{
-       		comp = list3p;
        		hel_runs = true;
        		std::cout<<"Looking at Both Plates" <<std::endl;
        		for(int i = 0; i <NUM_THREADS; i++){
@@ -82,12 +81,10 @@ int main(int argc, char **argv){
 	//Make relevant TTrees and Event Rootfile
 	auto a_good_forest = std::make_shared<forest>(1); 
 	a_good_forest->forest::mkfile(output_name);//Making the Tree File
-	std::future<bool> fut;
-
 	
 
 	for(int i = 0; i<NUM_THREADS; i++){
-		//num_mixed_p_pip[i]=0;
+		num_mixed_p_pip[i]=0;
 	}
 
 	//For each thread
@@ -95,7 +92,7 @@ int main(int argc, char **argv){
 		//Set the thread to run asynchronously
 		//The function running is the first argument
 		//The functions arguments are all remaining arguments
-		threads[i] = std::async(run_files, infilenames.at(i),filepath_map[comp], hists, a_good_forest, i, filetype_map[comp], file_num, _case, plate_stat);//, num_mixed_p_pip[i]);
+		threads[i] = std::async(run_files, infilenames.at(i), filepath_map[list3p], hists, a_good_forest, i, data_set, file_num, _case, plate_stat);//, num_mixed_p_pip[i]);
 		//run_files(infilenames.at(i), filepath_map[argv[1]], hists, a_good_forest, i, data_set, file_num, _case);
 		
 
@@ -110,7 +107,7 @@ int main(int argc, char **argv){
 			//Set the thread to run asynchronously
 			//The function running is the first argument
 			//The functions arguments are all remaining arguments
-			threads2[i] = std::async(run_files, infilenames2.at(i),filepath_map[list3n], hists, a_good_forest, i, filetype_map[comp], file_num, _case, -plate_stat);//, num_mixed_p_pip[i]);
+			threads2[i] = std::async(run_files, infilenames2.at(i), filepath_map[list3n], hists, a_good_forest, i, data_set, file_num, _case, -plate_stat);//, num_mixed_p_pip[i]);
 			//run_files(infilenames.at(i), filepath_map[argv[1]], hists, a_good_forest, i, data_set, file_num, _case);
 			
 

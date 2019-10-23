@@ -45,6 +45,7 @@ private:
 	bool _valid = false; //Valid trigger electron from eid 
 	int _top = 0; //Topology this fits under {bad, pmiss, pipmiss,pimmiss,zeromiss }->{0,1,2,3,4}
 	bool _assigned_4vecs = false; 
+	int _run_type = 0; 
 
 	//All four vectors in the center of mass frame 
 	TLorentzVector _beam;
@@ -59,6 +60,8 @@ private:
 	int good_pro = 0;
 	int good_pip = 0; 
 	int good_pim = 0; 
+
+	int _fc_curr = 0; 
 
 	bool pim_is_ele = false; 
 
@@ -143,6 +146,7 @@ public:
 	float Get_top();
 	float Get_pid(int i);
 	bool is_valid();
+	int Get_run_type();
 
 	int Get_ppip(int idx);
 	//void Fill_Tree(forest tree, int event_n);

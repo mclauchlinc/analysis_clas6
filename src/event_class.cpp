@@ -10,8 +10,10 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 	float phi[num_parts];
 	float sector[num_parts];
 	float p_[num_parts];
+	bool in_range = false;
 
 	_helicity = physics::event_helicity(data,plate_info);
+	_run_type = run_type;
 
 	switch(data_set){
 		case 0:
@@ -41,8 +43,14 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 	}	
 
 
-	_W = physics::WP(0,data);//The first index is e16 vs e1f
-	_Q2 = physics::Qsquared(0,data);//The first index is e16 vs e1f
+	_W = physics::WP(0,data);//The first index {0,1} -> {e16, e1f}
+	_Q2 = physics::Qsquared(0,data);//The first index {0,1} -> {e16, e1f}
+
+	if(_W >= Wmin && _W <= Wmax ){//Checking to see if the particle is in the relevant W Q2 region 
+		if(_Q2 >= Q2min && _Q2 <= Q2max){
+			in_range = true;
+		}
+	}
 	//Pre ID Filling
 		//Event-Wide
 		//Electrons
@@ -52,7 +60,7 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 	_hists->Histogram::CC_Fill(0,data->Branches::cc_sect(0),data->Branches::cc_segm(0),data->Branches::nphe(0),0,0);
 	
 	//electron ID
-	if(data->Branches::q(0)==-1 && data->Branches::cc(0)!=0 && data->Branches::dc(0)!=0 && data->Branches::sc(0)!=0 && data->Branches::ec(0)!=0){//Sanity are q = -1, cc, dc, ec, and sc hits
+	if(in_range && data->Branches::q(0)==-1 && data->Branches::cc(0)!=0 && data->Branches::dc(0)!=0 && data->Branches::sc(0)!=0 && data->Branches::ec(0)!=0){//Sanity are q = -1, cc, dc, ec, and sc hits
 		_hists->Histogram::WQ2_Fill(0,1,_W,_Q2);
 		_hists->Histogram::Fid_Fill(0,physics::get_theta(data->Branches::cz(0)),physics::get_phi(data->Branches::cx(0),data->Branches::cy(0)),0,1,0,_W,data->Branches::p(0));
 		_hists->Histogram::SF_Fill(0,data->Branches::p(0),data->Branches::etot(0),1,0,_W,sector[0]);
@@ -158,129 +166,131 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 	int pip_loop = 0;
 	int pim_loop = 0; 
 
-	for(int h = 1; h < num_parts; h++){//Particle Loop
-		for(int part = 0; part < 3; part++){//Hadron loop
-			fid_h = false; 
-			dt_h = false; 
-			hid_num = -99;
-			//Assign desired charge
-			switch(part){
-				case 0:
-				q_h = 1;
-				hid_num = PROTON;
-				break;
-				case 1:
-				q_h = 1; 
-				hid_num = PION; 
-				break;
-				case 2:
-				q_h = -1;
-				hid_num = -PION;
-				break;
-			}
-			//std::cout<<std::endl <<"for part = "<<part <<" q_h = " <<q_h <<" and hid_num = " <<hid_num;
-			//Pre Cut
-			_hists->Histogram::Fid_Fill(0,theta[h],phi[h],part+1,0,0,_W,data->Branches::p(h));
-			_hists->Histogram::DT_Fill(0,part,data->Branches::p(h), data->Branches::sc_r(h), data->Branches::sc_t(h), data->Branches::sc_r(0), data->Branches::sc_t(0),0,0,_W,sector[h]);
-			//Sanity Cut
-			if(data->Branches::q(h)==q_h && data->Branches::dc(h)!=0 && data->Branches::sc(h)!=0){
-				_hists->Histogram::Fid_Fill(0,theta[h],phi[h],part+1,1,0,_W,data->Branches::p(h));
-				_hists->Histogram::DT_Fill(0,part,data->Branches::p(h), data->Branches::sc_r(h), data->Branches::sc_t(h), data->Branches::sc_r(0), data->Branches::sc_t(0),1,0,_W,sector[h]);
-				if(cuts::fid_cut(part+1,data->Branches::p(h),data->Branches::cx(h),data->Branches::cy(h),data->Branches::cz(h))){
-					fid_h = true; 
-					_hists->Histogram::Fid_Fill(0,theta[h],phi[h],part+1,2,0,_W,data->Branches::p(h));
-					_hists->Histogram::DT_Fill(0,part,data->Branches::p(h), data->Branches::sc_r(h), data->Branches::sc_t(h), data->Branches::sc_r(0), data->Branches::sc_t(0),2,0,_W,sector[h]);
-				}else{
-					_hists->Histogram::Fid_Fill(0,theta[h],phi[h],part+1,2,1,_W,data->Branches::p(h));
-					_hists->Histogram::DT_Fill(0,part,data->Branches::p(h), data->Branches::sc_r(h), data->Branches::sc_t(h), data->Branches::sc_r(0), data->Branches::sc_t(0),2,1,_W,sector[h]);
-				}	
-				if(cuts::delta_t_cut(part, data->Branches::p(h), data->Branches::sc_r(0), data->Branches::sc_r(h), data->Branches::sc_t(0), data->Branches::sc_t(h))){
-					dt_h = true; 
-					_hists->Histogram::Fid_Fill(0,theta[h],phi[h],part+1,3,0,_W,data->Branches::p(h));
-					_hists->Histogram::DT_Fill(0,part,data->Branches::p(h), data->Branches::sc_r(h), data->Branches::sc_t(h), data->Branches::sc_r(0), data->Branches::sc_t(0),3,0,_W,sector[h]);
-				}else{
-					_hists->Histogram::Fid_Fill(0,theta[h],phi[h],part+1,3,1,_W,data->Branches::p(h));
-					_hists->Histogram::DT_Fill(0,part,data->Branches::p(h), data->Branches::sc_r(h), data->Branches::sc_t(h), data->Branches::sc_r(0), data->Branches::sc_t(0),3,1,_W,sector[h]);
+	if(in_range){
+		for(int h = 1; h < num_parts; h++){//Particle Loop
+			for(int part = 0; part < 3; part++){//Hadron loop
+				fid_h = false; 
+				dt_h = false; 
+				hid_num = -99;
+				//Assign desired charge
+				switch(part){
+					case 0:
+					q_h = 1;
+					hid_num = PROTON;
+					break;
+					case 1:
+					q_h = 1; 
+					hid_num = PION; 
+					break;
+					case 2:
+					q_h = -1;
+					hid_num = -PION;
+					break;
 				}
-				if(dt_h && fid_h){
-					_hists->Histogram::Fid_Fill(0,theta[h],phi[h],part+1,4,0,_W,data->Branches::p(h));
-					_hists->Histogram::DT_Fill(0,part,data->Branches::p(h), data->Branches::sc_r(h), data->Branches::sc_t(h), data->Branches::sc_r(0), data->Branches::sc_t(0),4,0,_W,sector[h]);
-					switch(part){
-						case 0:
-							//_prot = physics::Make_4Vector(data->Branches::p(h),data->Branches::cx(h),data->Branches::cy(h),data->Branches::cz(h),mp);
-							good_pro++;//Number of identified protons
-							//std::cout<<" assign pro idx:" <<h <<std::endl;
-							dpro[p_loop] = data->Branches::sc_r(h);
-							tpro[p_loop] = data->Branches::sc_t(h);
-							cxpro[p_loop] = data->Branches::cx(h);
-							cypro[p_loop] = data->Branches::cy(h);
-							czpro[p_loop] = data->Branches::cz(h);
-							ppro[p_loop] = data->Branches::p(h);
-							h_secpro[p_loop] = sector[h];
-							check_idx[p_loop] = h; 
-							pro_idx[p_loop] = h;
-							//std::cout<<"Sector Comparison for Proton: " <<sector[h] <<" " <<h_secpro[p_loop] <<std::endl; 
-							p_loop++;
-						break;
-						case 1:
-							//_pip = physics::Make_4Vector(data->Branches::p(h),data->Branches::cx(h),data->Branches::cy(h),data->Branches::cz(h),mpi);
-							good_pip++;//number of Identified pip
-							//std::cout<<" assign pip idx:" <<h <<std::endl;
-							dpip[pip_loop] = data->Branches::sc_r(h);
-							tpip[pip_loop] = data->Branches::sc_t(h);
-							cxpip[pip_loop] = data->Branches::cx(h);
-							cypip[pip_loop] = data->Branches::cy(h);
-							czpip[pip_loop] = data->Branches::cz(h);
-							ppip[pip_loop] = data->Branches::p(h);
-							h_secpip[pip_loop] = sector[h];
-							pip_idx[pip_loop]=h;
-							check_idx[1] = h; 
-							pip_loop++;
-						break;
-						case 2:
-							//Electron Contamination 
-							if(cuts::min_cc(data->Branches::cc_segm(h),data->Branches::cc_sect(h),data->Branches::nphe(h))){//Min CC Cut
-								if(cuts::sf_cut(data->Branches::p(h),data->Branches::etot(h),data->Branches::cx(h),data->Branches::cy(h))){//SF Cut
-									//if(cuts::fid_cut(h,data->Branches::p(h),data->Branches::cx(h),data->Branches::cy(h),data->Branches::cz(h))){//Electron Fiducial //I don't know that this should be necessary because it doesn't work towards e-pim separation 
-										pim_is_ele = true;//Defined quantity for Event object  
-									//}
+				//std::cout<<std::endl <<"for part = "<<part <<" q_h = " <<q_h <<" and hid_num = " <<hid_num;
+				//Pre Cut
+				_hists->Histogram::Fid_Fill(0,theta[h],phi[h],part+1,0,0,_W,data->Branches::p(h));
+				_hists->Histogram::DT_Fill(0,part,data->Branches::p(h), data->Branches::sc_r(h), data->Branches::sc_t(h), data->Branches::sc_r(0), data->Branches::sc_t(0),0,0,_W,sector[h]);
+				//Sanity Cut
+				if(data->Branches::q(h)==q_h && data->Branches::dc(h)!=0 && data->Branches::sc(h)!=0){
+					_hists->Histogram::Fid_Fill(0,theta[h],phi[h],part+1,1,0,_W,data->Branches::p(h));
+					_hists->Histogram::DT_Fill(0,part,data->Branches::p(h), data->Branches::sc_r(h), data->Branches::sc_t(h), data->Branches::sc_r(0), data->Branches::sc_t(0),1,0,_W,sector[h]);
+					if(cuts::fid_cut(part+1,data->Branches::p(h),data->Branches::cx(h),data->Branches::cy(h),data->Branches::cz(h))){
+						fid_h = true; 
+						_hists->Histogram::Fid_Fill(0,theta[h],phi[h],part+1,2,0,_W,data->Branches::p(h));
+						_hists->Histogram::DT_Fill(0,part,data->Branches::p(h), data->Branches::sc_r(h), data->Branches::sc_t(h), data->Branches::sc_r(0), data->Branches::sc_t(0),2,0,_W,sector[h]);
+					}else{
+						_hists->Histogram::Fid_Fill(0,theta[h],phi[h],part+1,2,1,_W,data->Branches::p(h));
+						_hists->Histogram::DT_Fill(0,part,data->Branches::p(h), data->Branches::sc_r(h), data->Branches::sc_t(h), data->Branches::sc_r(0), data->Branches::sc_t(0),2,1,_W,sector[h]);
+					}	
+					if(cuts::delta_t_cut(part, data->Branches::p(h), data->Branches::sc_r(0), data->Branches::sc_r(h), data->Branches::sc_t(0), data->Branches::sc_t(h))){
+						dt_h = true; 
+						_hists->Histogram::Fid_Fill(0,theta[h],phi[h],part+1,3,0,_W,data->Branches::p(h));
+						_hists->Histogram::DT_Fill(0,part,data->Branches::p(h), data->Branches::sc_r(h), data->Branches::sc_t(h), data->Branches::sc_r(0), data->Branches::sc_t(0),3,0,_W,sector[h]);
+					}else{
+						_hists->Histogram::Fid_Fill(0,theta[h],phi[h],part+1,3,1,_W,data->Branches::p(h));
+						_hists->Histogram::DT_Fill(0,part,data->Branches::p(h), data->Branches::sc_r(h), data->Branches::sc_t(h), data->Branches::sc_r(0), data->Branches::sc_t(0),3,1,_W,sector[h]);
+					}
+					if(dt_h && fid_h){
+						_hists->Histogram::Fid_Fill(0,theta[h],phi[h],part+1,4,0,_W,data->Branches::p(h));
+						_hists->Histogram::DT_Fill(0,part,data->Branches::p(h), data->Branches::sc_r(h), data->Branches::sc_t(h), data->Branches::sc_r(0), data->Branches::sc_t(0),4,0,_W,sector[h]);
+						switch(part){
+							case 0:
+								//_prot = physics::Make_4Vector(data->Branches::p(h),data->Branches::cx(h),data->Branches::cy(h),data->Branches::cz(h),mp);
+								good_pro++;//Number of identified protons
+								//std::cout<<" assign pro idx:" <<h <<std::endl;
+								dpro[p_loop] = data->Branches::sc_r(h);
+								tpro[p_loop] = data->Branches::sc_t(h);
+								cxpro[p_loop] = data->Branches::cx(h);
+								cypro[p_loop] = data->Branches::cy(h);
+								czpro[p_loop] = data->Branches::cz(h);
+								ppro[p_loop] = data->Branches::p(h);
+								h_secpro[p_loop] = sector[h];
+								check_idx[p_loop] = h; 
+								pro_idx[p_loop] = h;
+								//std::cout<<"Sector Comparison for Proton: " <<sector[h] <<" " <<h_secpro[p_loop] <<std::endl; 
+								p_loop++;
+							break;
+							case 1:
+								//_pip = physics::Make_4Vector(data->Branches::p(h),data->Branches::cx(h),data->Branches::cy(h),data->Branches::cz(h),mpi);
+								good_pip++;//number of Identified pip
+								//std::cout<<" assign pip idx:" <<h <<std::endl;
+								dpip[pip_loop] = data->Branches::sc_r(h);
+								tpip[pip_loop] = data->Branches::sc_t(h);
+								cxpip[pip_loop] = data->Branches::cx(h);
+								cypip[pip_loop] = data->Branches::cy(h);
+								czpip[pip_loop] = data->Branches::cz(h);
+								ppip[pip_loop] = data->Branches::p(h);
+								h_secpip[pip_loop] = sector[h];
+								pip_idx[pip_loop]=h;
+								check_idx[1] = h; 
+								pip_loop++;
+							break;
+							case 2:
+								//Electron Contamination 
+								if(cuts::min_cc(data->Branches::cc_segm(h),data->Branches::cc_sect(h),data->Branches::nphe(h))){//Min CC Cut
+									if(cuts::sf_cut(data->Branches::p(h),data->Branches::etot(h),data->Branches::cx(h),data->Branches::cy(h))){//SF Cut
+										//if(cuts::fid_cut(h,data->Branches::p(h),data->Branches::cx(h),data->Branches::cy(h),data->Branches::cz(h))){//Electron Fiducial //I don't know that this should be necessary because it doesn't work towards e-pim separation 
+											pim_is_ele = true;//Defined quantity for Event object  
+										//}
+									}
 								}
-							}
-							if(!pim_is_ele){
-								//_pim = physics::Make_4Vector(data->Branches::p(h),data->Branches::cx(h),data->Branches::cy(h),data->Branches::cz(h),mpi);
-								good_pim++;//number of identified pim
-								check_idx[2] = h; 
-								//std::cout<<" assign pim idx:" <<h <<std::endl;
-								dpim[pim_loop] = data->Branches::sc_r(h);
-								tpim[pim_loop] = data->Branches::sc_t(h);
-								cxpim[pim_loop] = data->Branches::cx(h);
-								cypim[pim_loop] = data->Branches::cy(h);
-								czpim[pim_loop] = data->Branches::cz(h);
-								ppim[pim_loop] = data->Branches::p(h);
-								h_secpim[pim_loop] = sector[h];
-								pim_idx[pim_loop]=h;
-								pim_loop++;
-							}
-						break;
+								if(!pim_is_ele){
+									//_pim = physics::Make_4Vector(data->Branches::p(h),data->Branches::cx(h),data->Branches::cy(h),data->Branches::cz(h),mpi);
+									good_pim++;//number of identified pim
+									check_idx[2] = h; 
+									//std::cout<<" assign pim idx:" <<h <<std::endl;
+									dpim[pim_loop] = data->Branches::sc_r(h);
+									tpim[pim_loop] = data->Branches::sc_t(h);
+									cxpim[pim_loop] = data->Branches::cx(h);
+									cypim[pim_loop] = data->Branches::cy(h);
+									czpim[pim_loop] = data->Branches::cz(h);
+									ppim[pim_loop] = data->Branches::p(h);
+									h_secpim[pim_loop] = sector[h];
+									pim_idx[pim_loop]=h;
+									pim_loop++;
+								}
+							break;
+						}
+					}else{
+						_hists->Histogram::Fid_Fill(0,theta[h],phi[h],part+1,4,1,_W,data->Branches::p(h));
+						_hists->Histogram::DT_Fill(0,part,data->Branches::p(h), data->Branches::sc_r(h), data->Branches::sc_t(h), data->Branches::sc_r(0), data->Branches::sc_t(0),4,1,_W,sector[h]);
+					}
+					if(data->Branches::id(h) == hid_num){
+						_hists->Histogram::Fid_Fill(0,theta[h],phi[h],part+1,5,0,_W,data->Branches::p(h));
+						_hists->Histogram::DT_Fill(0,part,data->Branches::p(h), data->Branches::sc_r(h), data->Branches::sc_t(h), data->Branches::sc_r(0), data->Branches::sc_t(0),5,0,_W,sector[h]);
+					}else{
+						_hists->Histogram::Fid_Fill(0,theta[h],phi[h],part+1,5,1,_W,data->Branches::p(h));
+						_hists->Histogram::DT_Fill(0,part,data->Branches::p(h), data->Branches::sc_r(h), data->Branches::sc_t(h), data->Branches::sc_r(0), data->Branches::sc_t(0),5,1,_W,sector[h]);
 					}
 				}else{
-					_hists->Histogram::Fid_Fill(0,theta[h],phi[h],part+1,4,1,_W,data->Branches::p(h));
-					_hists->Histogram::DT_Fill(0,part,data->Branches::p(h), data->Branches::sc_r(h), data->Branches::sc_t(h), data->Branches::sc_r(0), data->Branches::sc_t(0),4,1,_W,sector[h]);
+					_hists->Histogram::Fid_Fill(0,theta[h],phi[h],part+1,1,1,_W,data->Branches::p(h));
+					_hists->Histogram::DT_Fill(0,part,data->Branches::p(h), data->Branches::sc_r(h), data->Branches::sc_t(h), data->Branches::sc_r(0), data->Branches::sc_t(0),1,1,_W,sector[h]);
 				}
-				if(data->Branches::id(h) == hid_num){
-					_hists->Histogram::Fid_Fill(0,theta[h],phi[h],part+1,5,0,_W,data->Branches::p(h));
-					_hists->Histogram::DT_Fill(0,part,data->Branches::p(h), data->Branches::sc_r(h), data->Branches::sc_t(h), data->Branches::sc_r(0), data->Branches::sc_t(0),5,0,_W,sector[h]);
-				}else{
-					_hists->Histogram::Fid_Fill(0,theta[h],phi[h],part+1,5,1,_W,data->Branches::p(h));
-					_hists->Histogram::DT_Fill(0,part,data->Branches::p(h), data->Branches::sc_r(h), data->Branches::sc_t(h), data->Branches::sc_r(0), data->Branches::sc_t(0),5,1,_W,sector[h]);
-				}
-			}else{
-				_hists->Histogram::Fid_Fill(0,theta[h],phi[h],part+1,1,1,_W,data->Branches::p(h));
-				_hists->Histogram::DT_Fill(0,part,data->Branches::p(h), data->Branches::sc_r(h), data->Branches::sc_t(h), data->Branches::sc_r(0), data->Branches::sc_t(0),1,1,_W,sector[h]);
 			}
 		}
 	}
-	
+
 	bool double_id = false; 
 	int double_idx = -99;
 	int num_double_id = 0;
@@ -318,6 +328,8 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 						for( int j = 0; j < good_pim; j++){
 							test_pip = physics::Make_4Vector(ppip[i],cxpip[i],cypip[i],czpip[i],mpi);
 							test_pim = physics::Make_4Vector(ppim[j],cxpim[j],cypim[j],czpim[j],mpi);
+							//_hists->Histogram::MM_Fill(0,physics::MM_event(0,0,_elec,test_pip,test_pim),0,0);
+							//_hists->Histogram::MM_Fill(0,physics::MM_event(0,1,_elec,test_pip,test_pim),0,1);
 							if((physics::MM_event(0,0,_elec,test_pip,test_pim) > (p_center-p_sig))&&(physics::MM_event(0,0,_elec,test_pip,test_pim) < (p_center+p_sig))){
 								_pim = test_pim;
 								_pip = test_pip;
@@ -343,6 +355,8 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 					_pim = physics::Make_4Vector(ppim[0],cxpim[0],cypim[0],czpim[0],mpi);
 					for(int i = 0; i < good_pip; i++){
 						test_pip = physics::Make_4Vector(ppip[i],cxpip[i],cypip[i],czpip[i],mpi);
+					//	_hists->Histogram::MM_Fill(0,physics::MM_event(0,0,_elec,test_pip,_pim),0,0);
+					//	_hists->Histogram::MM_Fill(0,physics::MM_event(0,1,_elec,test_pip,_pim),0,1);
 						if((physics::MM_event(0,0,_elec,test_pip,_pim) > (p_center-p_sig))&&(physics::MM_event(0,0,_elec,test_pip,_pim) < (p_center+p_sig))){
 							_pip = test_pip;
 							top_possible[0]=true;
@@ -368,6 +382,8 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 					_pip = physics::Make_4Vector(ppip[0],cxpip[0],cypip[0],czpip[0],mpi);
 					for(int i = 0; i < good_pim; i++){
 						test_pim = physics::Make_4Vector(ppim[i],cxpim[i],cypim[i],czpim[i],mpi);
+						//_hists->Histogram::MM_Fill(0,physics::MM_event(0,0,_elec,_pip,test_pim),0,0);
+						//_hists->Histogram::MM_Fill(0,physics::MM_event(0,1,_elec,_pip,test_pim),0,1);
 						if((physics::MM_event(0,0,_elec,_pip,test_pim) > (p_center-p_sig))&&(physics::MM_event(0,0,_elec,_pip,test_pim) < (p_center+p_sig))){
 							_pim = test_pim;
 							top_possible[0]=true;
@@ -390,6 +406,8 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 				}else{//We have just one pi+ candidate and one pi- candidate so no need to do MM cuts to legitimize them
 					_pim = physics::Make_4Vector(ppim[0],cxpim[0],cypim[0],czpim[0],mpi);
 					_pip = physics::Make_4Vector(ppip[0],cxpip[0],cypip[0],czpip[0],mpi);
+					//_hists->Histogram::MM_Fill(0,physics::MM_event(0,0,_elec,_pip,_pim),0,0);
+					//_hists->Histogram::MM_Fill(0,physics::MM_event(0,1,_elec,_pip,_pim),0,1);
 					top_possible[0]=true;
 					d[2] = dpim[0];
 					t[2] = tpim[0];
@@ -416,10 +434,12 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 						for( int j = 0; j < good_pim; j++){
 							test_pro = physics::Make_4Vector(ppro[i],cxpro[i],cypro[i],czpro[i],mp);
 							test_pim = physics::Make_4Vector(ppim[j],cxpim[j],cypim[j],czpim[j],mpi);
+						//	_hists->Histogram::MM_Fill(1,physics::MM_event(0,0,_elec,test_pro,test_pim),0,0);
+						//	_hists->Histogram::MM_Fill(1,physics::MM_event(0,1,_elec,test_pro,test_pim),0,1);
 							if((physics::MM_event(0,0,_elec,test_pro,test_pim) > (pip_center-pip_sig))&&(physics::MM_event(0,0,_elec,test_pro,test_pim) < (pip_center+pip_sig))){
 								_pim = test_pim;
 								_pro = test_pro;
-								top_possible[1]=true;
+							//	top_possible[1]=true;
 								d[2] = dpim[j];
 								t[2] = tpim[j];
 								cx[2] = cxpim[j]; 
@@ -441,9 +461,11 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 					_pim = physics::Make_4Vector(ppim[0],cxpim[0],cypim[0],czpim[0],mpi);
 					for(int i = 0; i < good_pro; i++){
 						test_pro = physics::Make_4Vector(ppro[i],cxpro[i],cypro[i],czpro[i],mp);
+					//	_hists->Histogram::MM_Fill(1,physics::MM_event(0,0,_elec,test_pro,_pim),0,0);
+					//	_hists->Histogram::MM_Fill(1,physics::MM_event(0,1,_elec,test_pro,_pim),0,1);
 						if((physics::MM_event(0,0,_elec,test_pro,_pim) > (pip_center-pip_sig))&&(physics::MM_event(0,0,_elec,test_pro,_pim) < (pip_center+pip_sig))){
 							_pro = test_pro;
-							top_possible[1]=true;
+						//	top_possible[1]=true;
 							d[2] = dpim[0];
 							t[2] = tpim[0];
 							cx[2] = cxpim[0]; 
@@ -466,9 +488,11 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 					_pro = physics::Make_4Vector(ppro[0],cxpro[0],cypro[0],czpro[0],mp);
 					for(int i = 0; i < good_pim; i++){
 						test_pim = physics::Make_4Vector(ppim[i],cxpim[i],cypim[i],czpim[i],mpi);
+					//	_hists->Histogram::MM_Fill(1,physics::MM_event(0,0,_elec,_pro,test_pim),0,0);
+					//	_hists->Histogram::MM_Fill(1,physics::MM_event(0,1,_elec,_pro,test_pim),0,1);
 						if((physics::MM_event(0,0,_elec,_pro,test_pim) > (pip_center-pip_sig))&&(physics::MM_event(0,0,_elec,_pro,test_pim) < (pip_center+pip_sig))){
 							_pim = test_pim;
-							top_possible[1]=true;
+						//	top_possible[1]=true;
 							d[2] = dpim[i];
 							t[2] = tpim[i];
 							cx[2] = cxpim[i]; 
@@ -488,6 +512,8 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 				}else{//We have just one proton candidate and one pi- candidate so no need to do MM cuts to legitimize them
 					_pim = physics::Make_4Vector(ppim[0],cxpim[0],cypim[0],czpim[0],mpi);
 					_pro = physics::Make_4Vector(ppro[0],cxpro[0],cypro[0],czpro[0],mp);
+					//_hists->Histogram::MM_Fill(1,physics::MM_event(0,0,_elec,_pro,_pim),0,0);
+					//_hists->Histogram::MM_Fill(1,physics::MM_event(0,1,_elec,_pro,_pim),0,1);
 					top_possible[1]=true;
 					d[2] = dpim[0];
 					t[2] = tpim[0];
@@ -514,10 +540,12 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 						for( int j = 0; j < good_pip; j++){
 							test_pro = physics::Make_4Vector(ppro[i],cxpro[i],cypro[i],czpro[i],mp);
 							test_pip = physics::Make_4Vector(ppip[j],cxpip[j],cypip[j],czpip[j],mpi);
+						//	_hists->Histogram::MM_Fill(2,physics::MM_event(0,0,_elec,test_pro,test_pip),0,0);
+						//	_hists->Histogram::MM_Fill(2,physics::MM_event(0,1,_elec,test_pro,test_pip),0,1);
 							if((physics::MM_event(0,0,_elec,test_pro,test_pip) > (pim_center-pim_sig))&&(physics::MM_event(0,0,_elec,test_pro,test_pip) < (pim_center+pim_sig)) && (pro_idx[i]!=pip_idx[j])){
 								_pip = test_pip;
 								_pro = test_pro;
-								top_possible[2]=true;
+							//	top_possible[2]=true;
 								d[1] = dpip[j];
 								t[1] = tpip[j];
 								cx[1] = cxpip[j]; 
@@ -539,9 +567,11 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 					_pip = physics::Make_4Vector(ppip[0],cxpip[0],cypip[0],czpip[0],mpi);
 					for(int i = 0; i < good_pro; i++){
 						test_pro = physics::Make_4Vector(ppro[i],cxpro[i],cypro[i],czpro[i],mp);
+					//	_hists->Histogram::MM_Fill(2,physics::MM_event(0,0,_elec,test_pro,_pip),0,0);
+					//	_hists->Histogram::MM_Fill(2,physics::MM_event(0,1,_elec,test_pro,_pip),0,1);
 						if((physics::MM_event(0,0,_elec,test_pro,_pip) > (pim_center-pim_sig))&&(physics::MM_event(0,0,_elec,test_pro,_pip) < (pim_center+pim_sig))&& (pro_idx[i]!=pip_idx[0])){
 							_pro = test_pro;
-							top_possible[2]=true;
+						//	top_possible[2]=true;
 							d[1] = dpip[0];
 							t[1] = tpip[0];
 							cx[1] = cxpip[0]; 
@@ -564,9 +594,11 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 					_pro = physics::Make_4Vector(ppro[0],cxpro[0],cypro[0],czpro[0],mp);
 					for(int i = 0; i < good_pip; i++){
 						test_pip = physics::Make_4Vector(ppip[i],cxpip[i],cypip[i],czpip[i],mpi);
+					//	_hists->Histogram::MM_Fill(2,physics::MM_event(0,0,_elec,_pro,test_pip),0,0);
+					//	_hists->Histogram::MM_Fill(2,physics::MM_event(0,1,_elec,_pro,test_pip),0,1);
 						if((physics::MM_event(0,0,_elec,_pro,test_pip) > (pim_center-pim_sig))&&(physics::MM_event(0,0,_elec,_pro,test_pip) < (pim_center+pim_sig))&& (pro_idx[0]!=pip_idx[i])){
 							_pip = test_pip;
-							top_possible[2]=true;
+						//	top_possible[2]=true;
 							d[1] = dpip[i];
 							t[1] = tpip[i];
 							cx[1] = cxpip[i]; 
@@ -587,6 +619,8 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 					if(pro_idx[0] != pip_idx[0]){
 						_pip = physics::Make_4Vector(ppip[0],cxpip[0],cypip[0],czpip[0],mpi);
 						_pro = physics::Make_4Vector(ppro[0],cxpro[0],cypro[0],czpro[0],mp);
+					//	_hists->Histogram::MM_Fill(2,physics::MM_event(0,0,_elec,_pro,_pip),0,0);
+					//	_hists->Histogram::MM_Fill(2,physics::MM_event(0,1,_elec,_pro,_pip),0,1);
 						top_possible[2]=true;
 						d[1] = dpip[0];
 						t[1] = tpip[0];
@@ -619,12 +653,14 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 									test_pro = physics::Make_4Vector(ppro[i],cxpro[i],cypro[i],czpro[i],mp);
 									test_pip = physics::Make_4Vector(ppip[j],cxpip[j],cypip[j],czpip[j],mpi);
 									test_pim = physics::Make_4Vector(ppim[k],cxpim[k],cypim[k],czpim[k],mpi);
+								//	_hists->Histogram::MM_Fill(3,physics::MM_event(0,0,_elec,test_pro,test_pip,test_pim),0,0);
+								//	_hists->Histogram::MM_Fill(3,physics::MM_event(0,1,_elec,test_pro,test_pip,test_pim),0,1);
 									if((physics::MM_event(0,1,_elec,test_pro,test_pip,test_pim) > (MM_zero_center2-MM_zero_sigma2))&&(physics::MM_event(0,1,_elec,test_pro,test_pip,test_pim) < (MM_zero_center2+MM_zero_sigma2))){
 										if(pro_idx[i]!= pip_idx[j]){
 											_pro = test_pro;
 											_pip = test_pip;
 											_pim = test_pim;
-											top_possible[3] = true;
+										//	top_possible[3] = true;
 											d[1] = dpip[j];
 											t[1] = tpip[j];
 											cx[1] = cxpip[j]; 
@@ -657,11 +693,13 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 								test_pro = physics::Make_4Vector(ppro[i],cxpro[i],cypro[i],czpro[i],mp);
 								test_pip = physics::Make_4Vector(ppip[j],cxpip[j],cypip[j],czpip[j],mpi);
 								_pim = physics::Make_4Vector(ppim[0],cxpim[0],cypim[0],czpim[0],mpi);
+							//	_hists->Histogram::MM_Fill(3,physics::MM_event(0,0,_elec,test_pro,test_pip,_pim),0,0);
+							//	_hists->Histogram::MM_Fill(3,physics::MM_event(0,1,_elec,test_pro,test_pip,_pim),0,1);
 								if((physics::MM_event(0,1,_elec,test_pro,test_pip,_pim) > (MM_zero_center2-MM_zero_sigma2))&&(physics::MM_event(0,1,_elec,test_pro,test_pip,_pim) < (MM_zero_center2+MM_zero_sigma2))){
 									if(pro_idx[i]!= pip_idx[j]){
 										_pro = test_pro;
 										_pip = test_pip;
-										top_possible[3] = true;
+									//	top_possible[3] = true;
 										d[1] = dpip[j];
 										t[1] = tpip[j];
 										cx[1] = cxpip[j]; 
@@ -695,11 +733,13 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 								test_pro = physics::Make_4Vector(ppro[i],cxpro[i],cypro[i],czpro[i],mp);
 								test_pim = physics::Make_4Vector(ppim[j],cxpim[j],cypim[j],czpim[j],mpi);
 								_pip = physics::Make_4Vector(ppip[0],cxpip[0],cypip[0],czpip[0],mpi);
+							//	_hists->Histogram::MM_Fill(3,physics::MM_event(0,0,_elec,test_pro,_pip,test_pim),0,0);
+							//	_hists->Histogram::MM_Fill(3,physics::MM_event(0,1,_elec,test_pro,_pip,test_pim),0,1);
 								if((physics::MM_event(0,1,_elec,test_pro,_pip,test_pim) > (MM_zero_center2-MM_zero_sigma2))&&(physics::MM_event(0,1,_elec,test_pro,_pip,test_pim) < (MM_zero_center2+MM_zero_sigma2))){
 									if(pro_idx[i]!= pip_idx[0]){
 										_pro = test_pro;
 										_pim = test_pim;
-										top_possible[3] = true;
+									//	top_possible[3] = true;
 										d[1] = dpip[0];
 										t[1] = tpip[0];
 										cx[1] = cxpip[0]; 
@@ -730,10 +770,12 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 							test_pro = physics::Make_4Vector(ppro[i],cxpro[i],cypro[i],czpro[i],mp);
 							_pim = physics::Make_4Vector(ppim[0],cxpim[0],cypim[0],czpim[0],mpi);
 							_pip = physics::Make_4Vector(ppip[0],cxpip[0],cypip[0],czpip[0],mpi);
+						//	_hists->Histogram::MM_Fill(3,physics::MM_event(0,0,_elec,test_pro,_pip,_pim),0,0);
+						//	_hists->Histogram::MM_Fill(3,physics::MM_event(0,1,_elec,test_pro,_pip,_pim),0,1);
 							if((physics::MM_event(0,1,_elec,test_pro,_pip,_pim) > (MM_zero_center2-MM_zero_sigma2))&&(physics::MM_event(0,1,_elec,test_pro,_pip,_pim) < (MM_zero_center2+MM_zero_sigma2))){
 								if(pro_idx[i]!= pip_idx[0]){
 									_pro = test_pro;
-									top_possible[3] = true;
+								//	top_possible[3] = true;
 									d[1] = dpip[0];
 									t[1] = tpip[0];
 									cx[1] = cxpip[0]; 
@@ -768,11 +810,13 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 								test_pip = physics::Make_4Vector(ppip[i],cxpip[i],cypip[i],czpip[i],mpi);
 								test_pim = physics::Make_4Vector(ppim[j],cxpim[j],cypim[j],czpim[j],mpi);
 								_pro = physics::Make_4Vector(ppro[0],cxpro[0],cypro[0],czpro[0],mp);
+							//	_hists->Histogram::MM_Fill(3,physics::MM_event(0,0,_elec,_pro,test_pip,test_pim),0,0);
+							//	_hists->Histogram::MM_Fill(3,physics::MM_event(0,1,_elec,_pro,test_pip,test_pim),0,1);
 								if((physics::MM_event(0,1,_elec,_pro,test_pip,test_pim) > (MM_zero_center2-MM_zero_sigma2))&&(physics::MM_event(0,1,_elec,_pro,test_pip,test_pim) < (MM_zero_center2+MM_zero_sigma2))){
 									if(pro_idx[0]!= pip_idx[i]){
 										_pip = test_pip;
 										_pim = test_pim;
-										top_possible[3] = true;
+									//	top_possible[3] = true;
 										d[1] = dpip[i];
 										t[1] = tpip[i];
 										cx[1] = cxpip[i]; 
@@ -803,10 +847,12 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 							test_pip = physics::Make_4Vector(ppip[i],cxpip[i],cypip[i],czpip[i],mpi);
 							_pim = physics::Make_4Vector(ppim[0],cxpim[0],cypim[0],czpim[0],mpi);
 							_pro = physics::Make_4Vector(ppro[0],cxpro[0],cypro[0],czpro[0],mp);
+						//	_hists->Histogram::MM_Fill(3,physics::MM_event(0,0,_elec,_pro,test_pip,_pim),0,0);
+						//	_hists->Histogram::MM_Fill(3,physics::MM_event(0,1,_elec,_pro,test_pip,_pim),0,1);
 							if((physics::MM_event(0,1,_elec,_pro,test_pip,_pim) > (MM_zero_center2-MM_zero_sigma2))&&(physics::MM_event(0,1,_elec,_pro,test_pip,_pim) < (MM_zero_center2+MM_zero_sigma2))){
 								if(pro_idx[i]!= pip_idx[0]){
 									_pip = test_pip;
-									top_possible[3] = true;
+								//	top_possible[3] = true;
 									d[1] = dpip[i];
 									t[1] = tpip[i];
 									cx[1] = cxpip[i]; 
@@ -838,6 +884,8 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 							test_pim = physics::Make_4Vector(ppim[i],cxpim[i],cypim[i],czpim[i],mpi);
 							_pip = physics::Make_4Vector(ppip[0],cxpip[0],cypip[0],czpip[0],mpi);
 							_pro = physics::Make_4Vector(ppro[0],cxpro[0],cypro[0],czpro[0],mp);
+						//	_hists->Histogram::MM_Fill(3,physics::MM_event(0,0,_elec,_pro,_pip,test_pim),0,0);
+						//	_hists->Histogram::MM_Fill(3,physics::MM_event(0,1,_elec,_pro,_pip,test_pim),0,1);
 							if((physics::MM_event(0,1,_elec,_pro,_pip,test_pim) > (MM_zero_center2-MM_zero_sigma2))&&(physics::MM_event(0,1,_elec,_pro,_pip,test_pim) < (MM_zero_center2+MM_zero_sigma2))){
 								if(pro_idx[0]!= pip_idx[0]){
 									_pim = test_pim;
@@ -893,6 +941,8 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 							_pip = physics::Make_4Vector(ppip[0],cxpip[0],cypip[0],czpip[0],mpi);
 							_pro = physics::Make_4Vector(ppro[0],cxpro[0],cypro[0],czpro[0],mp);
 							_pim = physics::Make_4Vector(ppim[0],cxpim[0],cypim[0],czpim[0],mpi);
+						//	_hists->Histogram::MM_Fill(3,physics::MM_event(0,0,_elec,_pro,_pip,_pim),0,0);
+						//	_hists->Histogram::MM_Fill(3,physics::MM_event(0,1,_elec,_pro,_pip,_pim),0,1);
 						}else{
 							top_possible[3]=false;
 						}
@@ -938,7 +988,7 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 			MM_p = physics::MM_event(0,0,_elec,_pip,_pim);
 			MM_p2 = physics::MM_event(0,1,_elec,_pip,_pim);
 			//std::cout<<"MM squared for proton missing topology: " <<MM_p2 <<std::endl;
-			_hists->Histogram::MM_Fill(0,MM_p,0,0);
+			_hists->Histogram::MM_Fill(0,MM_p,0,0);//Added this up in the event particle determination step
 			_hists->Histogram::MM_Fill(0,MM_p2,0,1);
 			//_hists->Histogram::MM_Fill(4,MM_p,0,0);
 			//_hists->Histogram::MM_Fill(4,MM_p2,0,1);
@@ -1194,15 +1244,21 @@ float Event_Class::Get_px(int i){
 	float _px = -99; 
 	switch(i){
 		case 0:
-			_px = _elec[0];
+			_px = _beam[0];
 		break;
 		case 1:
-			_px = _pro[0];
+			_px = _target[0];
 		break;
 		case 2:
-			_px = _pip[0];
+			_px = _elec[0];
 		break;
 		case 3:
+			_px = _pro[0];
+		break;
+		case 4:
+			_px = _pip[0];
+		break;
+		case 5:
 			_px = _pim[0];
 		break;
 	}
@@ -1213,15 +1269,21 @@ float Event_Class::Get_py(int i){
 	float _py = -99; 
 	switch(i){
 		case 0:
-			_py = _elec[1];
+			_py = _beam[1];
 		break;
 		case 1:
-			_py = _pro[1];
+			_py = _target[1];
 		break;
 		case 2:
-			_py = _pip[1];
+			_py = _elec[1];
 		break;
 		case 3:
+			_py = _pro[1];
+		break;
+		case 4:
+			_py = _pip[1];
+		break;
+		case 5:
 			_py = _pim[1];
 		break;
 	}
@@ -1233,15 +1295,21 @@ float Event_Class::Get_pz(int i)
 	float _pz = -99; 
 	switch(i){
 		case 0:
-			_pz = _elec[2];
+			_pz = _beam[2];
 		break;
 		case 1:
-			_pz = _pro[2];
+			_pz = _target[2];
 		break;
 		case 2:
-			_pz = _pip[2];
+			_pz = _elec[2];
 		break;
 		case 3:
+			_pz = _pro[2];
+		break;
+		case 4:
+			_pz = _pip[2];
+		break;
+		case 5:
 			_pz = _pim[2];
 		break;
 	}
@@ -1253,15 +1321,21 @@ float Event_Class::Get_p0(int i)
 	float _p0 = -99; 
 	switch(i){
 		case 0:
-			_p0 = _elec[3];
+			_p0 = _beam[3];
 		break;
 		case 1:
-			_p0 = _pro[3];
+			_p0 = _target[3];
 		break;
 		case 2:
-			_p0 = _pip[3];
+			_p0 = _elec[3];
 		break;
 		case 3:
+			_p0 = _pro[3];
+		break;
+		case 4:
+			_p0 = _pip[3];
+		break;
+		case 5:
 			_p0 = _pim[3];
 		break;
 	}
@@ -1286,13 +1360,19 @@ float Event_Class::Get_pid(int i){
 			_pid = PROTON;
 		break;
 		case 2:
-			_pid = PION;
+			_pid = ELECTRON;
 		break;
 		case 3:
+			_pid = PROTON;
+		break;
+		case 4:
+			_pid = PION;
+		break;
+		case 5:
 			_pid = -PION;
 		break;
 		default:
-			_pid = 10; 
+			_pid = 0; 
 		break;
 	}
 	return _pid; 
@@ -1300,6 +1380,10 @@ float Event_Class::Get_pid(int i){
 
 bool Event_Class::is_valid(){
 	return _valid; 
+}
+
+int Event_Class::Get_run_type(){
+	return _run_type;
 }
 
 int Event_Class::Get_ppip(int idx){

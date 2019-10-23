@@ -217,8 +217,8 @@ const double alphaxmax = 3.2;
 //Binning
 const double Wmin = 1.4;
 const double Wres = 0.5;
-const double Wmax = 2.125;
-const double Q2min = 2.0;
+const double Wmax = 3;
+const double Q2min = 1.5;
 const double Q2max = 5.0;
 const double Q2res = 0.5;
 //CC Min
@@ -243,49 +243,58 @@ const float pbin_start = 0.5;
 
 
 //Fun names for file lists
-static const std::string list1 = "one";
-static const std::string list2 = "two";
-static const std::string list3 = "three";
-static const std::string list4 = "four";
-static const std::string list3p = "three+";
-static const std::string list3n = "three-";
-static const std::string list3h = "threeh";
+static const std::string list1 = "e16";
+static const std::string list2 = "e16_partial";
+static const std::string list3 = "e1f";
+static const std::string list4 = "e1f_partial";
+static const std::string list5 = "e16_sim";
+static const std::string list6 = "e16_partial_sim";
+static const std::string list7 = "e1f_sim";
+static const std::string list8 = "e1f_partial_sim";
 
 //Paths for file names
-static const std::string path1 = "/home/mclauchlinc/Desktop/analysis/nick_convert_e16.txt";
-static const std::string path2 = "/Users/cmc/Desktop/analysis/e16_10_18_17_ntple.txt";
-static const std::string path3 = "/Users/cmc/Desktop/analysis/Nick_skim_e16.txt";
-static const std::string path4 = "/Users/cmc/Desktop/analysis/arjun_sim.txt";
-static const std::string path3p = "/Users/cmc/Desktop/analysis/NickSkim_e16_PlateIN.txt";
-static const std::string path3n = "/Users/cmc/Desktop/analysis/NickSkim_e16_PlateOUT.txt";
+static const std::string path1 = "/home/mclauchlinc/Desktop/analysis/analysis_clas6/bin/analysis_curr_e16_evnt_tree.root";
+static const std::string path2 = "/home/mclauchlinc/Desktop/analysis/analysis_clas6/bin/analysis_curr_e16_partial_evnt_tree.root";
+static const std::string path3 = "/home/mclauchlinc/Desktop/analysis/analysis_clas6/bin/analysis_curr_e1f_evnt_tree.root";
+static const std::string path4 = "/home/mclauchlinc/Desktop/analysis/analysis_clas6/bin/analysis_curr_e1f_partial_evnt_tree.root";
+static const std::string path5 = "/home/mclauchlinc/Desktop/analysis/analysis_clas6/bin/analysis_curr_sim_e16_evnt_tree.root";
+static const std::string path6 = "/home/mclauchlinc/Desktop/analysis/analysis_clas6/bin/analysis_curr_sim_e16_partial_evnt_tree.root";
+static const std::string path7 = "/home/mclauchlinc/Desktop/analysis/analysis_clas6/bin/analysis_curr_sim_e1f_evnt_tree.root";
+static const std::string path8 = "/home/mclauchlinc/Desktop/analysis/analysis_clas6/bin/analysis_curr_sim_e1f_partial_evnt_tree.root";
 
 //Run type for file lists {e16,e1f,e16sim,e1fsim} -> {1,2,3,4}
 static const int type1 = 1;
 static const int type2 = 1;
-static const int type3 = 1;
-static const int type4 = 3;
-static const int type3p = 1;
-static const int type3n = 1; 
+static const int type3 = 2;
+static const int type4 = 2;
+static const int type5 = 3;
+static const int type6 = 3;
+static const int type7 = 4;
+static const int type8 = 4; 
 
 //Map of file lists to run type
 static std::unordered_map<std::string, std::string> filepath_map = 	{{list1,path1},
 																					{list2,path2},
 																					{list3,path3},
 																					{list4,path4},
-																					{list3p,path3p},
-																					{list3n,path3n}};
+																					{list5,path5},
+																					{list6,path6},
+																					{list7,path7},
+																					{list8,path8};
 
 static std::unordered_map<std::string, int> filetype_map = 	{{list1,type1},
 																			{list2,type2},
 																			{list3,type3},
 																			{list4,type4},
-																			{list3p,type3p},
-																			{list3n,type3n}};
+																			{list5,type5},
+																			{list6,type6},
+																			{list7,type7},
+																			{list8,type8}};
 
 static const char * species[] = {"ele","pro","pip","pim"};//4
-static const char * eid_cut[] = {"pre","sanity","fid","sf","min_cc","fid+sf","fid+cc","sf+cc","eid","bank","event"}; //11
+static const char * eid_cut[] = {"pre","sanity","fid","sf","min_cc","fid+sf","fid+cc","sf+cc","eid","bank","event","event_noeid"}; //12
 static const char * cut_ver[] = {"cut","anticut"};
-static const char * hid_cut[] = {"pre","sanity","fid","dt","hid","bank","event"}; //7
+static const char * hid_cut[] = {"pre","sanity","fid","dt","hid","bank","event","event_nohid"}; //8
 static const char * topologies[] = {"None","Pmiss","PIPmiss","PIMmiss","Zeromiss","ALLmiss"}; //6
 static const char * sec_list[] = {"all_sectors","sec1","sec2","sec3","sec4","sec5","sec6"}; //7`
 static const char * W_dep_list[] = {"No_W_Dep","W_Dep"};

@@ -9,7 +9,6 @@ forest::forest(int is_alive){
 	//_the_tree->Branch("EventBranch",&the_event,"evnt/I:apart/I:px/F:py/F:pz/F:p0/F:pid/I:hel/I:top/I");
 	_the_tree->Branch("evnt",&_evnt,"evnt/I");
 	_the_tree->Branch("apart",&_apart,"apart/I");
-	_the_tree->Branch("bpart",&_bpart,"bpart/I");
 	_the_tree->Branch("px",&_px,"px[apart]/F");
 	_the_tree->Branch("py",&_py,"py[apart]/F");
 	_the_tree->Branch("pz",&_pz,"pz[apart]/F");
@@ -18,14 +17,6 @@ forest::forest(int is_alive){
 	_the_tree->Branch("hel",&_hel,"hel/I");
 	_the_tree->Branch("top",&_top,"top/I");
 	_the_tree->Branch("fc_tot",&_fc_tot,"fc_tot/I");
-	_the_tree->Branch("MM",&_MM,"MM[bpart]/F");
-	_the_tree->Branch("theta",&_theta,"theta[bpart]/F");
-	_the_tree->Branch("alpha",&_alpha,"alpha[bpart]/F");
-	_the_tree->Branch("run_type",&_run_type,"run_type/I");
-	Float_t _MM_sp[3]= {NAN,NAN,NAN};//{p/pip,p/pim,pip/pim}
-	Float_t _theta_sp[3]{NAN,NAN,NAN};//{p,pip,pim}
-	Float_t _alpha_sp[3]{NAN,NAN,NAN};//[{pim,p},{pp,pip}],[{p,pp},{pip,pim}],[{pip,p},{pp,pim}]
-	Int_t _run_type= 0;//{1,2,3,4}->{e16,e1f,e16sim,e1f sim} 
 	//The individual thread trees that will be merged
 	for(int thread_id = 0; thread_id < NUM_THREADS; thread_id++){
 		sprintf(tree_name,"t%d",thread_id);
@@ -33,7 +24,6 @@ forest::forest(int is_alive){
 		//_a_tree[thread_id]->Branch("EventBranch",&the_eventb,"evntb/I:apartb/I:pxb/F:pyb/F:pzb/F:p0b/F:pidb/I:helb/I:topb/I");
 		_a_tree[thread_id]->Branch("evnt",&(_evntb[thread_id]),"evnt/I");
 		_a_tree[thread_id]->Branch("apart",&(_apartb[thread_id]),"apart/I");
-		_a_tree[thread_id]->Branch("bpart",&(_bpartb[thread_id]),"bpart/I");
 		_a_tree[thread_id]->Branch("px",&(_pxb[thread_id]),"px[apart]/F");
 		_a_tree[thread_id]->Branch("py",&(_pyb[thread_id]),"py[apart]/F");
 		_a_tree[thread_id]->Branch("pz",&(_pzb[thread_id]),"pz[apart]/F");
@@ -41,11 +31,7 @@ forest::forest(int is_alive){
 		_a_tree[thread_id]->Branch("pid",&(_pidb[thread_id]),"pid[apart]/I");
 		_a_tree[thread_id]->Branch("hel",&(_helb[thread_id]),"hel/I");
 		_a_tree[thread_id]->Branch("top",&(_topb[thread_id]),"top/I");
-		_a_tree[thread_id]->Branch("fc_tot",&(_fc_totb[thread_id]),"fc_tot/I");
-		_a_tree[thread_id]->Branch("MM",&_MMb[thread_id],"MM[bpart]/F");
-		_a_tree[thread_id]->Branch("theta",&_thetab[thread_id],"theta[bpart]/F");
-		_a_tree[thread_id]->Branch("alpha",&_alphab[thread_id],"alpha[bpart]/F");
-		_a_tree[thread_id]->Branch("run_type",&_run_typeb[thread_id],"run_type/I");
+		_a_tree[thread_id]->Branch("fc_tot",&(_fc_totb),"fc_tot/I");
 		//The B Trees
 		/*
 		_b_tree[thread_id] = std::make_shared<TTree>("TREEsb","Tree to hold Thread Event Fourvectors");//
@@ -101,26 +87,19 @@ void forest::Fill_Thread_Tree(std::shared_ptr<Event_Class> event_friend, int eve
 	//the_eventb[thread_id] = new Event();
 	//std::cout<<std::endl <<"Tree being filled in thread " <<thread_id; 
 	//if(event_friend->Event_Class::is_valid()){
-		TLorentzVector k[6]; 
 		_evntb[thread_id] = event_n; 
-		_apartb[thread_id] = 6;
-		_bpartb[thread_id] = 3;  
-		for(int i = 0; i<6; i++){
+		_apartb[thread_id] = 4; 
+		for(int i = 0; i<4; i++){
 			_pxb[thread_id][i] = event_friend->Event_Class::Get_px(i);
 			//std::cout<<"Here is pxb " <<_pxb[thread_id][i] <<" for thread " <<thread_id <<" and index " <<i <<std::endl;
 			_pyb[thread_id][i] = event_friend->Event_Class::Get_py(i);
 			_pzb[thread_id][i] = event_friend->Event_Class::Get_pz(i);
 			_p0b[thread_id][i] = event_friend->Event_Class::Get_p0(i);
 			_pidb[thread_id][i] = event_friend->Event_Class::Get_pid(i);
-			k[i] = {_pxb[thread_id][i],_pyb[thread_id][i],_pzb[thread_id][i],_p0b[thread_id][i]};
 			//std::cout<<std::endl <<"pid? " <<_pidb[thread_id][i];
 		}
 		_helb[thread_id] = event_friend->Event_Class::Get_hel();
 		_topb[thread_id] = event_friend->Event_Class::Get_top();
-		_run_typeb[thread_id] = event_friend->Event_Class::Get_run_type();
-		_MMb[thread_id][0] = (k[3]+k[4]).Mag();
-		_MMb[thread_id][1] = (k[3]+k[5]).Mag();
-		_MMb[thread_id][2] = (k[5]+k[4]).Mag();
 		_a_tree[thread_id]->TTree::Fill();
 	//}
 }
