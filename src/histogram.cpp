@@ -228,8 +228,7 @@ void Histogram::Fid_Fill(int top, float theta, float phi, int part, int cut, int
 		Fid_fill_hist[physics::get_sector(phi)][part][cut][0][Histogram::p_binning(p_)][0][cutvanti]=true;
 		if(Fid_made_hist[physics::get_sector(phi)][part][cut][0][Histogram::p_binning(p_)][0][cutvanti]){
 			Fid_hist[0][part][cut][0][Histogram::p_binning(p_)][0][cutvanti]->Fill(phic,theta);//All Sectors
-			Fid_hist[physics::get_sector(phi)][part][cut][0][Histogram::p_binning(p_)][0][cutvanti]->Fill(phic,theta);//Individual Sectors
-			//std::cout<<"We did it! ";
+			Fid_hist[physics::get_sector(phi)][part][cut][0][Histogram::p_binning(p_)][0][cutvanti]->Fill(phic,theta);//Individual Sectors			
 		}else{
 			std::cout<<"would have segfaulted ";
 			std::cout<<std::endl <<"For Fid Plot: " <<physics::get_sector(phi) <<" " <<part <<" " <<cut <<" " <<0 <<" " <<Histogram::p_binning(p_) <<" " <<top <<" " <<cutvanti <<std::endl;

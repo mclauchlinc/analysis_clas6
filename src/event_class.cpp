@@ -55,7 +55,7 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 		//Event-Wide
 		//Electrons
 	_hists->Histogram::WQ2_Fill(0,0,_W,_Q2);
-	_hists->Histogram::Fid_Fill(0,physics::get_theta(data->Branches::cz(0)),physics::get_phi(data->Branches::cx(0),data->Branches::cy(0)),0,0,0,_W,_p[0]);
+	_hists->Histogram::Fid_Fill(0,physics::get_theta(data->Branches::cz(0)),physics::get_phi(data->Branches::cx(0),data->Branches::cy(0)),0,0,0,_W,data->Branches::p(0));
 	_hists->Histogram::SF_Fill(0,data->Branches::p(0),data->Branches::etot(0),0,0,_W,sector[0]);
 	_hists->Histogram::CC_Fill(0,data->Branches::cc_sect(0),data->Branches::cc_segm(0),data->Branches::nphe(0),0,0);
 	
