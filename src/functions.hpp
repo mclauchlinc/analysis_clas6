@@ -8,6 +8,8 @@
 #include <vector>
 #include <fstream>
 #include <string>
+#include "branches.hpp"
+#include "environment.hpp"
 
 namespace fun {
 bool replace(std::string& str, const std::string& from, const std::string& to);
@@ -20,6 +22,8 @@ std::vector<std::string> read_file_list(std::string path, int thread_num);
 void loadChain(std::shared_ptr<TChain> c, std::string file, int thread_id, int max);
 
 char* appendCharToCharArray(char* array, char a);
+
+
 
 }
 

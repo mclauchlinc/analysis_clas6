@@ -4,6 +4,8 @@
 #include "functions.hpp"
 #include "physics.hpp"
 #include "detectors.hpp"
+#include "branches.hpp"
+#include "environment.hpp"
 
 namespace cuts{
 	//Fiducial Cuts
@@ -31,6 +33,29 @@ namespace cuts{
 
 	//Missing Mass Cuts
 	bool MM_cut(int top, float MM);
+
+	//Environment cuts
+	//Environment things
+	bool in_range(float W_, float Q2_, std::shared_ptr<Environment> envi);
+	bool e_sanity(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi);
+	bool h_sanity(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int par);
+	bool e_cc(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi);
+	bool e_ec(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi);
+	bool e_sf(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi);
+	bool e_fid(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi);
+	bool h_fid(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int par, int had);
+	bool h_dt(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int par, int had);
+	bool pim_e_sep(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int par, int had);
+	bool eid(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi);
+	bool hid(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int par, int had);
+
+	bool p_miss(std::shared_ptr<Environment> envi);
+	bool pip_miss(std::shared_ptr<Environment> envi);
+	bool pim_miss(std::shared_ptr<Environment> envi);
+	bool z_miss(std::shared_ptr<Environment> envi);
+
+	bool p_corr(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi);
+	bool eff_cut(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi);
 
 }
 

@@ -13,15 +13,23 @@ int main(int argc, char **argv){
 	//start timer
 	auto start = std::chrono::high_resolution_clock::now();
 
+
 	//for threading
 	std::vector<std::vector<std::string>> infilenames(NUM_THREADS);
 	std::vector<std::vector<std::string>> infilenames2(NUM_THREADS);//For two lists of plate stuff
 
-	int data_set = 0; //{e1-6,e1f, e1-6 sim, e1f sim} ->{1,2,3,4}
+	int data_set = 0; //{e1-6,e1f, e1-6 sim, e1f sim, e16 empty, e1f empty} ->{1,2,3,4,5,6}
 	int _case = 0; //For file entry
 	int plate_stat = 0;//Status of the half wave plate
 	bool hel_runs = false;
+	int sim_status = 0; //{1,-1}->{data,sim}
 
+	//Make the environment tracker
+	auto envi = std::make_shared<Environment>();
+	//std::cout<<"Test of Environment pre copy| dc_hit: " <<envi->Environment::was_dc_hit();
+	Setup::set_envi(envi); //setup.hpp
+	//std::cout<<std::endl <<"Test of Environment pos copy| dc_hit: " <<envi->Environment::was_dc_hit() <<std::endl;
+	
 	/*
 	When running this analysis you have several options
 	Case 1: ./analysis [file set] [num of files] [outputfile name]
@@ -30,9 +38,9 @@ int main(int argc, char **argv){
 	*/
 	//Case 1
 	if(argc ==4){
-        comp = argv[1]; //variables.h
-        file_num = std::atoi(argv[2]); //variables.h
-        output_name = argv[3]; //variables.h
+        comp = argv[1]; 
+        file_num = std::atoi(argv[2]); 
+        output_name = argv[3]; 
         std::cout<<"Argument assignment complete" <<std::endl;
        	//Should make a mapping of input paths to data types
        	_case = 1; 
@@ -57,17 +65,42 @@ int main(int argc, char **argv){
 	       		plate_stat = 1;
 	       	}
        	}
+       	data_set = filetype_map[comp];
 	}
 	//Case 2
 	if(argc >4){
 		output_name = argv[1];
 		data_set = std::atoi(argv[2]);
-		for(int w = 3; w <argc; w++){//Putting all the files into 
-			infilenames[(w-3)%NUM_THREADS].push_back(argv[w]);
+		sim_status = std::atoi(argv[3]);
+		for(int w = 4; w <argc; w++){//Putting all the files into 
+			infilenames[(w-4)%NUM_THREADS].push_back(argv[w]);
 		}
 		_case = 2; 
 	}
+
 	std::cout<<"Brought Data in though Case: " <<_case <<std::endl; 
+	
+	//Assigning environment parameters
+	if(_case == 1){
+		if(data_set == 1 || data_set == 2){
+			envi->Environment::env_sim(false);
+			envi->Environment::env_data_set(data_set);
+		}else if(data_set == 3 || data_set == 4){
+			envi->Environment::env_sim(true);
+			envi->Environment::env_data_set(data_set-2);
+		}else if(data_set == 5 || data_set == 6){
+			envi->Environment::env_sim(false);
+			envi->Environment::env_data_set(data_set-4);
+		}
+	}else if(_case == 2){
+		if(sim_status == 1){
+			envi->Environment::env_sim(false);
+		}else if(sim_status==-1){
+			envi->Environment::env_sim(true);
+		}
+	}
+	//Output a file listing the inputs for the environment
+	Setup::make_envi_file(output_name,envi);
 
 	// Make a set of threads (Futures are special threads which return a value)
   	std::future<size_t> threads[NUM_THREADS];
@@ -77,7 +110,7 @@ int main(int argc, char **argv){
 	size_t events = 0; 
 
 	//Make histograms objects as a shared pointer that all threads will have
-	auto hists = std::make_shared<Histogram>(output_name);//Check on this
+	auto hists = std::make_shared<Histogram>(envi,output_name);//Check on this
 
 	//Make relevant TTrees and Event Rootfile
 	auto a_good_forest = std::make_shared<forest>(1); 
@@ -95,7 +128,7 @@ int main(int argc, char **argv){
 		//Set the thread to run asynchronously
 		//The function running is the first argument
 		//The functions arguments are all remaining arguments
-		threads[i] = std::async(run_files, infilenames.at(i),filepath_map[comp], hists, a_good_forest, i, filetype_map[comp], file_num, _case, plate_stat);//, num_mixed_p_pip[i]);
+		threads[i] = std::async(run_files, infilenames.at(i),filepath_map[comp], hists, a_good_forest, i, filetype_map[comp], file_num, _case, plate_stat, envi);//, num_mixed_p_pip[i]);
 		//run_files(infilenames.at(i), filepath_map[argv[1]], hists, a_good_forest, i, data_set, file_num, _case);
 		
 
@@ -110,7 +143,7 @@ int main(int argc, char **argv){
 			//Set the thread to run asynchronously
 			//The function running is the first argument
 			//The functions arguments are all remaining arguments
-			threads2[i] = std::async(run_files, infilenames2.at(i),filepath_map[list3n], hists, a_good_forest, i, filetype_map[comp], file_num, _case, -plate_stat);//, num_mixed_p_pip[i]);
+			threads2[i] = std::async(run_files, infilenames2.at(i),filepath_map[list3n], hists, a_good_forest, i, filetype_map[comp], file_num, _case, -plate_stat, envi);//, num_mixed_p_pip[i]);
 			//run_files(infilenames.at(i), filepath_map[argv[1]], hists, a_good_forest, i, data_set, file_num, _case);
 			
 
@@ -122,13 +155,22 @@ int main(int argc, char **argv){
 	}
 	
 	a_good_forest->forest::Grow_Forest();//Combine all those Thread specific trees and output a root file with all event selected events with four vectors 
+	a_good_forest->forest::Write();//Write the TTree for the events
+
 
 	//For each thread to see how many events each thread successfully analyized
 	for(int i = 0; i<NUM_THREADS; i++){
 		events += threads[i].get();
-		events += threads2[i].get();
+		if(hel_runs){
+			events += threads2[i].get();
+		}
 		//std::cout<<std::endl<<"Number of misIDed proton/pip particles: " <<num_mixed_p_pip[i] <<std::endl;
 	}
+	std::cout<<std::endl <<"Total Number of Files: " <<envi->Environment::was_num_file() <<std::endl; 
+	
+
+	hists->Histogram::Write(envi);
+
 	std::cout<<std::endl;
 	//Timer and Efficiency Counters
 	std::cout.imbue(std::locale(""));//Puts commas in appropriately? Apparently?

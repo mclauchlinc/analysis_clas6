@@ -62,7 +62,7 @@ forest::forest(int is_alive){
 	alive = is_alive; 
 }
 
-forest::~forest(){ this->Write();}//Including this and the forest::Write() are necessary for properly writing the TTree to the TFile 
+//forest::~forest(){ this->Write();}//Including this and the forest::Write() are necessary for properly writing the TTree to the TFile 
 
 
 void forest::Write(){
@@ -101,6 +101,7 @@ void forest::Fill_Thread_Tree(std::shared_ptr<Event_Class> event_friend, int eve
 	//the_eventb[thread_id] = new Event();
 	//std::cout<<std::endl <<"Tree being filled in thread " <<thread_id; 
 	//if(event_friend->Event_Class::is_valid()){
+		//std::cout<<std::endl<<"Filling Tree trying for event: " <<event_n;
 		TLorentzVector k[6]; 
 		_evntb[thread_id] = event_n; 
 		_apartb[thread_id] = 6;
@@ -122,6 +123,7 @@ void forest::Fill_Thread_Tree(std::shared_ptr<Event_Class> event_friend, int eve
 		_MMb[thread_id][1] = (k[3]+k[5]).Mag();
 		_MMb[thread_id][2] = (k[5]+k[4]).Mag();
 		_a_tree[thread_id]->TTree::Fill();
+		//std::cout<<"   successfully filled?"; 
 	//}
 }
 

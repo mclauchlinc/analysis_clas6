@@ -68,3 +68,5 @@ char* fun::appendCharToCharArray(char* array, char a)
     return ret;
 }
 
+
+

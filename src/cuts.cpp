@@ -186,3 +186,190 @@ bool cuts::MM_cut(int top_, float MM){
 	return pass; 
 }
 
+//Putting together the e_sanity cuts based on environment we set
+bool cuts::in_range(float W_, float Q2_, std::shared_ptr<Environment> envi){
+	bool pass = false;
+	if(W_ >= envi->was_Wmin() && W_ <= envi->was_Wmax() ){//Checking to see if the particle is in the relevant W Q2 region 
+		if(Q2_ >= envi->was_Qmin() && Q2_ <= envi->was_Qmax()){
+			pass = true;
+		}
+	}
+	return pass; 
+}
+
+bool cuts::e_sanity(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi){
+  bool pass = false; 
+  bool dc = false;
+  bool sc = false;
+  bool ec = false;
+  bool cc = false;
+  //DC Cut
+  if(envi->was_dc_hit() && data->Branches::dc(0)){
+    dc = true;
+  }else if(!(envi->was_dc_hit())){
+    dc = true;
+  }
+  if(envi->was_sc_hit() && data->Branches::sc(0)){
+    sc = true;
+  }else if(!(envi->was_sc_hit())){
+    sc = true;
+  }
+  if(envi->was_ec_hit() && data->Branches::ec(0)){
+    ec = true;
+  }else if(!(envi->was_ec_hit())){
+    ec = true;
+  }
+  if(envi->was_cc_hit() && data->Branches::cc(0)){
+    cc = true;
+  }else if(!(envi->was_cc_hit())){
+    cc = true;
+  }
+  pass = dc && sc && ec && cc; 
+  return pass; 
+}
+bool cuts::h_sanity(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int par){
+  bool pass = true;
+  //DC Cut
+  if(envi->was_dc_hit() && data->Branches::dc(par)){
+    pass &= true;
+  }
+  if(envi->was_sc_hit() && data->Branches::sc(par)){
+   	pass &= true;
+  }
+  return pass; 
+}
+bool cuts::e_cc(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi){
+	bool cc = false;
+	if(!(envi->was_sim())){
+		if(envi->was_eid_cc() && cuts::min_cc(data->Branches::cc_segm(0),data->Branches::cc_sect(0),data->Branches::nphe(0))){
+	    	cc = true;
+	  	}
+	}
+  	return cc; 
+}
+bool cuts::e_ec(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi){
+	bool ec = false;
+	if(envi->was_eid_ec() && cuts::min_ec(data->Branches::etot(0))){
+    	ec = true;
+  	}
+  	return ec; 
+}
+bool cuts::e_sf(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi){
+	bool sf = false;
+	if(envi->was_eid_sf() && cuts::sf_cut(data->Branches::p(0),data->Branches::etot(0),data->Branches::cx(0),data->Branches::cy(0))){
+    	sf = true;
+  	}
+  	return sf; 
+}
+bool cuts::e_fid(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi){
+	bool fid = false;
+	if(envi->was_eid_fid() && cuts::fid_cut(0,data->Branches::p(0),data->Branches::cx(0),data->Branches::cy(0),data->Branches::cz(0))){
+    	fid = true;
+  	}
+  	return fid; 
+}
+bool cuts::h_fid(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int par, int had){
+	bool pass = false;
+	if(envi->was_hid_fid(had) && cuts::fid_cut(had+1,data->Branches::p(par),data->Branches::cx(par),data->Branches::cy(par),data->Branches::cz(par))){
+    	pass = true;
+  	}
+  	return pass; 
+}
+bool cuts::h_dt(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int par, int had){
+	bool pass = false;
+	if(envi->was_hid_dt(had) && cuts::delta_t_cut(had, data->Branches::p(par), data->Branches::sc_r(0), data->Branches::sc_r(par), data->Branches::sc_t(0), data->Branches::sc_t(par))){
+    	pass = true;
+  	}
+  	return pass; 
+}
+bool cuts::pim_e_sep(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int par, int had){
+	bool pass = false; 
+	if(envi->was_hid_e()){
+		if(had == 2){
+			if(data->cc(par)>0){//If it has a registerd hit in the CC 
+				if(cuts::min_cc(data->Branches::cc_segm(par),data->Branches::cc_sect(par),data->Branches::nphe(par))){//Min CC Cut
+					if(cuts::sf_cut(data->Branches::p(par),data->Branches::etot(par),data->Branches::cx(par),data->Branches::cy(par))){//SF Cut
+						//if(cuts::fid_cut(h,data->Branches::p(h),data->Branches::cx(h),data->Branches::cy(h),data->Branches::cz(h))){//Electron Fiducial //I don't know that this should be necessary because it doesn't work towards e-pim separation 
+							pass = true;//Defined quantity for Event object  
+						//}
+					}
+				}
+			}else{
+				pass = true;
+			}
+		}else{
+			pass = true;
+		}
+	}
+	return pass; 
+}
+
+bool cuts::eid(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi){
+	bool pass = true;
+	if(envi->was_eid_fid()){
+		pass &= cuts::e_fid(data,envi);
+	}
+	if(envi->was_eid_sf()){
+		pass &= cuts::e_sf(data,envi);
+	}
+	if(envi->was_eid_ec()){
+		pass &= cuts::e_ec(data,envi);
+	}
+	if(envi->was_eid_cc()){
+		pass &= cuts::e_cc(data,envi);
+	}
+	return pass; 
+}
+
+bool cuts::hid(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int par, int had){
+	bool pass = true;
+	if(envi->was_hid_fid(had)){
+		pass &= cuts::h_fid(data,envi,par,had);
+	}
+	if(envi->was_hid_dt(had)){
+		pass &= cuts::h_dt(data,envi,par,had);
+	}
+	if(envi->was_hid_e()){
+		pass &= cuts::pim_e_sep(data,envi,par,had);
+	}
+	return pass; 
+}
+
+bool cuts::p_miss(std::shared_ptr<Environment> envi){
+	bool pass = false; 
+	if(envi->was_top(0)){
+		pass = true; 
+	}
+	return pass; 
+}
+bool cuts::pip_miss(std::shared_ptr<Environment> envi){
+	bool pass = false; 
+	if(envi->was_top(1)){
+		pass = true; 
+	}
+	return pass;
+}
+bool cuts::pim_miss(std::shared_ptr<Environment> envi){
+	bool pass = false; 
+	if(envi->was_top(2)){
+		pass = true; 
+	}
+	return pass;
+}
+bool cuts::z_miss(std::shared_ptr<Environment> envi){
+	bool pass = false; 
+	if(envi->was_top(3)){
+		pass = true; 
+	}
+	return pass;
+}
+
+bool cuts::p_corr(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi){
+	bool pass = false; 
+	return pass; 
+}
+bool cuts::eff_cut(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi){
+	bool pass = false; 
+	return pass; 
+}
+

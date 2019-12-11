@@ -11,6 +11,7 @@
 #include "CartesianGenerator.hpp"
 #include "physics.hpp"
 #include "detectors.hpp"
+#include "environment.hpp"
 //#include "particle.hpp"
 //#include "variables.h"
 //#include "CartesianGenerator.hh"
@@ -105,7 +106,7 @@ protected:
 	TH2F_ptr SF_hist[10][30][7][6][2];//cuts, W Binning, Sector, topology
 	TH2F_ptr DT_hist[3][7][30][7][6][2]; //particle, cuts, W binning, sector, topology
 	TH1F_ptr CC_hist[6][18][11][4][6][2]; //Sector, segment, cut, side of detector, topology
-	TH1F_ptr MM_hist[5][3][2];//topology, cut, squared v linear
+	TH1F_ptr MM_hist[4][3][2][2];//topology, cut, squared v linear, fitting vs. not fitting plots
 
 	bool Fid_made_hist[7][4][11][30][12][6][2];
 	bool Fid_fill_hist[7][4][11][30][12][6][2];
@@ -125,37 +126,37 @@ protected:
 
 
 public:
-	Histogram(const std::string& output_file);
-	~Histogram();
-	void Write();
+	Histogram(std::shared_ptr<Environment> _envi, const std::string& output_file);
+	//~Histogram();
+	void Write(std::shared_ptr<Environment> _envi);
 	//W Qsquared plots
 	int W_binning(float W_);
 	int p_binning(float p_);
 	char Part_cut(int species, int cut);
-	void WQ2_Make();
-	void WQ2_Fill(int top, int cut, float W_, float Q2_);
-	void WQ2_Write();
+	void WQ2_Make(std::shared_ptr<Environment> _envi);
+	void WQ2_Fill(std::shared_ptr<Environment> _envi, int top, int cut, float W_, float Q2_);
+	void WQ2_Write(std::shared_ptr<Environment> _envi);
 	//Fiducial Cuts
-	void Fid_Make();
-	void Fid_Fill(int top, float theta, float phi, int part, int cut, int cutvanti, float W_, float p);
-	void Fid_Write();
+	void Fid_Make(std::shared_ptr<Environment> _envi );
+	void Fid_Fill(std::shared_ptr<Environment> _envi, int top, float theta, float phi, int part, int cut, int cutvanti, float W_, float p);
+	void Fid_Write(std::shared_ptr<Environment> _envi);
 	//Sampling Fraction Cuts
-	void SF_Make();
-	void SF_Fill(int top, float p, float en, int cut, int cva, float W_, int sec);
-	void SF_Write();
+	void SF_Make(std::shared_ptr<Environment> _envi );
+	void SF_Fill(std::shared_ptr<Environment> _envi, int top, float p, float en, int cut, int cva, float W_, int sec);
+	void SF_Write(std::shared_ptr<Environment> _envi);
 	//Delta T Cuts
-	void DT_Make();
-	void DT_Fill(int top, int part, float p, float d, float t, float d0, float t0, int cut, int anti, float W_, int sec);
-	void DT_Fill(int top, int part, float p, float dt, int cut, int anti, float W_, int sec);
-	void DT_Write();
+	void DT_Make(std::shared_ptr<Environment> _envi );
+	void DT_Fill(std::shared_ptr<Environment> _envi, int top, int part, float p, float d, float t, float d0, float t0, int cut, int anti, float W_, int sec);
+	void DT_Fill(std::shared_ptr<Environment> _envi,int top, int part, float p, float dt, int cut, int anti, float W_, int sec);
+	void DT_Write(std::shared_ptr<Environment> _envi);
 	//Min CC Cuts
-	void CC_Make();
-	void CC_Fill(int top, int sec, int segm, int nphe, int cut, int anti);
-	void CC_Write();
+	void CC_Make(std::shared_ptr<Environment> _envi );
+	void CC_Fill(std::shared_ptr<Environment> _envi, int top, int sec, int segm, int nphe, int cut, int anti);
+	void CC_Write(std::shared_ptr<Environment> _envi);
 	//Missing Mass Cuts
-	void MM_Make();
-	void MM_Fill(int top, float mm, int cut, int square);
-	void MM_Write();
+	void MM_Make(std::shared_ptr<Environment> _envi );
+	void MM_Fill(std::shared_ptr<Environment> _envi, int top, float mm, int cut, int square, bool fit);
+	void MM_Write(std::shared_ptr<Environment> _envi);
 	/*//Signature Plots //We'll get there
 	void MM2_Make();
 	void MM2_Fill(int top, float mm, float W_, float Q2_);
