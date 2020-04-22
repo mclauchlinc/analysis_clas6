@@ -189,8 +189,8 @@ const float FIDymin = 0.0;
 const float FIDxmax = 30.0;
 const float FIDymax = 180.0;
 //Delta_t
-const int DTxres = 25;//300;
-const int DTyres = 100;
+const int DTxres = 600;//300;
+const int DTyres = 400;
 const float DTxmin = 0.0;
 const float DTymin = -5.0;//-4.0;
 const float DTxmax = 4.5;//7.0;
@@ -250,6 +250,7 @@ static const std::string list4 = "four";
 static const std::string list3p = "three+";
 static const std::string list3n = "three-";
 static const std::string list3h = "threeh";
+static const std::string lists1 = "sim_e16_1";
 
 //Paths for file names
 static const std::string path1 = "/home/mclauchlinc/Desktop/analysis/nick_convert_e16.txt";
@@ -258,6 +259,7 @@ static const std::string path3 = "/Users/cmc/Desktop/analysis/Nick_skim_e16.txt"
 static const std::string path4 = "/Users/cmc/Desktop/analysis/arjun_sim.txt";
 static const std::string path3p = "/Users/cmc/Desktop/analysis/NickSkim_e16_PlateIN.txt";
 static const std::string path3n = "/Users/cmc/Desktop/analysis/NickSkim_e16_PlateOUT.txt";
+static const std::string paths1 = "/Users/cmc/Desktop/analysis/simulation/sim_e16_group1.txt";
 
 //Run type for file lists {e16,e1f,e16sim,e1fsim} -> {1,2,3,4}
 static const int type1 = 1;
@@ -266,6 +268,7 @@ static const int type3 = 1;
 static const int type4 = 3;
 static const int type3p = 1;
 static const int type3n = 1; 
+static const int types1 = 3; 
 
 //Map of file lists to run type
 static std::unordered_map<std::string, std::string> filepath_map = 	{{list1,path1},
@@ -273,14 +276,14 @@ static std::unordered_map<std::string, std::string> filepath_map = 	{{list1,path
 																					{list3,path3},
 																					{list4,path4},
 																					{list3p,path3p},
-																					{list3n,path3n}};
+																					{list3n,path3n},{lists1,paths1}};
 
 static std::unordered_map<std::string, int> filetype_map = 	{{list1,type1},
 																			{list2,type2},
 																			{list3,type3},
 																			{list4,type4},
 																			{list3p,type3p},
-																			{list3n,type3n}};
+																			{list3n,type3n},{lists1,types1}};
 
 static const char * species[] = {"ele","pro","pip","pim"};//4
 static const char * eid_cut[] = {"pre","sanity","fid","sf","min_cc","fid+sf","fid+cc","sf+cc","eid","bank","event"}; //11
@@ -294,5 +297,6 @@ static const char * basic_cut[] = {"pre","cut","anti"};
 static const char * MM_sq[] = {"linear","squared"};
 static const char * par_cut[4][11] = {{"pre","sanity","fid","sf","min_cc","fid+sf","fid+cc","sf+cc","eid","bank","event"},{"pre","sanity","fid","dt","hid","bank","event"},{"pre","sanity","fid","dt","hid","bank","event"},{"pre","sanity","fid","dt","hid","bank","event"}};
 static const char * fit_q[] = {"4fit","4show"};
+static const char * thrown[] = {"recon","thrown"};//For reconstructed vs. thrown events
 
 #endif

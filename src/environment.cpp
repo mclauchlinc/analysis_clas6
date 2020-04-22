@@ -201,6 +201,9 @@ void Environment::env_W_dep_plot(bool W_dep_plot_) //Is there W dependence in th
 {
 	_W_dep_plot = W_dep_plot_;
 }
+void Environment::env_Friend_plot(bool friend_plot){
+	_friend_plot = friend_plot;
+}
 //Switch to the Was 
 
 int Environment::was_data_set(){
@@ -402,6 +405,10 @@ bool Environment::was_p_dep_plot() //Is there momentum dependence in the relevan
 bool Environment::was_W_dep_plot() //Is there W dependence in the relevant plots? 
 {
 	return _W_dep_plot;
+}
+bool Environment::was_Friend_plot()
+{
+	return _friend_plot;
 }
 /*
 void copy_envi(Environment *cop_envi){

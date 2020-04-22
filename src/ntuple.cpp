@@ -22,6 +22,7 @@ forest::forest(int is_alive){
 	_the_tree->Branch("theta",&_theta,"theta[bpart]/F");
 	_the_tree->Branch("alpha",&_alpha,"alpha[bpart]/F");
 	_the_tree->Branch("run_type",&_run_type,"run_type/I");
+	_the_tree->Branch("weight",&_weight,"weight/I");
 	Float_t _MM_sp[3]= {NAN,NAN,NAN};//{p/pip,p/pim,pip/pim}
 	Float_t _theta_sp[3]{NAN,NAN,NAN};//{p,pip,pim}
 	Float_t _alpha_sp[3]{NAN,NAN,NAN};//[{pim,p},{pp,pip}],[{p,pp},{pip,pim}],[{pip,p},{pp,pim}]
@@ -46,6 +47,7 @@ forest::forest(int is_alive){
 		_a_tree[thread_id]->Branch("theta",&_thetab[thread_id],"theta[bpart]/F");
 		_a_tree[thread_id]->Branch("alpha",&_alphab[thread_id],"alpha[bpart]/F");
 		_a_tree[thread_id]->Branch("run_type",&_run_typeb[thread_id],"run_type/I");
+		_a_tree[thread_id]->Branch("weight",&_weightb[thread_id],"weight/I");
 		//The B Trees
 		/*
 		_b_tree[thread_id] = std::make_shared<TTree>("TREEsb","Tree to hold Thread Event Fourvectors");//

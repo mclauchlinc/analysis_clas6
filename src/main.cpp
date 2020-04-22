@@ -27,7 +27,7 @@ int main(int argc, char **argv){
 	//Make the environment tracker
 	auto envi = std::make_shared<Environment>();
 	//std::cout<<"Test of Environment pre copy| dc_hit: " <<envi->Environment::was_dc_hit();
-	Setup::set_envi(envi); //setup.hpp
+	Setup::set_envi(envi,3); //setup.hpp
 	//std::cout<<std::endl <<"Test of Environment pos copy| dc_hit: " <<envi->Environment::was_dc_hit() <<std::endl;
 	
 	/*
@@ -54,6 +54,9 @@ int main(int argc, char **argv){
 	        }else if(argv[1] == list3n){
 	        	std::cout<<"Half Wave Plate Out" <<std::endl;
 	       		plate_stat = -1; 
+	        }else{
+	        	std::cout<<"Pretend Wave Plate In" <<std::endl;
+	       		plate_stat = 1; 
 	        }
        	}else{
        		comp = list3p;
@@ -82,13 +85,13 @@ int main(int argc, char **argv){
 	
 	//Assigning environment parameters
 	if(_case == 1){
-		if(data_set == 1 || data_set == 2){
+		if(data_set == 1 || data_set == 2){//Data
 			envi->Environment::env_sim(false);
 			envi->Environment::env_data_set(data_set);
-		}else if(data_set == 3 || data_set == 4){
+		}else if(data_set == 3 || data_set == 4){//Simulation
 			envi->Environment::env_sim(true);
 			envi->Environment::env_data_set(data_set-2);
-		}else if(data_set == 5 || data_set == 6){
+		}else if(data_set == 5 || data_set == 6){//Empty Target
 			envi->Environment::env_sim(false);
 			envi->Environment::env_data_set(data_set-4);
 		}
@@ -154,8 +157,8 @@ int main(int argc, char **argv){
 		}
 	}
 	
-	a_good_forest->forest::Grow_Forest();//Combine all those Thread specific trees and output a root file with all event selected events with four vectors 
-	a_good_forest->forest::Write();//Write the TTree for the events
+	//a_good_forest->forest::Grow_Forest();//Combine all those Thread specific trees and output a root file with all event selected events with four vectors 
+	//a_good_forest->forest::Write();//Write the TTree for the events
 
 
 	//For each thread to see how many events each thread successfully analyized

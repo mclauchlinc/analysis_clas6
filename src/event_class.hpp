@@ -47,6 +47,7 @@ private:
 	int _top = 0; //Topology this fits under {bad, pmiss, pipmiss,pimmiss,zeromiss }->{0,1,2,3,4}
 	bool _assigned_4vecs = false; 
 	int _run_type = 0; //{e1-6,e1f, e1-6 sim, e1f sim, e16 empty, e1f empty} ->{1,2,3,4,5,6}
+	float _weight = NAN;
 
 	//All four vectors in the center of mass frame 
 	TLorentzVector _beam;
@@ -124,6 +125,7 @@ private:
 	int h_secpim[20] = {-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99};
 	int pim_idx[20] = {-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99};
 
+	//Pieces for the hadrons because they're harder to track
 	float d[3]= {NAN,NAN,NAN}; 
 	float t[3]= {NAN,NAN,NAN};
 	float cx[3]= {NAN,NAN,NAN}; 
@@ -133,6 +135,10 @@ private:
 	int h_sec[3]= {-99,-99,-99};
 
 	bool top_possible[4]= {false,false,false,false};
+
+	//Some simlation specific pieces
+	float _Wt = NAN; 
+	float _Q2t = NAN; 
 	
 public:
 	Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogram> _hists, int run_type, int plate_info, std::shared_ptr<Environment> eniv);//default to e16
@@ -150,6 +156,7 @@ public:
 	int Get_run_type();
 
 	int Get_ppip(int idx);
+	float Get_weight();
 	//void Fill_Tree(forest tree, int event_n);
 	/*
 	void Assign_electron(float p, float cx, float cy, float cz);

@@ -2,17 +2,24 @@
 
 
 Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogram> _hists, int run_type, int plate_info, std::shared_ptr<Environment> envi ){ 
-						 
+	//std::cout<<"We have made it into the event for a thread" <<std::endl;			 
 	bool fid_e_pass = false;
 	bool sf_e_pass = false;
 	bool cc_e_pass = false;
-	int num_parts = data->Branches::gpart();
+	int good_particles; 
+	if(run_type==3 || run_type== 4){
+		good_particles = data->Branches::npart();
+	}else{
+		good_particles = data->Branches::gpart();
+	}
+	int num_parts = good_particles;
 	float theta[num_parts];
 	float phi[num_parts];
 	float sector[num_parts];
 	float p_[num_parts];
 	bool in_range = false;
-
+	_weight = data->Branches::weight();	
+	//std::cout<<std::endl <<"Did we get inside an event at least?"
 	_helicity = physics::event_helicity(data,plate_info);
 	_run_type = run_type;
 
@@ -46,6 +53,13 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 
 	_W = physics::WP(0,data);//The first index {0,1} -> {e16, e1f}
 	_Q2 = physics::Qsquared(0,data);//The first index {0,1} -> {e16, e1f}
+	if(envi->was_sim()){
+		_Wt = physics::WP(0,data,1);//The first index {0,1} -> {e16, e1f}
+		_Q2t = physics::Qsquared(0,data,1);//The first index {0,1} -> {e16, e1f}
+		//std::cout<<std::endl <<"W thrown is: " <<_Wt;
+		//std::cout<<std::endl <<"Q2 thrown is: " <<_Q2t <<std::endl;  
+	}
+
 
 	/*if(_W >= Wmin && _W <= Wmax ){//Checking to see if the particle is in the relevant W Q2 region 
 		if(_Q2 >= Q2min && _Q2 <= Q2max){
@@ -56,6 +70,9 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 		//Event-Wide
 		//Electrons
 	_hists->Histogram::WQ2_Fill(envi,0,0,_W,_Q2);
+	if(envi->was_sim()){
+		_hists->Histogram::WQ2_Fill(envi,0,0,_Wt,_Q2t,1);
+	}
 	_hists->Histogram::Fid_Fill(envi,0,physics::get_theta(data->Branches::cz(0)),physics::get_phi(data->Branches::cx(0),data->Branches::cy(0)),0,0,0,_W,data->Branches::p(0));
 	_hists->Histogram::SF_Fill(envi,0,data->Branches::p(0),data->Branches::etot(0),0,0,_W,sector[0]);
 	_hists->Histogram::CC_Fill(envi,0,data->Branches::cc_sect(0),data->Branches::cc_segm(0),data->Branches::nphe(0),0,0);
@@ -1036,6 +1053,8 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 				_hists->Histogram::Fid_Fill(envi,1,physics::get_theta(data->Branches::cz(0)),physics::get_phi(data->Branches::cx(0),data->Branches::cy(0)),0,10,0,_W,data->Branches::p(0));
 				_hists->Histogram::SF_Fill(envi,1,data->Branches::p(0),data->Branches::etot(0),10,0,_W,sector[0]);
 				_hists->Histogram::CC_Fill(envi,1,data->Branches::cc_sect(0),data->Branches::cc_segm(0),data->Branches::nphe(0),10,0);
+		
+
 				for(int par = 1; par<3; par++){
 					_hists->Histogram::Fid_Fill(envi,1,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,0,_W,_p[par]);
 					_hists->Histogram::DT_Fill(envi,1,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,0,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));
@@ -1082,6 +1101,9 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 				_hists->Histogram::Fid_Fill(envi,2,physics::get_theta(data->Branches::cz(0)),physics::get_phi(data->Branches::cx(0),data->Branches::cy(0)),0,10,0,_W,data->Branches::p(0));
 				_hists->Histogram::SF_Fill(envi,2,data->Branches::p(0),data->Branches::etot(0),10,0,_W,sector[0]);
 				_hists->Histogram::CC_Fill(envi,2,data->Branches::cc_sect(0),data->Branches::cc_segm(0),data->Branches::nphe(0),10,0);
+				
+				
+
 				//Hadron
 				for(int i = 0; i<2; i++){
 					switch(i){
@@ -1098,10 +1120,6 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 			}else{
 				_hists->Histogram::MM_Fill(envi,1,MM_pip,2,0,ideal_top[1]);
 				_hists->Histogram::MM_Fill(envi,1,MM_pip2,2,1,ideal_top[1]);
-				
-				//_hists->Histogram::MM_Fill(envi,4,MM_pip,2,0);
-				//_hists->Histogram::MM_Fill(envi,4,MM_pip2,2,1);
-				//_hists->Histogram::WQ2_Fill(envi,2,10,_W,_Q2);
 				_hists->Histogram::Fid_Fill(envi,2,physics::get_theta(data->Branches::cz(0)),physics::get_phi(data->Branches::cx(0),data->Branches::cy(0)),0,10,1,_W,data->Branches::p(0));
 				_hists->Histogram::SF_Fill(envi,2,data->Branches::p(0),data->Branches::etot(0),10,1,_W,sector[0]);
 				_hists->Histogram::CC_Fill(envi,2,data->Branches::cc_sect(0),data->Branches::cc_segm(0),data->Branches::nphe(0),10,1);
@@ -1124,16 +1142,9 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 			MM_pim = physics::MM_event(0,0,_elec,_pro,_pip);
 			MM_pim2 = physics::MM_event(0,1,_elec,_pro,_pip);
 			_hists->Histogram::MM_Fill(envi,2,MM_pim,0,0,ideal_top[2]);
-			_hists->Histogram::MM_Fill(envi,2,MM_pim2,0,1,ideal_top[2]);
-			
-			//_hists->Histogram::MM_Fill(envi,4,MM_pim,0,0);
-			//_hists->Histogram::MM_Fill(envi,4,MM_pim2,0,1);
 			if((MM_pim > (pim_center-pim_sig))&&(MM_pim < (pim_center+pim_sig))){//Missing Mass Cut on Proton Mass
 				_hists->Histogram::MM_Fill(envi,2,MM_pim,1,0,ideal_top[2]);
 				_hists->Histogram::MM_Fill(envi,2,MM_pim2,1,1,ideal_top[2]);
-				
-				//_hists->Histogram::MM_Fill(envi,4,MM_pim,1,0);
-				//_hists->Histogram::MM_Fill(envi,4,MM_pim2,1,1);
 				topo[2]=true;
 			//	std::cout<<std::endl <<"PIM Missing topology passed";
 				_hists->Histogram::WQ2_Fill(envi,3,10,_W,_Q2);
@@ -1143,6 +1154,7 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 				/*if(!top_possible[3]){
 					_pim = _beam + _target - _elec - _pro - _pip; 
 				}*/
+				
 				for(int par = 0; par<2; par++){
 					_hists->Histogram::Fid_Fill(envi,3,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,0,_W,_p[par]);
 					_hists->Histogram::DT_Fill(envi,3,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,0,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));
@@ -1150,10 +1162,6 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 			}else{
 				_hists->Histogram::MM_Fill(envi,2,MM_pim,2,0,ideal_top[2]);
 				_hists->Histogram::MM_Fill(envi,2,MM_pim2,2,1,ideal_top[2]);
-				
-				//_hists->Histogram::MM_Fill(envi,4,MM_pim,2,0);
-				//_hists->Histogram::MM_Fill(envi,4,MM_pim2,2,1);
-				//_hists->Histogram::WQ2_Fill(envi,3,10,_W,_Q2);
 				_hists->Histogram::Fid_Fill(envi,3,physics::get_theta(data->Branches::cz(0)),physics::get_phi(data->Branches::cx(0),data->Branches::cy(0)),0,10,1,_W,data->Branches::p(0));
 				_hists->Histogram::SF_Fill(envi,3,data->Branches::p(0),data->Branches::etot(0),10,1,_W,sector[0]);
 				_hists->Histogram::CC_Fill(envi,3,data->Branches::cc_sect(0),data->Branches::cc_segm(0),data->Branches::nphe(0),10,1);
@@ -1169,30 +1177,24 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 			MM_z2 = physics::MM_event(0,1,_elec,_pro,_pip,_pim);
 			_hists->Histogram::MM_Fill(envi,3,MM_z,0,0,ideal_top[3]);
 			_hists->Histogram::MM_Fill(envi,3,MM_z2,0,1,ideal_top[3]);
-			//_hists->Histogram::MM_Fill(envi,4,MM_z,0,0);
-			//_hists->Histogram::MM_Fill(envi,4,MM_z2,0,1);
 			if((MM_z2 > (MM_zero_center2-MM_zero_sigma2))&&(MM_z2 < (MM_zero_center2+MM_zero_sigma2))){//Missing Mass Cut on Proton Mass
-				_hists->Histogram::MM_Fill(envi,3,MM_p,1,0,ideal_top[3]);//Added this up in the event particle determination step
-				_hists->Histogram::MM_Fill(envi,3,MM_p2,1,1,ideal_top[3]);
-				//_hists->Histogram::MM_Fill(envi,4,MM_z,1,0);
-				//_hists->Histogram::MM_Fill(envi,4,MM_z2,1,1);
+				_hists->Histogram::MM_Fill(envi,3,MM_z,1,0,ideal_top[3]);//Added this up in the event particle determination step
+				_hists->Histogram::MM_Fill(envi,3,MM_z2,1,1,ideal_top[3]);
 				topo[3]=true;
-				//std::cout<<std::endl <<"ZERO Missing topology passed";
 				_hists->Histogram::WQ2_Fill(envi,4,10,_W,_Q2);
 				_hists->Histogram::Fid_Fill(envi,4,physics::get_theta(data->Branches::cz(0)),physics::get_phi(data->Branches::cx(0),data->Branches::cy(0)),0,10,0,_W,data->Branches::p(0));
 				_hists->Histogram::SF_Fill(envi,4,data->Branches::p(0),data->Branches::etot(0),10,0,_W,sector[0]);
 				_hists->Histogram::CC_Fill(envi,4,data->Branches::cc_sect(0),data->Branches::cc_segm(0),data->Branches::nphe(0),10,0);
+
+
+
 				for(int par = 0; par<3; par++){
 					_hists->Histogram::Fid_Fill(envi,4,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,0,_W,_p[par]);
 					_hists->Histogram::DT_Fill(envi,4,par,_p[par], d[par], t[par], data->Branches::sc_r(0), data->Branches::sc_t(0),6,0,_W,physics::get_sector(physics::get_phi(cx[par],cy[par])));
 				}
 			}else{
-				_hists->Histogram::MM_Fill(envi,3,MM_p,2,0,ideal_top[3]);//Added this up in the event particle determination step
-				_hists->Histogram::MM_Fill(envi,3,MM_p2,2,1,ideal_top[3]);
-				
-				//_hists->Histogram::MM_Fill(envi,4,MM_z,2,0);
-				//_hists->Histogram::MM_Fill(envi,4,MM_z2,2,1);
-				//_hists->Histogram::WQ2_Fill(envi,4,10,_W,_Q2);
+				_hists->Histogram::MM_Fill(envi,3,MM_z,2,0,ideal_top[3]);//Added this up in the event particle determination step
+				_hists->Histogram::MM_Fill(envi,3,MM_z2,2,1,ideal_top[3]);
 				_hists->Histogram::Fid_Fill(envi,4,physics::get_theta(data->Branches::cz(0)),physics::get_phi(data->Branches::cx(0),data->Branches::cy(0)),0,10,1,_W,data->Branches::p(0));
 				_hists->Histogram::SF_Fill(envi,4,data->Branches::p(0),data->Branches::etot(0),10,1,_W,sector[0]);
 				_hists->Histogram::CC_Fill(envi,4,data->Branches::cc_sect(0),data->Branches::cc_segm(0),data->Branches::nphe(0),10,1);
@@ -1228,6 +1230,8 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 		}
 	}
 
+
+
 	if(_top!=0){
 		//std::cout<<" and we made it into the combined event selection?" <<std::endl;
 		_valid = true;
@@ -1235,6 +1239,15 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 		_hists->Histogram::Fid_Fill(envi,5,physics::get_theta(data->Branches::cz(0)),physics::get_phi(data->Branches::cx(0),data->Branches::cy(0)),0,10,0,_W,data->Branches::p(0));
 		_hists->Histogram::SF_Fill(envi,5,data->Branches::p(0),data->Branches::etot(0),10,0,_W,sector[0]);
 		_hists->Histogram::CC_Fill(envi,5,data->Branches::cc_sect(0),data->Branches::cc_segm(0),data->Branches::nphe(0),10,0);
+		
+
+		_hists->Histogram::Friend_Fill(envi,_top-1,_W,_Q2,physics::MM_2(_pro,_pip),physics::get_theta(cz[2]),physics::alpha(0,_pro,_pip,_pim,_target,run_type),physics::get_phi_pos(cx[2],cy[2]),0,_weight);
+		_hists->Histogram::Friend_Fill(envi,_top-1,_W,_Q2,physics::MM_2(_pip,_pim),physics::get_theta(cz[0]),physics::alpha(1,_pro,_pip,_pim,_target,run_type),physics::get_phi_pos(cx[0],cy[0]),1,_weight);
+		_hists->Histogram::Friend_Fill(envi,_top-1,_W,_Q2,physics::MM_2(_pro,_pim),physics::get_theta(cz[1]),physics::alpha(2,_pro,_pip,_pim,_target,run_type),physics::get_phi_pos(cx[1],cy[1]),2,_weight);
+		_hists->Histogram::Friend_Fill(envi,4,_W,_Q2,physics::MM_2(_pro,_pip),physics::get_theta(cz[2]),physics::alpha(0,_pro,_pip,_pim,_target,run_type),physics::get_phi_pos(cx[2],cy[2]),0,_weight);
+		_hists->Histogram::Friend_Fill(envi,4,_W,_Q2,physics::MM_2(_pip,_pim),physics::get_theta(cz[0]),physics::alpha(1,_pro,_pip,_pim,_target,run_type),physics::get_phi_pos(cx[0],cy[0]),1,_weight);
+		_hists->Histogram::Friend_Fill(envi,4,_W,_Q2,physics::MM_2(_pro,_pim),physics::get_theta(cz[1]),physics::alpha(2,_pro,_pip,_pim,_target,run_type),physics::get_phi_pos(cx[1],cy[1]),2,_weight);
+
 		for(int par = 0; par<3; par++){
 			if(topo[3]){
 				_hists->Histogram::Fid_Fill(envi,5,physics::get_theta(cz[par]),physics::get_phi(cx[par],cy[par]),par+1,6,0,_W,_p[par]);
@@ -1427,6 +1440,14 @@ int Event_Class::Get_run_type(){
 
 int Event_Class::Get_ppip(int idx){
 	return ppip[idx];
+}
+
+float Event_Class::Get_weight(){
+	if(_weight > 0.0){
+		return _weight;
+	}else{
+		std::cout<<std::endl <<"No legit weight here." <<std::endl; 
+	}
 }
 
 /*

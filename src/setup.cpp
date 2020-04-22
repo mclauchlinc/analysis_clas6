@@ -1,6 +1,6 @@
 #include "setup.hpp"
 
-void Setup::set_envi(std::shared_ptr<Environment> setup){
+void Setup::set_envi(std::shared_ptr<Environment> setup, int run_type){
 	setup->Environment::env_data_set(0); //Which data set? {1,2}->{e16,e1f} //Not Setting
 	setup->Environment::env_dc_hit(true); //Was a hit on the DC required?
 	setup->Environment::env_cc_hit(true);  //Was a hit on the CC required for electrons?
@@ -81,6 +81,7 @@ void Setup::set_envi(std::shared_ptr<Environment> setup){
   	setup->Environment::env_WQ2_plot(true); //Were W Qsquared plots made?
   	setup->Environment::env_p_dep_plot(true); //Is there momentum dependence in the relevant plots?
   	setup->Environment::env_W_dep_plot(true); //Is there W dependence in the relevant plots? 
+  	setup->Environment::env_Friend_plot(true);//Construct the multi dimensional histogram and fill it
 }
 
 void Setup::make_envi_file(const std::string& output_name, std::shared_ptr<Environment> envi){

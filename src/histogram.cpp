@@ -10,6 +10,7 @@ Histogram::Histogram(std::shared_ptr<Environment> _envi, const std::string& outp
 	Histogram::DT_Make(_envi);
 	Histogram::CC_Make(_envi);
 	Histogram::MM_Make(_envi);
+	Histogram::Friend_Make(_envi);
 }
 
 //Histogram::~Histogram() { this->Write(); }
@@ -29,9 +30,12 @@ void Histogram::Write(std::shared_ptr<Environment> _envi){
 	CC_Write( _envi);
 	std::cout<<" Done!" <<std::endl <<"Writing MM Plots";
 	MM_Write( _envi);
+	std::cout<<" Done!" <<std::endl <<"Writing Friend Plots";
+	Friend_Write(_envi);
 	std::cout<<" Done!" <<std::endl <<"Closing Event Selection RootFile";
 	RootOutputFile->Close();
 	std::cout<<" Done!" <<std::endl;
+
 }
 
 
@@ -42,7 +46,7 @@ int Histogram::W_binning(float W_){
   for(int i = 1; i < 30; i++){
     top = Wbin_start + i*Wbin_res;//constants.hpp
     bot = top - Wbin_res; 
-    if(W_ < top && W_ > bot){
+    if(W_ < top && W_ >= bot){
       j = i; 
     }
   }
@@ -55,7 +59,7 @@ int Histogram::p_binning(float p_){
   for(int i = 1; i < 12; i++){
     top = pbin_start + i*pbin_res;//constants.hpp
     bot = top - pbin_res; 
-    if(p_ < top && p_ > bot){
+    if(p_ < top && p_ >= bot){
       j = i; 
     }
   }
@@ -81,30 +85,43 @@ char Histogram::Part_cut(int species, int cut){
 
 void Histogram::WQ2_Make(std::shared_ptr<Environment> _envi ){
 	if(_envi->was_WQ2_plot()){
-		std::vector<long> space_dims(2);
+		std::vector<long> space_dims(3);
 		space_dims[0] = 11; //Electron Cuts
 		space_dims[1] = 6; //Topologies
+		space_dims[2] = 2; //Recon vs. Thrown
 
 		CartesianGenerator cart(space_dims);//CartesianGenerator.hpp
 		char hname[100]; 
 
 		while(cart.GetNextCombination()){
-			if(cart[0]==10 && cart[1]!=0){
-				sprintf(hname,"W_Q2_%s_%s",eid_cut[cart[0]],topologies[cart[1]]); //constants.h and otherwise writing the specific cut to the right plot
-		    	WQ2_hist[cart[0]][cart[1]] = std::make_shared<TH2F>( hname, hname, WQxres, WQxmin, WQxmax, WQyres, WQymin, WQymax); // constants.h
-		    	WQ2_made_hist[cart[0]][cart[1]]=true;
-			}else if( cart[0]!= 10 && cart[1]==0){
-				sprintf(hname,"W_Q2_%s_%s",eid_cut[cart[0]],topologies[cart[1]]); //constants.h and otherwise writing the specific cut to the right plot
-		    	WQ2_hist[cart[0]][cart[1]] = std::make_shared<TH2F>( hname, hname, WQxres, WQxmin, WQxmax, WQyres, WQymin, WQymax); // constants.h	
-		    	WQ2_made_hist[cart[0]][cart[1]]=true;		
-		    }
+			if(_envi->Environment::was_sim()){
+				if(cart[0]==10 && cart[1]!=0){
+					sprintf(hname,"W_Q2_%s_%s_%s",eid_cut[cart[0]],topologies[cart[1]],thrown[cart[2]]); //constants.h and otherwise writing the specific cut to the right plot
+			    	WQ2_hist[cart[0]][cart[1]][cart[2]] = std::make_shared<TH2F>( hname, hname, WQxres, WQxmin, WQxmax, WQyres, WQymin, WQymax); // constants.h
+			    	WQ2_made_hist[cart[0]][cart[1]][cart[2]]=true;
+				}else if( cart[0]!= 10 && cart[1]==0){
+					sprintf(hname,"W_Q2_%s_%s_%s",eid_cut[cart[0]],topologies[cart[1]],thrown[cart[2]]); //constants.h and otherwise writing the specific cut to the right plot
+			    	WQ2_hist[cart[0]][cart[1]][cart[2]] = std::make_shared<TH2F>( hname, hname, WQxres, WQxmin, WQxmax, WQyres, WQymin, WQymax); // constants.h	
+			    	WQ2_made_hist[cart[0]][cart[1]][cart[2]]=true;		
+		    	}
+			}else if(cart[2] == 0){
+				if(cart[0]==10 && cart[1]!=0){
+					sprintf(hname,"W_Q2_%s_%s",eid_cut[cart[0]],topologies[cart[1]]); //constants.h and otherwise writing the specific cut to the right plot
+			    	WQ2_hist[cart[0]][cart[1]][cart[2]] = std::make_shared<TH2F>( hname, hname, WQxres, WQxmin, WQxmax, WQyres, WQymin, WQymax); // constants.h
+			    	WQ2_made_hist[cart[0]][cart[1]][cart[2]]=true;
+				}else if( cart[0]!= 10 && cart[1]==0){
+					sprintf(hname,"W_Q2_%s_%s",eid_cut[cart[0]],topologies[cart[1]]); //constants.h and otherwise writing the specific cut to the right plot
+			    	WQ2_hist[cart[0]][cart[1]][cart[2]] = std::make_shared<TH2F>( hname, hname, WQxres, WQxmin, WQxmax, WQyres, WQymin, WQymax); // constants.h	
+			    	WQ2_made_hist[cart[0]][cart[1]][cart[2]]=true;		
+		    	}
+			}
 		}
 	}
 }
 
-void Histogram::WQ2_Fill(std::shared_ptr<Environment> _envi, int top, int cut, float W_, float Q2_){
+void Histogram::WQ2_Fill(std::shared_ptr<Environment> _envi, int top, int cut, float W_, float Q2_, int thr){
 	if(_envi->was_WQ2_plot()){
-		WQ2_hist[cut][top]->Fill(W_,Q2_);
+		WQ2_hist[cut][top][thr]->Fill(W_,Q2_);
 	}
 }
 
@@ -119,17 +136,31 @@ void Histogram::WQ2_Write(std::shared_ptr<Environment> _envi){
 			dir_WQ2_sub[top] = dir_WQ2->mkdir(dir_name);
 			dir_WQ2_sub[top]->cd();
 			for(int cut = 0; cut < 11; cut++){
-				if((top==0 && cut !=10) || (top!=0 && cut==10)){
-					if(WQ2_made_hist[cut][top]){
-						WQ2_hist[cut][top]->SetXTitle("W (GeV)");
-						WQ2_hist[cut][top]->SetYTitle("Q^{2} (GeV^{2}");
-						WQ2_hist[cut][top]->SetOption("Colz");
-						WQ2_hist[cut][top]->Write();
-					}else{
-						std::cout<<std::endl <<"WQ2 would have segfaulted: " <<cut <<" " <<top;
+				if(_envi->was_sim()){
+					for(int thr = 0; thr < 2; thr++){
+						if((top==0 && cut !=10) || (top!=0 && cut==10)){
+							if(WQ2_made_hist[cut][top]){
+								WQ2_hist[cut][top][thr]->SetXTitle("W (GeV)");
+								WQ2_hist[cut][top][thr]->SetYTitle("Q^{2} (GeV^{2}");
+								WQ2_hist[cut][top][thr]->SetOption("Colz");
+								WQ2_hist[cut][top][thr]->Write();
+							}else{
+								std::cout<<std::endl <<"WQ2 would have segfaulted: " <<cut <<" " <<top;
+							}
+						}
 					}
-					
-				}
+				}else{
+					if((top==0 && cut !=10) || (top!=0 && cut==10)){
+						if(WQ2_made_hist[cut][top]){
+							WQ2_hist[cut][top][0]->SetXTitle("W (GeV)");
+							WQ2_hist[cut][top][0]->SetYTitle("Q^{2} (GeV^{2}");
+							WQ2_hist[cut][top][0]->SetOption("Colz");
+							WQ2_hist[cut][top][0]->Write();
+						}else{
+							std::cout<<std::endl <<"WQ2 would have segfaulted: " <<cut <<" " <<top;
+						}
+					}
+				}	
 			}
 			dir_WQ2_sub[top]->Close();
 		}
@@ -984,6 +1015,160 @@ void Histogram::MM_Write(std::shared_ptr<Environment> _envi){
 		}
 	}
 
+}
+
+void Histogram::Friend_Make(std::shared_ptr<Environment> _envi){
+	//If we decide we want to fill this stuff
+	if(_envi->was_Friend_plot()){
+		char hname[100];
+		sprintf(hname,"2#pi_off_proton_#Delta^{++}");
+		Double_t xmin1[7] = {-0.5,_W_min,_Q2_min,_MM_min[0],_theta_min,_alpha_min,_phi_min};
+		Double_t xmax1[7] = {5.5,_W_max,_Q2_max,_MM_max[0],_theta_max,_alpha_max,_phi_max};
+		Double_t xmin2[7] = {-0.5,_W_min,_Q2_min,_MM_min[1],_theta_min,_alpha_min,_phi_min};
+		Double_t xmax2[7] = {5.5,_W_max,_Q2_max,_MM_max[1],_theta_max,_alpha_max,_phi_max};
+		Double_t xmin3[7] = {-0.5,_W_min,_Q2_min,_MM_min[2],_theta_min,_alpha_min,_phi_min};
+		Double_t xmax3[7] = {5.5,_W_max,_Q2_max,_MM_max[2],_theta_max,_alpha_max,_phi_max};
+		Friend[0] = std::make_shared<THnSparseD>(hname,hname,7,_Friend_bins,xmin1,xmax1);
+		//Friend[0]->Sumw2();//Must be called before error bars can be placed. 
+		sprintf(hname,"2#pi_off_proton_#rho");
+		Friend[1] = std::make_shared<THnSparseD>(hname,hname,7,_Friend_bins,xmin2,xmax2);
+		//Friend[1]->Sumw2();//Must be called before error bars can be placed. 
+		sprintf(hname,"2#pi_off_proton_#Delta^{0}");
+		Friend[2] = std::make_shared<THnSparseD>(hname,hname,7,_Friend_bins,xmin3,xmax3);
+		//Friend[2]->Sumw2();//Must be called before error bars can be placed. 
+	}
+}
+
+int Histogram::Friend_W_binning(float W_){
+	int Wbin = W_binning(W_)-1;
+	return Wbin;
+}
+
+int Histogram::Friend_Q2_binning(float Q2_){
+  int j = -1;
+  float top, bot; 
+  for(int i = 0; i < _Friend_bins[2]; i++){
+    top = _Q2_min + (i+1)*((_Q2_max-_Q2_min)/_Friend_bins[2]);//constants.hpp
+    bot = top - ((_Q2_max-_Q2_min)/_Friend_bins[2]); 
+    if(Q2_ < top && Q2_ >= bot){
+      j = i; 
+    }
+  }
+  return j; 
+}
+
+int Histogram::Friend_MM_binning(float MM_, int chan){
+  int j = -1;
+  float top, bot; 
+  for(int i = 0; i < _Friend_bins[3]; i++){
+    top = _MM_min[chan] + (i+1)*((_MM_max[chan]-_MM_min[chan])/_Friend_bins[3]);//constants.hpp
+    bot = top - ((_MM_max[chan]-_MM_min[chan])/_Friend_bins[3]); 
+    if(MM_ < top && MM_ >= bot){
+      j = i; 
+    }
+  }
+  return j; 
+}
+
+int Histogram::Friend_theta_binning(float theta_){
+  int j = -1;
+  float top, bot; 
+  for(int i = 0; i < _Friend_bins[4]; i++){
+    top = _theta_min + (i+1)*((_theta_max-_theta_min)/_Friend_bins[4]);//constants.hpp
+    bot = top - ((_theta_max-_theta_min)/_Friend_bins[4]); 
+    if(theta_ < top && theta_ >= bot){
+      j = i; 
+    }
+  }
+  return j; 
+}
+
+int Histogram::Friend_alpha_binning(float alpha_){
+  int j = -1;
+  float top, bot; 
+  for(int i = 0; i < _Friend_bins[5]; i++){
+    top = _alpha_min + (i+1)*((_alpha_max-_alpha_min)/_Friend_bins[5]);//constants.hpp
+    bot = top - ((_alpha_max-_alpha_min)/_Friend_bins[5]); 
+    if(alpha_ < top && alpha_ >= bot){
+      j = i; 
+    }
+  }
+  return j; 
+}
+
+int Histogram::Friend_phi_binning(float phi_){
+  int j = -1;
+  float top, bot; 
+  for(int i = 0; i < _Friend_bins[6]; i++){
+    top = _phi_min + (i+1)*((_phi_max-_phi_min)/_Friend_bins[6]);//constants.hpp
+    bot = top - ((_phi_max-_phi_min)/_Friend_bins[6]); 
+    if(phi_ < top && phi_ >= bot){
+      j = i; 
+    }
+  }
+  return j; 
+}
+
+
+int * Histogram::Friend_binning(int top, float W_, float Q2_, float MM_, float theta_, float alpha_, float phi_ , int channel){
+	int x[7]; 
+	int test = 0; 
+	bool in_region = false; 
+	x[0] = top; //{pmiss,pipmiss,pimmiss,zeromiss,all}
+	x[1] = Friend_W_binning(W_);
+	x[2] = Friend_Q2_binning(Q2_);
+	x[3] = Friend_MM_binning(MM_,channel);
+	x[4] = Friend_theta_binning(theta_);
+	x[5] = Friend_alpha_binning(alpha_);
+	x[6] = Friend_phi_binning(phi_);
+	/*std::cout<<std::endl <<"Filling Friend in channel " <<channel <<std::endl; 
+	std::cout<<"top = " <<top <<" bin: " <<x[0] <<std::endl;
+	std::cout<<"W = " <<W_ <<" bin: " <<x[1] <<std::endl;
+	std::cout<<"Q2 = " <<Q2_ <<" bin: " <<x[2] <<std::endl;
+	std::cout<<"MM = " <<MM_ <<" bin: " <<x[3] <<std::endl;
+	std::cout<<"theta = " <<theta_ <<" bin: " <<x[4] <<std::endl;
+	std::cout<<"alpha = " <<alpha_ <<" bin: " <<x[5] <<std::endl;
+	std::cout<<"phi = " <<phi_ <<" bin: " <<x[6] <<std::endl;
+	*/
+	for(int i = 0; i < 7; i++){
+		if(x[i] > 0){
+			test++;
+		}
+	}
+	if(test < 7){
+		x[0] = -1;
+	}
+	return x; 
+}
+
+void Histogram::Friend_Fill(std::shared_ptr<Environment> _envi, int top_, float W_, float Q2_, float MM_, float theta_, float alpha_, float phi_ , int chan_, float weight_){
+	int *y = Friend_binning(top_,W_,Q2_,MM_,theta_,alpha_,phi_,chan_);
+	Double_t x[7] = {(float)top_, W_, Q2_, MM_, theta_, alpha_, phi_};
+	if(y[0]>=0){
+		Friend[chan_]->Fill(x,weight_);
+	}
+}
+
+void Histogram::Friend_Write(std::shared_ptr<Environment> _envi){
+	char dir_name[100];
+	TDirectory * Friend_plot = RootOutputFile->mkdir("Friend plots");
+	Friend_plot->cd();
+	TH1D* MM_proj[3]; 
+	TH1D* alpha_proj[3];
+	TH1D* theta_proj[3];
+
+	for(int i = 0; i< 3; i++){
+		MM_proj[i] = Friend[i]->Projection(3);
+		alpha_proj[i] = Friend[i]->Projection(5);
+		theta_proj[i] = Friend[i]->Projection(4);
+		Friend[i]->Write(); 
+		MM_proj[i]->Draw();
+		MM_proj[i]->Write();
+		alpha_proj[i]->Draw();
+		alpha_proj[i]->Write();
+		theta_proj[i]->Draw();
+		theta_proj[i]->Write();
+	}
 }
 /*
 void Histogram::Fill_EID(std::shared_ptr<Particle> par, float W_, float Q2_){

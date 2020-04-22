@@ -12,6 +12,7 @@
 #include "physics.hpp"
 #include "detectors.hpp"
 #include "environment.hpp"
+#include "THnSparse.h"
 //#include "particle.hpp"
 //#include "variables.h"
 //#include "CartesianGenerator.hh"
@@ -19,6 +20,7 @@
 
 using TH2F_ptr = std::shared_ptr<TH2F>;
 using TH1F_ptr = std::shared_ptr<TH1F>;
+using THn_ptr = std::shared_ptr<THnSparseD>;
 
 
 class Histogram {
@@ -101,7 +103,7 @@ protected:
 	double YM_res[3] = {0.06,0.06,0.06};
 
 	 //Making the Histograms
-	TH2F_ptr WQ2_hist[11][6];//electron cuts, topologies (including pre)
+	TH2F_ptr WQ2_hist[11][6][2];//electron cuts, topologies (including pre), Recon vs. Raw (for data this should always be "Recon")
 	TH2F_ptr Fid_hist[7][4][11][30][12][6][2];//sector, species, cut, W binning, p binning, topology
 	TH2F_ptr SF_hist[10][30][7][6][2];//cuts, W Binning, Sector, topology
 	TH2F_ptr DT_hist[3][7][30][7][6][2]; //particle, cuts, W binning, sector, topology
@@ -121,8 +123,24 @@ protected:
 	bool DT_dir_hist[3][7][30][7][6][2];
 	bool DT_dir_made[3][8][2][8][6];
 
-	bool WQ2_made_hist[11][6];
-	bool WQ2_dir_made[11][6];
+	bool WQ2_made_hist[11][6][2];
+	bool WQ2_dir_made[11][6][2];
+
+	THn_ptr Friend[3];//This will be the 7 dimensional histogram from which I can project out different pieces
+	Int_t _Friend_bins[7] = {5,29,5,14,10,10,10}; //topology, W, Q2, MM, Theta, Alpha, Phi
+	float _W_min = 1.4;
+	float _W_max = 2.125;
+	float _Q2_min = 2.0;
+	float _Q2_max = 5.0;
+	float _MM_min[3] = {1.1,0.3,1.1};
+	float _MM_max[3] = {2.0,1.2,2.0};
+	float _theta_min = 0.0;
+	float _theta_max = 180.0;
+	float _alpha_min = 0.0;
+	float _alpha_max = 360.;
+	float _phi_min = 0.0; 
+	float _phi_max = 360.0;
+
 
 
 public:
@@ -134,7 +152,7 @@ public:
 	int p_binning(float p_);
 	char Part_cut(int species, int cut);
 	void WQ2_Make(std::shared_ptr<Environment> _envi);
-	void WQ2_Fill(std::shared_ptr<Environment> _envi, int top, int cut, float W_, float Q2_);
+	void WQ2_Fill(std::shared_ptr<Environment> _envi, int top, int cut, float W_, float Q2_, int thr = 0);
 	void WQ2_Write(std::shared_ptr<Environment> _envi);
 	//Fiducial Cuts
 	void Fid_Make(std::shared_ptr<Environment> _envi );
@@ -157,6 +175,17 @@ public:
 	void MM_Make(std::shared_ptr<Environment> _envi );
 	void MM_Fill(std::shared_ptr<Environment> _envi, int top, float mm, int cut, int square, bool fit);
 	void MM_Write(std::shared_ptr<Environment> _envi);
+
+	void Friend_Make(std::shared_ptr<Environment> _envi);
+	int Friend_W_binning(float W_);
+	int Friend_Q2_binning(float Q2_);
+	int Friend_MM_binning(float MM_, int chan);
+	int Friend_theta_binning(float theta_);
+	int Friend_alpha_binning(float alpha_);
+	int Friend_phi_binning(float phi_);
+	int * Friend_binning(int top, float W_, float Q2_, float MM_, float theta_, float alpha_, float phi_ , int channel);
+	void Friend_Fill(std::shared_ptr<Environment> _envi, int top_, float W_, float Q2_, float MM_, float theta_, float alpha_, float phi_ , int chan_, float weight_);
+	void Friend_Write(std::shared_ptr<Environment> _envi);
 	/*//Signature Plots //We'll get there
 	void MM2_Make();
 	void MM2_Fill(int top, float mm, float W_, float Q2_);

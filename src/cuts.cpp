@@ -219,9 +219,9 @@ bool cuts::e_sanity(std::shared_ptr<Branches> data, std::shared_ptr<Environment>
   }else if(!(envi->was_ec_hit())){
     ec = true;
   }
-  if(envi->was_cc_hit() && data->Branches::cc(0)){
+  if(envi->was_cc_hit() && data->Branches::cc(0) && !(envi->was_sim())){
     cc = true;
-  }else if(!(envi->was_cc_hit())){
+  }else if(!(envi->was_cc_hit()) || envi->was_sim()){
     cc = true;
   }
   pass = dc && sc && ec && cc; 

@@ -111,9 +111,12 @@ class Branches {
   float _qpart[MAX_PARTS];    //[nprt]
   int _flagspart[MAX_PARTS];  //[nprt]
 
+  float _weight;
+
  public:
-  Branches(std::shared_ptr<TChain> tree);
+  Branches(std::shared_ptr<TChain> tree, int run_type);
   ~Branches(){};
+  bool MC(); 
   void init();
   int npart();
   int evstat();
@@ -214,6 +217,7 @@ class Branches {
   float pypart(int i);
   float pzpart(int i);
   float qpart(int i);
+  float weight();
 };
 
 #endif

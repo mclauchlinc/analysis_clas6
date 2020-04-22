@@ -2,7 +2,10 @@
 
 
 void physics::Print_4Vec(TLorentzVector k1){
-	std::cout<<std::endl <<"Four Vector= px: " <<k1[0] <<" py: " <<k1[1] <<" pz: " <<k1[2] <<" E: " <<k1[3]; 
+	std::cout<<std::endl <<"Four Vector= px: " <<k1[0] <<" py: " <<k1[1] <<" pz: " <<k1[2]; 
+}
+void physics::Print_3Vec(TVector3 p1){
+	std::cout<<std::endl <<"Three Vector= px: " <<p1[0] <<" py: " <<p1[1] <<" pz: " <<p1[2] ;
 }
 
 bool physics::Check_4Vec(TLorentzVector k1){
@@ -20,9 +23,16 @@ TLorentzVector physics::Make_4Vector(float p, float cx, float cy, float cz, floa
 	return k_mu;
 }
 
+TLorentzVector physics::Make_4Vector(float px, float py, float pz, float m){
+	TVector3 k_mu_3(px, py, pz);
+	TLorentzVector k_mu;
+	k_mu.SetVectM(k_mu_3,m);
+	return k_mu;
+}
+
 TLorentzVector physics::Set_k_mu(int set){
 	TLorentzVector k_mu;
-	switch(set){
+	switch(set%2){
 		case 0:
 		k_mu = k_mu_e16; //Constants.hpp
 		break;
@@ -42,19 +52,29 @@ int physics::event_helicity(std::shared_ptr<Branches> data, int plate_stat){
 	return plate_stat*eh; 
 }
 
-float physics::Qsquared(int set, std::shared_ptr<Branches> data){
-	TVector3 k_mu_3(data->p(0)*data->cx(0),data->p(0)*data->cy(0),data->p(0)*data->cz(0));
-	TLorentzVector k_mu = physics::Set_k_mu(set);
+float physics::Qsquared(int set, std::shared_ptr<Branches> data, int thr){
 	TLorentzVector k_mu_prime; 
-	k_mu_prime.SetVectM(k_mu_3,me); //Constants.hpp
+	if(thr==1){
+		k_mu_prime = Make_4Vector(data->pxpart(0),data->pypart(0),data->pzpart(0),me);
+	}else{
+		k_mu_prime = Make_4Vector(data->p(0)*data->cx(0),data->p(0)*data->cy(0),data->p(0)*data->cz(0),me);
+	}
+	TLorentzVector k_mu = physics::Set_k_mu(set);
 	return -(k_mu - k_mu_prime).Mag2();
 }
 
-float physics::WP(int set, std::shared_ptr<Branches> data){
+float physics::WP(int set, std::shared_ptr<Branches> data, int thr){
 	TLorentzVector k_mu = physics::Set_k_mu(set);
-	TVector3 k_mu_3(data->p(0)*data->cx(0),data->p(0)*data->cy(0),data->p(0)*data->cz(0));
-	TLorentzVector k_mu_prime;
-	k_mu_prime.SetVectM(k_mu_3,me);
+	TLorentzVector k_mu_prime; 
+	if(thr==1){
+		k_mu_prime = Make_4Vector(data->pxpart(0),data->pypart(0),data->pzpart(0),me);
+		//Print_4Vec(k_mu_prime);
+		//std::cout<<std::endl <<"again particle ID: " <<data->pidpart(0) <<" px: " <<data->pxpart(0) <<" py: " <<data->pypart(0) <<" pz: " <<data->pzpart(0);  
+	}else{
+		k_mu_prime = Make_4Vector(data->p(0)*data->cx(0),data->p(0)*data->cy(0),data->p(0)*data->cz(0),me);
+	}
+	//std::cout<<std::endl <<"     Thrown: " <<thr <<" |"; 
+	
 	TLorentzVector q_mu; 
 	q_mu = k_mu - k_mu_prime;
 	return (p_mu + q_mu).Mag();
@@ -93,6 +113,14 @@ float physics::get_theta(float cz_){
 float physics::get_phi(float cx_, float cy_){
 	float degree = 180.0/TMath::Pi();
 	return TMath::ATan2(cy_,cx_)*degree;
+}
+
+float physics::get_phi_pos(float cx_, float cy_){
+	float phi = physics::get_phi(cx_,cy_);
+	if(phi<0){
+		phi = 180.0 - phi; 
+	}
+	return phi;
 }
 
 int physics::get_sector(float phi_){
@@ -312,12 +340,13 @@ void physics::COM_gp(int set, TLorentzVector &p0, TLorentzVector &p1, TLorentzVe
 	physics::Boost_4Vec(-b,p3);
 } //Bring four vectors into the COM reference frame for excited nucleon 
 
-float physics::alpha(int top, TLorentzVector p1, TLorentzVector p2, TLorentzVector p3, TLorentzVector p4){
+float physics::alpha(int top, TLorentzVector p1, TLorentzVector p2, TLorentzVector p3, TLorentzVector p4, int set){
 	float dotpro;
 	float alph; 
 	float sin, cos; 
 	float theta_b, phi_b, phi_c; 
 	TVector3 norm1, norm2, delta_v, gamma_v, beta_v, v1, v2, v3, v4, norm3;
+	physics::COM_gp(set,p1,p2,p3,p4);
 	switch(top){
 		//v1 = Target particle (the particle whose theta and phi angles are being measured) {pi-, p, pi+}
 		//v2 = Paired particle for  scattering plane {p, pp, p}
@@ -342,9 +371,29 @@ float physics::alpha(int top, TLorentzVector p1, TLorentzVector p2, TLorentzVect
 		v4 = physics::V4_to_V3(p3);
 		break;
 	}
-	delta_v = -(1/physics::Vec3_Mag(v1))*v1;
-	beta_v = (1/(physics::Vec3_Mag(physics::Cross_Product(physics::Cross_Product(v2,v4),delta_v))))*physics::Cross_Product(physics::Cross_Product(v2,v4),delta_v);
-	gamma_v = -(1/(physics::Vec3_Mag(physics::Cross_Product(physics::Cross_Product(v3,v1),delta_v))))*physics::Cross_Product(physics::Cross_Product(v3,v1),delta_v);
+	
+	//Make them all unit vectors. 
+	v1 = (1.0/physics::Vec3_Mag(v1))*v1;
+	v2 = (1.0/physics::Vec3_Mag(v2))*v2;
+	v3 = (1.0/physics::Vec3_Mag(v3))*v3;
+	v4 = (1.0/physics::Vec3_Mag(v4))*v4;
+	/*std::cout<<std::endl <<"v1: "; 
+	physics::Print_3Vec(v1);
+	std::cout<<std::endl <<"v2: "; 
+	physics::Print_3Vec(v2);
+	std::cout<<std::endl <<"v3: "; 
+	physics::Print_3Vec(v3);
+	std::cout<<std::endl <<"v4: "; 
+	physics::Print_3Vec(v4);*/
+	delta_v = -v1;
+	//std::cout<<std::endl <<"delta_v: "; 
+	//physics::Print_3Vec(delta_v);
+	beta_v = physics::Cross_Product(physics::Cross_Product(v2,v4),delta_v);
+	//std::cout<<std::endl <<"Beta: "; 
+	//physics::Print_3Vec(beta_v);
+	gamma_v = physics::Cross_Product(delta_v,physics::Cross_Product(v3,v1));
+	//std::cout<<std::endl <<"gamma: "; 
+	//physics::Print_3Vec(gamma_v);
 	
 	phi_b = TMath::ATan2(delta_v[1],delta_v[0]);//Angle from x axis to y-axis
 	
@@ -362,9 +411,10 @@ float physics::alpha(int top, TLorentzVector p1, TLorentzVector p2, TLorentzVect
 	beta_v.RotateZ(-phi_c);
 	gamma_v.RotateZ(-phi_c);
 	alph = TMath::ATan2(gamma_v[1],gamma_v[0])*180/TMath::Pi();
-	if(alph < 0){
-		alph = 360 + alph; 
+	if(alph < 0.0){
+		alph = 360.0 + alph; 
 	} 
+	//std::cout<<std::endl <<"alpha: " <<alph;
 	
 	//std::cout<<"alpha post = " <<alph <<std::endl;
 	//std::cout<<std::endl <<"aCos(-.5)" <<TMath::ACos(-0.5) <<std::endl;

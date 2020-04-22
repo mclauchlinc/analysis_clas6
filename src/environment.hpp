@@ -63,6 +63,7 @@ class Environment {
   bool _WQ2_plot = false; //Were W Qsquared plots made?
   bool _p_dep_plot = false; //Is there momentum dependence in the relevant plots?
   bool _W_dep_plot = false; //Is there W dependence in the relevant plots? 
+  bool _friend_plot = false; //Are we going to fill the multidimensional histogram? 
   
 
  public:
@@ -119,6 +120,7 @@ class Environment {
   void env_WQ2_plot(bool WQ2_plot_); //Were W Qsquared plots made?
   void env_p_dep_plot(bool p_dep_plot_); //Is there momentum dependence in the relevant plots?
   void env_W_dep_plot(bool W_dep_plot_); //Is there W dependence in the relevant plots? 
+  void env_Friend_plot(bool friend_plot);
 
   int was_data_set();
   bool was_dc_hit(); //Was a hit on the DC required?
@@ -171,6 +173,7 @@ class Environment {
   bool was_WQ2_plot(); //Were W Qsquared plots made?
   bool was_p_dep_plot(); //Is there momentum dependence in the relevant plots?
   bool was_W_dep_plot(); //Is there W dependence in the relevant plots? 
+  bool was_Friend_plot();
 
   //void copy_envi(Environment cop_envi);
 };

@@ -29,13 +29,15 @@ size_t run(std::shared_ptr<TChain> _chain, std::shared_ptr<Histogram> _hists, st
 	std::cout<<"Thread " <<thread_id <<": " <<num_of_events <<" Events" <<std::endl;
 	_envi->Environment::env_num_file(num_of_events);
 	//Make a data object which all the branches can be accessed from
-	auto data = std::make_shared<Branches>(_chain);
+	std::cout<<std::endl <<"Run type is: " <<run_type;
+	auto data = std::make_shared<Branches>(_chain,run_type);
+	std::cout<<std::endl <<"data things MC is: " <<data->MC() <<std::endl; 
 
 	//Total number of events analyzed
 	size_t total_com = 0; 
 	size_t good_e = 0; 
 	size_t good_event = 0; 
-
+	//std::cout<<"We are about to try and do some event things in thred " <<thread_id <<std::endl;
 	//Analysis loop
 	for(size_t curr_event = 0; curr_event < num_of_events; curr_event++){
 		//Get singular event
@@ -64,7 +66,7 @@ size_t run_files(std::vector<std::string> inputs, std::string list_file, std::sh
 	auto chain = std::make_shared<TChain>("h10");
 	//Add every file to the chain
 	if(_case==1){
-		fun::loadChain(chain,list_file,thread_id,max);//Splits the list of files up into the individual thread chains
+		fun::loadChain(chain,list_file,thread_id,max,run_type);//Splits the list of files up into the individual thread chains
 	}else if(_case==2){
 		for(auto in:inputs) chain->Add(in.c_str());//This will have already split up the list of input files into individual lists which become chains
 	}else{

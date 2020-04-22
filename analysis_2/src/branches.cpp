@@ -20,6 +20,7 @@ void Branches::init() {
   _tree->SetBranchAddress("hel",&_hel);
   _tree->SetBranchAddress("top",&_top);
   _tree->SetBranchAddress("fc_tot",&_fc_tot);
+  _tree->SetBranchAddress("run_type",&_run_type);
 }
 
 int Branches::evnt() { return _evnt; }
@@ -34,5 +35,6 @@ TLorentzVector Branches::Par_4Vec(int i) {
 int Branches::hel() { return _hel; }
 int Branches::top() { return _top; }
 int Branches::fc_tot() { return _fc_tot; }
+int run_type(){ return _run_type; }
 
 

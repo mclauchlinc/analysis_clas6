@@ -36,8 +36,21 @@ std::vector<std::string> fun::read_file_list(std::string path, int thread_num){
   }
   return result;
 }
+void fun::removeTree(std::string file_name){
 
-void fun::loadChain(std::shared_ptr<TChain> c, std::string file, int thread_id, int max)
+  TFile *file=new TFile((file_name).c_str(),"update");
+  std::string object_to_remove="h10;1";
+  //the object can be a tree, a histogram, etc, in this case "test1" is a TTree
+  //notice the ";1" which means cycle 1; to remove all cycles do ";*"
+  //if your object is not at the top directory, but in a directory in the .root file, called foo
+  // you do first
+  //file->cd("foo");
+  //then continue with the Delete command which is only applied to the current gDirectory
+  gDirectory->Delete(object_to_remove.c_str());
+  file->Close();
+}
+
+void fun::loadChain(std::shared_ptr<TChain> c, std::string file, int thread_id, int max, int run_type)
 {
   std::vector<std::string> filelist = fun::read_file_list(file,thread_id);//read_file_list(file); //creates a vector of file names
   //If not specified will take in all the files in the text file
@@ -51,6 +64,9 @@ void fun::loadChain(std::shared_ptr<TChain> c, std::string file, int thread_id, 
   }
   //If specified then it will take in that number of files 
   for(int i = 0; i < max; i++) {
+    //if(run_type ==3 || run_type == 4){//With some of the larger sim files this seems to be an issue where there are multiple trees in the sim files..?
+    //  fun::removeTree(filelist[i]);
+    //}
     c->AddFile(filelist[i].c_str());
   }
 }

@@ -15,7 +15,11 @@ Event::Event(std::shared_ptr<Branches> data, std::shared_ptr<Histogram> _hists, 
 	_pip= data->Branches::Par_4Vec(4);
 	_pim= data->Branches::Par_4Vec(5);
 
-	_fc_curr = data->Branches::fc_tot(); 
+	_fc_curr = data->Branches::fc_tot();
+
+	if(run_type != data->Branches::run_type()){
+		std::cout<<std::endl <<"MisID of run type" ; 
+	} 
 
 	//Get all relevant four vectors into the center of mass frame
 	physics::COM_gp(_beam,_elec,_pro,_pip,_pim,_target,_gamma);
@@ -35,6 +39,8 @@ Event::Event(std::shared_ptr<Branches> data, std::shared_ptr<Histogram> _hists, 
 	_Q2 = NAN; 
 
 	_helicity = data->Branches::hel(); 
+
+	
 }
 
 float Event::Get_px(int i){

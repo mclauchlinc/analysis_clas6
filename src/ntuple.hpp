@@ -30,6 +30,7 @@ private:
 	Float_t _theta[3]{NAN,NAN,NAN};//{p,pip,pim}
 	Float_t _alpha[3]{NAN,NAN,NAN};//[{pim,p},{pp,pip}],[{p,pp},{pip,pim}],[{pip,p},{pp,pim}]
 	Int_t _run_type= 0;//{1,2,3,4}->{e16,e1f,e16sim,e1f sim} 
+	Float_t _weight = NAN; 
 
 	//Variables for the individual threads
 	Int_t _evntb[NUM_THREADS]; //The #event for the given file
@@ -47,6 +48,7 @@ private:
 	Float_t _thetab[NUM_THREADS][3];//{p,pip,pim}
 	Float_t _alphab[NUM_THREADS][3];//[{pim,p},{pp,pip}],[{p,pp},{pip,pim}],[{pip,p},{pp,pim}]
 	Int_t _run_typeb[NUM_THREADS];//{1,2,3,4}->{e16,e1f,e16sim,e1f sim} 
+	Float_t _weightb[NUM_THREADS]; 
 	/*
 	Int_t _evntc[NUM_THREADS]; //The #event for the given file
 	Int_t _apartc[NUM_THREADS];//The particle in each event  

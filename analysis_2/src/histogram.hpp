@@ -3,6 +3,7 @@
 
 #include "TH1.h"
 #include "TH2.h"
+#include "THnSparse.h"
 #include "TFile.h"
 #include "TCanvas.h"
 #include "TDirectory.h"
@@ -18,6 +19,7 @@
 
 using TH2F_ptr = std::shared_ptr<TH2F>;
 using TH1F_ptr = std::shared_ptr<TH1F>;
+using THn_ptr = std::shared_ptr<ThnSparseF>;
 
 
 class Histogram {
@@ -86,6 +88,11 @@ protected:
 	 int MinCCres = 502;
 
 	//binning
+	int bins[3][6] = {{0,0,0,0,0,0},{0,0,0,0,0,0},{0,0,0,0,0,0}}; //{W, Q2, MM, theta, alpha, helicity}
+	float xmin[3][6] = {{NAN,NAN,NAN,NAN,NAN,NAN},{NAN,NAN,NAN,NAN,NAN,NAN},{NAN,NAN,NAN,NAN,NAN,NAN}};
+	float xmax[3][6] = {{NAN,NAN,NAN,NAN,NAN,NAN},{NAN,NAN,NAN,NAN,NAN,NAN},{NAN,NAN,NAN,NAN,NAN,NAN}Zaq	ww5678\}; 
+
+
 	 float Wbin_res = 0.025;//The width of a W bin //30 steps
 	 float Wbin_start = 1.4;//The starting of W bins
 
@@ -100,28 +107,10 @@ protected:
 	double YM_res[3] = {0.06,0.06,0.06};
 
 	 //Making the Histograms
-	TH2F_ptr WQ2_hist[11][6];//electron cuts, topologies (including pre)
-	TH2F_ptr Fid_hist[7][4][11][30][12][6][2];//sector, species, cut, W binning, p binning, topology
-	TH2F_ptr SF_hist[10][30][7][6][2];//cuts, W Binning, Sector, topology
-	TH2F_ptr DT_hist[3][7][30][7][6][2]; //particle, cuts, W binning, sector, topology
-	TH1F_ptr CC_hist[6][18][11][4][6][2]; //Sector, segment, cut, side of detector, topology
-	TH1F_ptr MM_hist[5][3][2];//topology, cut, squared v linear
-
-	bool Fid_made_hist[7][4][11][30][12][6][2];
-	bool Fid_fill_hist[7][4][11][30][12][6][2];
-	bool Fid_write_hist[7][4][11][30][12][6][2];
-
-	bool CC_made_hist[6][18][11][4][6][2];
-	bool CC_fill_hist[6][18][11][4][6][2];
-	bool CC_write_hist[6][18][11][4][6][2];
-
-	bool DT_made_hist[3][7][30][7][6][2];
-	bool DT_fill_hist[3][7][30][7][6][2];
-	bool DT_dir_hist[3][7][30][7][6][2];
-	bool DT_dir_made[3][8][2][8][6];
-
-	bool WQ2_made_hist[11][6];
-	bool WQ2_dir_made[11][6];
+	THn_ptr egg[4][3]; //{e16,e1f,e16sim,e1fsim},{pim,p,pip}
+	//projections
+	TH1F_ptr hist_mm[3][]
+	
 
 
 public:
@@ -129,46 +118,8 @@ public:
 	~Histogram();
 	void Write();
 	//W Qsquared plots
-	int W_binning(float W_);
-	int p_binning(float p_);
-	char Part_cut(int species, int cut);
-	void WQ2_Make();
-	void WQ2_Fill(int top, int cut, float W_, float Q2_);
-	void WQ2_Write();
-	//Fiducial Cuts
-	void Fid_Make();
-	void Fid_Fill(int top, float theta, float phi, int part, int cut, int cutvanti, float W_, float p);
-	void Fid_Write();
-	//Sampling Fraction Cuts
-	void SF_Make();
-	void SF_Fill(int top, float p, float en, int cut, int cva, float W_, int sec);
-	void SF_Write();
-	//Delta T Cuts
-	void DT_Make();
-	void DT_Fill(int top, int part, float p, float d, float t, float d0, float t0, int cut, int anti, float W_, int sec);
-	void DT_Fill(int top, int part, float p, float dt, int cut, int anti, float W_, int sec);
-	void DT_Write();
-	//Min CC Cuts
-	void CC_Make();
-	void CC_Fill(int top, int sec, int segm, int nphe, int cut, int anti);
-	void CC_Write();
-	//Missing Mass Cuts
-	void MM_Make();
-	void MM_Fill(int top, float mm, int cut, int square);
-	void MM_Write();
-	/*//Signature Plots //We'll get there
-	void MM2_Make();
-	void MM2_Fill(int top, float mm, float W_, float Q2_);
-	void MM2_Write();
-	void Th2_Make();
-	void Th2_Fill(int top, float theta, float W_, float Q2_);
-	void Th2_Write();
-	void Alpha_Make();
-	void Alpha_Fill(int top, float alpha, float W_, float Q2_);
-	void Alpha_Write();
-	*/
-	//void Fill_EID(std::shared_ptr<Particle> par);
-	//void Fill_HID(std::shared_ptr<Particle>  par);
+	void Set_THn(); 
+	//int Set_Bins(int bin, std::vector<float> bin);
 };
 
 
