@@ -16,6 +16,7 @@ class Branches {
  private:
   std::shared_ptr<TChain> _tree;
   bool _MC = false;
+  bool _include_weights = false; 
   int _npart;
   int _evstat;
   int _intt;
@@ -110,6 +111,11 @@ class Branches {
   float _pzpart[MAX_PARTS];   //[nprt]
   float _qpart[MAX_PARTS];    //[nprt]
   int _flagspart[MAX_PARTS];  //[nprt]
+
+  float _mcp[MAX_PARTS];
+  float _mctheta[MAX_PARTS];
+  float _mcphi[MAX_PARTS];
+  int _mcid[MAX_PARTS];
 
   float _weight;
 
@@ -218,6 +224,11 @@ class Branches {
   float pzpart(int i);
   float qpart(int i);
   float weight();
+
+  float mcp(int i);
+  float mctheta(int i);
+  float mcphi(int i);
+  int mcid(int i);
 };
 
 #endif

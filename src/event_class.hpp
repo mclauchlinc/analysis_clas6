@@ -9,6 +9,7 @@
 #include "eid.hpp"//Electron ID Cuts
 #include "cuts.hpp"
 #include "environment.hpp"
+#include "functions.hpp"
 //#include "particle.hpp"
 //#include "hid.hpp"//Hadron ID Cuts
 

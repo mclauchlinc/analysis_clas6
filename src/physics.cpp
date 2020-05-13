@@ -30,14 +30,26 @@ TLorentzVector physics::Make_4Vector(float px, float py, float pz, float m){
 	return k_mu;
 }
 
+TLorentzVector physics::Make_4Vector(bool nope, float p, float theta, float phi, float m){
+	TLorentzVector k_mu;
+	if(nope){
+		TVector3 k_mu_3(p*TMath::Sin(theta*TMath::Pi()/180.0)*TMath::Cos(phi*TMath::Pi()/180.0), p*TMath::Sin(theta*TMath::Pi()/180.0)*TMath::Sin(phi*TMath::Pi()/180.0), p*TMath::Cos(theta*TMath::Pi()/180.0));
+		k_mu.SetVectM(k_mu_3,m);
+	}
+	return k_mu;
+}
+
 TLorentzVector physics::Set_k_mu(int set){
 	TLorentzVector k_mu;
 	switch(set%2){
-		case 0:
+		case 1:
 		k_mu = k_mu_e16; //Constants.hpp
 		break;
-		case 1:
+		case 0:
 		k_mu = k_mu_e1f; //Constants.hpp
+		break;
+		default:
+		k_mu = k_mu_e16;
 		break;
 	}
 	return k_mu; 
@@ -54,31 +66,52 @@ int physics::event_helicity(std::shared_ptr<Branches> data, int plate_stat){
 
 float physics::Qsquared(int set, std::shared_ptr<Branches> data, int thr){
 	TLorentzVector k_mu_prime; 
-	if(thr==1){
-		k_mu_prime = Make_4Vector(data->pxpart(0),data->pypart(0),data->pzpart(0),me);
-	}else{
-		k_mu_prime = Make_4Vector(data->p(0)*data->cx(0),data->p(0)*data->cy(0),data->p(0)*data->cz(0),me);
+	if(set < 5){
+		if(thr==1){
+			k_mu_prime = Make_4Vector(data->pxpart(0),data->pypart(0),data->pzpart(0),me);
+		}else{
+			k_mu_prime = Make_4Vector(data->p(0)*data->cx(0),data->p(0)*data->cy(0),data->p(0)*data->cz(0),me);
+		}
+	}else if(set >= 5){
+		for(int i = 0; i<4; i++){
+			if(data->mcid(i)==ELECTRON){
+				k_mu_prime = Make_4Vector(true,data->mcp(i),data->mctheta(i),data->mcphi(i),me);
+			}
+		}
 	}
 	TLorentzVector k_mu = physics::Set_k_mu(set);
 	return -(k_mu - k_mu_prime).Mag2();
 }
 
+
 float physics::WP(int set, std::shared_ptr<Branches> data, int thr){
 	TLorentzVector k_mu = physics::Set_k_mu(set);
 	TLorentzVector k_mu_prime; 
-	if(thr==1){
-		k_mu_prime = Make_4Vector(data->pxpart(0),data->pypart(0),data->pzpart(0),me);
-		//Print_4Vec(k_mu_prime);
-		//std::cout<<std::endl <<"again particle ID: " <<data->pidpart(0) <<" px: " <<data->pxpart(0) <<" py: " <<data->pypart(0) <<" pz: " <<data->pzpart(0);  
-	}else{
-		k_mu_prime = Make_4Vector(data->p(0)*data->cx(0),data->p(0)*data->cy(0),data->p(0)*data->cz(0),me);
+	if(set < 5){
+		if(thr==1){
+			k_mu_prime = Make_4Vector(data->pxpart(0),data->pypart(0),data->pzpart(0),me);
+			//Print_4Vec(k_mu_prime);
+			//std::cout<<std::endl <<"again particle ID: " <<data->pidpart(0) <<" px: " <<data->pxpart(0) <<" py: " <<data->pypart(0) <<" pz: " <<data->pzpart(0);  
+		}else{
+			k_mu_prime = Make_4Vector(data->p(0)*data->cx(0),data->p(0)*data->cy(0),data->p(0)*data->cz(0),me);
+		}
+	}else if(set >= 5){
+		for(int i = 0; i<4; i++){
+			//std::cout<<std::endl <<"ID: " <<data->mcid(i);
+			if(data->mcid(i)==ELECTRON){
+				//std::cout<<std::endl <<"p: " <<data->mcp(i);
+				//std::cout<<"  theta: " <<data->mctheta(i);
+				//std::cout<<"  phi: " <<data->mcphi(i);
+				k_mu_prime = Make_4Vector(true,data->mcp(i),data->mctheta(i),data->mcphi(i),me);
+			}
+		}
 	}
-	//std::cout<<std::endl <<"     Thrown: " <<thr <<" |"; 
-	
 	TLorentzVector q_mu; 
 	q_mu = k_mu - k_mu_prime;
+	//std::cout<<" W: " <<(p_mu + q_mu).Mag();
 	return (p_mu + q_mu).Mag();
 }
+
 
 float physics::beta_calc(float m, std::shared_ptr<Branches> data, int i){
 	return data->p(i)/TMath::Sqrt(m*m+data->p(i)*data->p(i));

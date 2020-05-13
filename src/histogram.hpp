@@ -30,8 +30,8 @@ protected:
 
 	//Plot Formation Constants
 	//W Q2
-	 int WQxres = 300;
-	 int WQyres = 300;
+	 int WQxres = 200;
+	 int WQyres = 200;
 	 double WQxmin = -0.01;
 	 double WQymin = -0.01;
 	 double WQxmax = 3.99;
@@ -41,35 +41,35 @@ protected:
 	 int WQ2yres = 20;
 
 	//Electron Sampling Fraction
-	 int SFxres = 300;
-	 int SFyres = 200;
+	 int SFxres = 500;
+	 int SFyres = 300;
 	 double SFxmin = 0.0;
 	 double SFymin = 0.0;
 	 double SFxmax = 6.0;
 	 double SFymax = 1.0;
 	//Minimum Electron Energy
-	 int MEExres = 100;
-	 int MEEyres = 100;
+	 int MEExres = 300;
+	 int MEEyres = 300;
 	 double MEExmin = 0.0;
 	 double MEEymin = 0.0;
 	 double MEExmax = 6.0;
 	 double MEEymax = 1.0;
 	//Fiducial Cuts
-	 int FIDxres = 200;
-	 int FIDyres = 200;
+	 int FIDxres = 400;
+	 int FIDyres = 300;
 	 double FIDxmin = -30.0;
 	 double FIDymin = 0.0;
 	 double FIDxmax = 30.0;
 	 double FIDymax = 180.0;
 	//Delta_t
-	 int DTxres = 100;//300;
-	 int DTyres = 200;
+	 int DTxres = 1000;//300;
+	 int DTyres = 400;
 	 double DTxmin = 0.0;
-	 double DTymin = -5.0;//-4.0;
+	 double DTymin = -10.0;//-4.0;
 	 double DTxmax = 4.5;//7.0;
-	 double DTymax = 5.0;//4.0;
+	 double DTymax = 10.0;//4.0;
 	//Missing Mass
-	 int MMxres = 1500;
+	 int MMxres = 400;
 	 double MMxmin = -0.2;
 	 double MMxmax = 3.0;
 	//Alpha
@@ -118,10 +118,10 @@ protected:
 	bool CC_fill_hist[6][18][11][4][6][2];
 	bool CC_write_hist[6][18][11][4][6][2];
 
-	bool DT_made_hist[3][7][30][7][6][2];
-	bool DT_fill_hist[3][7][30][7][6][2];
-	bool DT_dir_hist[3][7][30][7][6][2];
-	bool DT_dir_made[3][8][2][8][6];
+	bool DT_made_hist[3][8][30][7][6][2];//Added one to the second bin for cuts to all for the electron WQ2
+	bool DT_fill_hist[3][8][30][7][6][2];
+	bool DT_dir_hist[3][8][30][7][6][2];
+	bool DT_dir_made[3][9][2][8][6];
 
 	bool WQ2_made_hist[11][6][2];
 	bool WQ2_dir_made[11][6][2];

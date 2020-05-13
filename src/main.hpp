@@ -29,9 +29,9 @@ size_t run(std::shared_ptr<TChain> _chain, std::shared_ptr<Histogram> _hists, st
 	std::cout<<"Thread " <<thread_id <<": " <<num_of_events <<" Events" <<std::endl;
 	_envi->Environment::env_num_file(num_of_events);
 	//Make a data object which all the branches can be accessed from
-	std::cout<<std::endl <<"Run type is: " <<run_type;
+	//std::cout<<std::endl <<"Run type is: " <<run_type;
 	auto data = std::make_shared<Branches>(_chain,run_type);
-	std::cout<<std::endl <<"data things MC is: " <<data->MC() <<std::endl; 
+	//std::cout<<std::endl <<"data things MC is: " <<data->MC() <<std::endl; 
 
 	//Total number of events analyzed
 	size_t total_com = 0; 

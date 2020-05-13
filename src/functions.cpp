@@ -84,5 +84,14 @@ char* fun::appendCharToCharArray(char* array, char a)
     return ret;
 }
 
+bool fun::no_pro_pip_match(int idx1, int idx2[20]){//Designed to check to see if there was a double identification on a pip/proton
+  bool pass = true;
+  for(int i=0; i< 20; i++){
+    if(idx1 == idx2[i]){
+      pass = false;
+    }
+  }
+  return pass; 
+}
 
 

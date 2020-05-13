@@ -18,23 +18,15 @@ Histogram::Histogram(std::shared_ptr<Environment> _envi, const std::string& outp
 void Histogram::Write(std::shared_ptr<Environment> _envi){
 	std::cout<< "Writing Plots" <<std::endl;
 	RootOutputFile->cd();
-	std::cout<<"Writing WQ2 Plots"; 
 	Histogram::WQ2_Write( _envi);
-	std::cout <<" Done!" <<std::endl <<"Writing Fid Plots"; 
 	Histogram::Fid_Write( _envi);
-	std::cout <<" Done!" <<std::endl <<"Writing SF Plots"; 
 	Histogram::SF_Write( _envi);
-	std::cout <<" Done!" <<std::endl <<"Writing DT Plots"; 
 	Histogram::DT_Write( _envi);
-	std::cout<<" Done!" <<std::endl <<"Writing CC Plots";
-	CC_Write( _envi);
-	std::cout<<" Done!" <<std::endl <<"Writing MM Plots";
-	MM_Write( _envi);
-	std::cout<<" Done!" <<std::endl <<"Writing Friend Plots";
+	Histogram::CC_Write( _envi);
+	Histogram::MM_Write( _envi);
 	Friend_Write(_envi);
-	std::cout<<" Done!" <<std::endl <<"Closing Event Selection RootFile";
 	RootOutputFile->Close();
-	std::cout<<" Done!" <<std::endl;
+	std::cout<<"Histograms Done!" <<std::endl;
 
 }
 
@@ -127,6 +119,7 @@ void Histogram::WQ2_Fill(std::shared_ptr<Environment> _envi, int top, int cut, f
 
 void Histogram::WQ2_Write(std::shared_ptr<Environment> _envi){
 	if(_envi->was_WQ2_plot()){
+		std::cout<<"WQ2 Plots: "; 
 		char dir_name[100];
 		TDirectory* dir_WQ2 = RootOutputFile->mkdir("W vs. Q2");
 		dir_WQ2->cd();
@@ -165,6 +158,7 @@ void Histogram::WQ2_Write(std::shared_ptr<Environment> _envi){
 			dir_WQ2_sub[top]->Close();
 		}
 		dir_WQ2->Close();
+		std::cout<<"Done" <<std::endl;
 	}
 }
 
@@ -305,6 +299,7 @@ void Histogram::Fid_Fill(std::shared_ptr<Environment> _envi,int top, float theta
 
 void Histogram::Fid_Write(std::shared_ptr<Environment> _envi){
 	if(_envi->was_fid_plot(0) || _envi->was_fid_plot(1) || _envi->was_fid_plot(2)|| _envi->was_fid_plot(3)){//If nothing has being plotted then don't make the directories
+		std::cout<<"Fid Plots: "; 
 		char dir_name[100];
 		TDirectory* dir_Fid = RootOutputFile->mkdir("Fiducial Plots");
 		dir_Fid->cd();
@@ -453,6 +448,7 @@ void Histogram::Fid_Write(std::shared_ptr<Environment> _envi){
 				}
 			}
 		}
+		std::cout<<"Done" <<std::endl;
 	}
 }
 
@@ -499,6 +495,7 @@ void Histogram::SF_Fill(std::shared_ptr<Environment> _envi,int top, float p, flo
 
 void Histogram::SF_Write(std::shared_ptr<Environment> _envi){
 	if(_envi->was_sf_plot()){
+		std::cout<<"SF Plots: "; 
 		TDirectory* dir_SF = RootOutputFile->mkdir("SF Plots");
 		dir_SF->cd();
 		TDirectory* sf_dir[11];//Cut
@@ -580,6 +577,7 @@ void Histogram::SF_Write(std::shared_ptr<Environment> _envi){
 				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->Write();
 			}
 		}
+		std::cout<<"Done" <<std::endl;
 	}
 }
 
@@ -589,7 +587,7 @@ void Histogram::DT_Make(std::shared_ptr<Environment> _envi){
 	char hname[100];
 	std::vector<long> space_dims(6);
 	space_dims[0] = 3;  //species
-	space_dims[1] = 7;  //Cuts
+	space_dims[1] = 8;//7;  //Cuts
 	space_dims[2] = 30; //W Binning
 	space_dims[3] = 7; //Sector
 	space_dims[4] = 6; //topology
@@ -613,6 +611,8 @@ void Histogram::DT_Make(std::shared_ptr<Environment> _envi){
 					sprintf(hname,"%s_DeltaT_%s_%s_%s_W:%f-%f_%s",species[cart[0]+1],hid_cut[cart[1]],cut_ver[cart[5]],sec_list[cart[3]],bot,top,topologies[cart[4]]);
 					DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]] = std::make_shared<TH2F>(hname,hname, DTxres, DTxmin, DTxmax, DTyres, DTymin, DTymax);
 					DT_made_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]] = true;
+				}else{
+					DT_made_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]] = false;
 				}
 			}
 		}
@@ -622,7 +622,7 @@ void Histogram::DT_Make(std::shared_ptr<Environment> _envi){
 void Histogram::DT_Fill(std::shared_ptr<Environment> _envi,int top, int part, float p, float d, float t, float d0, float t0, int cut, int anti, float W_, int sec){
 	if(_envi->was_dt_plot(part)){
 		float dt = physics::delta_t(part, p, d, t, d0, t0);
-		if(sec < 7){
+		if(sec < 7){//If sector dependent
 			if(cut!=6){//No event selection in the W variance. 
 				if(DT_made_hist[part][cut][Histogram::W_binning(W_)][0][top][anti]){
 					DT_hist[part][cut][Histogram::W_binning(W_)][0][top][anti]->Fill(p,dt);
@@ -673,152 +673,164 @@ void Histogram::DT_Fill(std::shared_ptr<Environment> _envi,int top, int part, fl
 }
 
 void Histogram::DT_Write(std::shared_ptr<Environment> _envi){
-	char dir_name[100]; 
-	TDirectory* DT_plot = RootOutputFile->mkdir("DT_plots");
-	TDirectory* par_dt[3][8][2][8][6];
-	//std::cout<<"Did I get here?" <<std::endl; 
-	DT_plot->cd(); 
-	for(int i = 0; i<3; i++){
+	bool do_dt_plots = false;
+	for(int i = 0; i< 3; i++){
 		if(_envi->was_dt_plot(i)){
-			sprintf(dir_name,"%s_DT_plots",species[i+1]);
-			par_dt[i][0][0][0][0]= DT_plot->mkdir(dir_name);
-			DT_dir_made[i][0][0][0][0]=true;
-			//std::cout<<"Made pointer:" <<i <<" 0 0 0 0" <<std::endl;
-			for(int j = 1; j < 8; j++){//cut
-				sprintf(dir_name,"%s_DT_%s",species[i+1],hid_cut[j-1]);
-				par_dt[i][j][0][0][0] = par_dt[i][0][0][0][0]->mkdir(dir_name);
-				DT_dir_made[i][j][0][0][0]=true;
-				//std::cout<<"    Made Pointers" <<i <<j <<" 0 0 0"<<std::endl;
-				//W Dependence
-				sprintf(dir_name,"%s_DT_%s_%s",species[i+1],hid_cut[j-1],W_dep_list[1]);
-				par_dt[i][j][1][0][0] = par_dt[i][j][0][0][0]->mkdir(dir_name);
-				DT_dir_made[i][j][1][0][0]=true;
-				//std::cout<<"    Made Pointers" <<i <<j <<" 1 0 0"<<std::endl;
-				for(int k = 1; k < 8; k++){ //Sector 
-					sprintf(dir_name,"%s_DT_%s_%s",species[i+1],hid_cut[j-1],sec_list[k-1]);
-					par_dt[i][j][0][k][0] = par_dt[i][j][0][0][0]->mkdir(dir_name);
-					DT_dir_made[i][j][0][k][0]=true;
-					//std::cout<<"    Made Pointers" <<i <<j <<" 0 " <<k <<" 0"<<std::endl;
-					//std::cout<<"Sector Pointer" <<std::endl;
-					}
-				if(j == 7){//Event cut
-					for(int l = 1; l < 6; l++){ //topology 
-						sprintf(dir_name,"%s_DT_%s_%s",species[i+1],hid_cut[j-1],topologies[l]);
-						par_dt[i][j][0][0][l] = par_dt[i][j][0][0][0]->mkdir(dir_name);
-						DT_dir_made[i][j][0][0][l]=true;
-						//std::cout<<"    Made Pointers" <<i <<j <<" 0 0 " <<k<<std::endl;
-						//std::cout<<"Topology Pointer" <<std::endl;
+			do_dt_plots = true;
+		}
+	}
+	if(do_dt_plots){
+		std::cout <<"Writing DT Plots: ";
+		char dir_name[100]; 
+		TDirectory* DT_plot = RootOutputFile->mkdir("DT_plots");
+		TDirectory* par_dt[3][9][2][8][6];//Particle, cut, anti
+		//std::cout<<"Did I get here?" <<std::endl; 
+		DT_plot->cd(); 
+		for(int i = 0; i<3; i++){
+			if(_envi->was_dt_plot(i)){
+				sprintf(dir_name,"%s_DT_plots",species[i+1]);
+				par_dt[i][0][0][0][0]= DT_plot->mkdir(dir_name);
+				DT_dir_made[i][0][0][0][0]=true;
+				//std::cout<<"Made pointer:" <<i <<" 0 0 0 0" <<std::endl;
+				for(int j = 1; j < 9; j++){//8; j++){//cut
+					sprintf(dir_name,"%s_DT_%s",species[i+1],hid_cut[j-1]);
+					par_dt[i][j][0][0][0] = par_dt[i][0][0][0][0]->mkdir(dir_name);
+					DT_dir_made[i][j][0][0][0]=true;
+					//std::cout<<"    Made Pointers" <<i <<j <<" 0 0 0"<<std::endl;
+					//W Dependence
+					sprintf(dir_name,"%s_DT_%s_%s",species[i+1],hid_cut[j-1],W_dep_list[1]);
+					par_dt[i][j][1][0][0] = par_dt[i][j][0][0][0]->mkdir(dir_name);
+					DT_dir_made[i][j][1][0][0]=true;
+					//std::cout<<"    Made Pointers" <<i <<j <<" 1 0 0"<<std::endl;
+					for(int k = 1; k < 8; k++){ //Sector 
+						sprintf(dir_name,"%s_DT_%s_%s",species[i+1],hid_cut[j-1],sec_list[k-1]);
+						par_dt[i][j][0][k][0] = par_dt[i][j][0][0][0]->mkdir(dir_name);
+						DT_dir_made[i][j][0][k][0]=true;
+						//std::cout<<"    Made Pointers" <<i <<j <<" 0 " <<k <<" 0"<<std::endl;
+						//std::cout<<"Sector Pointer" <<std::endl;
+						}
+					if(j == 7){//Event cut
+						for(int l = 1; l < 6; l++){ //topology 
+							sprintf(dir_name,"%s_DT_%s_%s",species[i+1],hid_cut[j-1],topologies[l]);
+							par_dt[i][j][0][0][l] = par_dt[i][j][0][0][0]->mkdir(dir_name);
+							DT_dir_made[i][j][0][0][l]=true;
+							//std::cout<<"    Made Pointers" <<i <<j <<" 0 0 " <<k<<std::endl;
+							//std::cout<<"Topology Pointer" <<std::endl;
 
+						}
 					}
 				}
 			}
 		}
-	}
+		//std::cout<<"Made it through making directories" <<std::endl;
 
-	std::vector<long> space_dims(6);
-	space_dims[0] = 3;  //species
-	space_dims[1] = 7;  //Cuts
-	space_dims[2] = 30; //W Binning
-	space_dims[3] = 7; //Sector
-	space_dims[4] = 6; //topology
-	space_dims[5] = 2; //Cut v anti
+		std::vector<long> space_dims(6);
+		space_dims[0] = 3;  //species
+		space_dims[1] = 8;//7;  //Cuts
+		space_dims[2] = 30; //W Binning
+		space_dims[3] = 7; //Sector
+		space_dims[4] = 6; //topology
+		space_dims[5] = 2; //Cut v anti
 
-	CartesianGenerator cart(space_dims);
-	while(cart.GetNextCombination()){
-		if(_envi->was_dt_plot(cart[0])){
-			if(DT_dir_made[0][0][0][0][0]){
-				par_dt[cart[0]][0][0][0][0]->cd();//Main folder for particles
-
-				//std::cout<<std::endl <<"Current Vals: " <<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3] <<" " <<cart[4]; 
-				//std::cout<<" Now Writing in " <<cart[0] <<" 0 0 0 0"<<std::endl;
-				if(DT_dir_made[cart[0]][cart[1]+1][0][0][0]){
-					par_dt[cart[0]][cart[1]+1][0][0][0]->cd();//Get into those CUTS
-					//std::cout <<"      Now Writing in " <<cart[0] <<" " <<cart[1]+1 <<" 0 0 0"<<std::endl;
-					//All W, Sectors, and Combined Topology for Event selection, but still by Cut
-					if(cart[2] ==0 && cart[3] == 0 && ((cart[1]!=6 && cart[4]==0)||(cart[1]==6 && cart[4]==5))){
-						if(DT_made_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]){
-							DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetXTitle("Momentum (GeV)");
-							DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetYTitle("Delta T (ns)");
-							DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetOption("COLZ");
-							DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->Write();	
-						}else{
-							std::cout<<"DT Would have segfaulted Writing: " <<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3] <<" " <<cart[4] <<" " <<cart[5] <<std::endl;
-						}		
-					}
-					
-					//For W Range, but all sectors, combine topology for event selection, all sectors
-					//if(_envi->was_W_dep_plot()){	
-						if(cart[2]!=0 && cart[3] == 0 && ((cart[1]!=6 && cart[4]==0))){//||(cart[1]==6 && cart[4]==5))){ //Issue when trying to look at event selection for this. Not sure why, but getting rid of it solved it *shrug* 9/12/19
-							//std::cout <<"          trying to Write in " <<cart[0] <<" " <<cart[1]+1 <<" 1 0 0"<<std::endl;
-							if(DT_dir_made[cart[0]][cart[1]+1][1][0][0]){
+		CartesianGenerator cart(space_dims);
+		while(cart.GetNextCombination()){
+			if(_envi->was_dt_plot(cart[0])){
+				if(DT_dir_made[0][0][0][0][0]){
+					par_dt[cart[0]][0][0][0][0]->cd();//Main folder for particles
+					if(DT_dir_made[cart[0]][cart[1]+1][0][0][0]){
+						par_dt[cart[0]][cart[1]+1][0][0][0]->cd();//Get into those CUTS
+						//std::cout <<"      Now Writing in " <<cart[0] <<" " <<cart[1]+1 <<" 0 0 0"<<std::endl;
+						//All W, Sectors, and Combined Topology for Event selection, but still by Cut
+						if(cart[2] ==0 && cart[3] == 0 && ((cart[1]!=6 && cart[4]==0)||(cart[1]==6 && cart[4]==5))){
+							if(DT_made_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]){
+								//std::cout<<"DT shouldn't have segfaulted Writing: " <<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3] <<" " <<cart[4] <<" " <<cart[5] <<std::endl;
+								DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetXTitle("Momentum (GeV)");
+								DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetYTitle("Delta T (ns)");
+								DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetOption("COLZ");
+								DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->Write();	
+							}else{
+								std::cout<<"DT Would have segfaulted Writing: " <<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3] <<" " <<cart[4] <<" " <<cart[5] <<std::endl;
+							}		
+						}
+						
+						//For W Range, but all sectors, combine topology for event selection, all sectors
+						//if(_envi->was_W_dep_plot()){	
+							if(cart[2]!=0 && cart[3] == 0 && ((cart[1]!=6 && cart[4]==0))){//||(cart[1]==6 && cart[4]==5))){ //Issue when trying to look at event selection for this. Not sure why, but getting rid of it solved it *shrug* 9/12/19
+								//std::cout <<"          trying to Write in " <<cart[0] <<" " <<cart[1]+1 <<" 1 0 0"<<std::endl;
+								if(DT_dir_made[cart[0]][cart[1]+1][1][0][0]){
+									par_dt[cart[0]][cart[1]+1][0][0][0]->cd();//Get into those CUTS
+									par_dt[cart[0]][cart[1]+1][1][0][0]->cd();
+									//std::cout <<"   We are writing" <<std::endl;
+									if(DT_made_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]){
+										//std::cout<<"DT shouldn't have segfaulted Writing: " <<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3] <<" " <<cart[4] <<" " <<cart[5] <<std::endl;
+										DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetXTitle("Momentum (GeV)");
+										DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetYTitle("Delta T (ns)");
+										DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetOption("COLZ");
+										DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->Write();	
+									}else{
+										std::cout<<"DT Would have segfaulted Writing: " <<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3] <<" " <<cart[4] <<" " <<cart[5] <<std::endl;
+									}	
+								}else{
+									std::cout<<"cart values: " <<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3] <<" " <<cart[4] <<" " <<cart[5] <<std::endl;
+									std::cout<<"DTWould have filled nonexistant dir on: " <<cart[0] <<" " <<cart[1]+1 <<" " <<1 <<" " <<0 <<" " <<0 <<" " <<0 <<std::endl;
+								}
+										
+							}
+						//}
+						//For Sector Range, but all W, combine topology for event selection
+						if(cart[2] ==0 && ((cart[1]!=6 && cart[4]==0)||(cart[1]==6 && cart[4]==5))){
+							//std::cout <<"          Trying to Write in " <<cart[0] <<" " <<cart[1]+1 <<" 0 " <<cart[3]+1 <<" 0"<<std::endl;
+							if(DT_dir_made[cart[0]][cart[1]+1][0][cart[3]+1][0]){
 								par_dt[cart[0]][cart[1]+1][0][0][0]->cd();//Get into those CUTS
-								par_dt[cart[0]][cart[1]+1][1][0][0]->cd();
-								//std::cout <<"   We are writing" <<std::endl;
+								par_dt[cart[0]][cart[1]+1][0][cart[3]+1][0]->cd();
+								//std::cout <<"  We are writing "<<std::endl;
 								if(DT_made_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]){
+									//std::cout<<"DT shouldn't have segfaulted Writing: " <<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3] <<" " <<cart[4] <<" " <<cart[5] <<std::endl;
 									DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetXTitle("Momentum (GeV)");
 									DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetYTitle("Delta T (ns)");
 									DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetOption("COLZ");
 									DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->Write();	
 								}else{
 									std::cout<<"DT Would have segfaulted Writing: " <<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3] <<" " <<cart[4] <<" " <<cart[5] <<std::endl;
-								}	
+								}
+							}else{
+								std::cout<<"cart values: " <<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3] <<" " <<cart[4] <<" " <<cart[5] <<std::endl;
+								std::cout<<"DTWould have filled nonexistant dir on: " <<cart[0] <<" " <<cart[1]+1 <<" " <<0 <<" " <<cart[3]+1 <<" " <<0 <<" " <<0 <<std::endl;
+							}		
+						}
+						//For topology Range, but all W, all sector
+						if(cart[2] ==0 && cart[3] == 0 && cart[1] == 6 && cart[4]!=0){
+							//std::cout <<"          Trying to Write in " <<cart[0] <<" " <<cart[1]+1 <<" 0 0 " <<cart[4]+1<<std::endl;
+							if(DT_dir_made[cart[0]][cart[1]+1][0][0][cart[4]]){//Changed cart[4] + 1 to just cart[4] 5/5/20
+								par_dt[cart[0]][cart[1]+1][0][0][0]->cd();//Get into those CUTS
+								par_dt[cart[0]][cart[1]+1][0][0][cart[4]]->cd();
+								//std::cout <<"  we are writing"<<std::endl;
+								if(DT_made_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]){
+									//std::cout<<"DT shouldn't have segfaulted Writing: " <<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3] <<" " <<cart[4] <<" " <<cart[5] <<std::endl;
+									DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetXTitle("Momentum (GeV)");
+									DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetYTitle("Delta T (ns)");
+									DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetOption("COLZ");
+									DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->Write();	
+								}else{
+									std::cout<<"DT Would have segfaulted Writing: " <<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3] <<" " <<cart[4] <<" " <<cart[5] <<std::endl;
+								}
 							}else{
 								std::cout<<"cart values: " <<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3] <<" " <<cart[4] <<" " <<cart[5] <<std::endl;
 								std::cout<<"DTWould have filled nonexistant dir on: " <<cart[0] <<" " <<cart[1]+1 <<" " <<1 <<" " <<0 <<" " <<0 <<" " <<0 <<std::endl;
-							}
-									
+							}		
 						}
-					//}
-					//For Sector Range, but all W, combine topology for event selection
-					if(cart[2] ==0 && ((cart[1]!=6 && cart[4]==0)||(cart[1]==6 && cart[4]==5))){
-						//std::cout <<"          Trying to Write in " <<cart[0] <<" " <<cart[1]+1 <<" 0 " <<cart[3]+1 <<" 0"<<std::endl;
-						if(DT_dir_made[cart[0]][cart[1]+1][0][cart[3]+1][0]){
-							par_dt[cart[0]][cart[1]+1][0][0][0]->cd();//Get into those CUTS
-							par_dt[cart[0]][cart[1]+1][0][cart[3]+1][0]->cd();
-							//std::cout <<"  We are writing "<<std::endl;
-							if(DT_made_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]){
-								DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetXTitle("Momentum (GeV)");
-								DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetYTitle("Delta T (ns)");
-								DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetOption("COLZ");
-								DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->Write();	
-							}else{
-								std::cout<<"DT Would have segfaulted Writing: " <<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3] <<" " <<cart[4] <<" " <<cart[5] <<std::endl;
-							}
-						}else{
-							std::cout<<"cart values: " <<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3] <<" " <<cart[4] <<" " <<cart[5] <<std::endl;
-							std::cout<<"DTWould have filled nonexistant dir on: " <<cart[0] <<" " <<cart[1]+1 <<" " <<0 <<" " <<cart[3]+1 <<" " <<0 <<" " <<0 <<std::endl;
-						}		
+					}else{
+						std::cout<<"cart values: " <<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3] <<" " <<cart[4] <<" " <<cart[5] <<std::endl;
+						std::cout<<"DTWould have filled nonexistant dir on: " <<cart[0] <<" " <<cart[1]+1 <<" " <<0 <<" " <<0 <<" " <<0 <<" " <<cart[4]+1 <<std::endl;
 					}
-					//For topology Range, but all W, all sector
-					if(cart[2] ==0 && cart[3] == 0 && cart[1] == 6 && cart[4]!=0){
-						//std::cout <<"          Trying to Write in " <<cart[0] <<" " <<cart[1]+1 <<" 0 0 " <<cart[4]+1<<std::endl;
-						if(DT_dir_made[cart[0]][cart[1]+1][0][0][cart[4]]+1){
-							par_dt[cart[0]][cart[1]+1][0][0][0]->cd();//Get into those CUTS
-							par_dt[cart[0]][cart[1]+1][0][0][cart[4]+1]->cd();
-							//std::cout <<"  we are writing"<<std::endl;
-							if(DT_made_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]){
-								DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetXTitle("Momentum (GeV)");
-								DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetYTitle("Delta T (ns)");
-								DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->SetOption("COLZ");
-								DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]]->Write();	
-							}else{
-								std::cout<<"DT Would have segfaulted Writing: " <<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3] <<" " <<cart[4] <<" " <<cart[5] <<std::endl;
-							}
-						}else{
-							std::cout<<"cart values: " <<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3] <<" " <<cart[4] <<" " <<cart[5] <<std::endl;
-							std::cout<<"DTWould have filled nonexistant dir on: " <<cart[0] <<" " <<cart[1]+1 <<" " <<1 <<" " <<0 <<" " <<0 <<" " <<0 <<std::endl;
-						}		
-					}
+								
 				}else{
-					std::cout<<"cart values: " <<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3] <<" " <<cart[4] <<" " <<cart[5] <<std::endl;
-					std::cout<<"DTWould have filled nonexistant dir on: " <<cart[0] <<" " <<cart[1]+1 <<" " <<0 <<" " <<0 <<" " <<0 <<" " <<cart[4]+1 <<std::endl;
+						std::cout<<"cart values: " <<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3] <<" " <<cart[4] <<" " <<cart[5] <<std::endl;
+						std::cout<<"DTWould have filled nonexistant dir on: " <<0 <<" " <<0 <<" " <<0 <<" " <<0 <<" " <<0 <<" " <<cart[4]+1 <<std::endl;
 				}
-							
-			}else{
-					std::cout<<"cart values: " <<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3] <<" " <<cart[4] <<" " <<cart[5] <<std::endl;
-					std::cout<<"DTWould have filled nonexistant dir on: " <<0 <<" " <<0 <<" " <<0 <<" " <<0 <<" " <<0 <<" " <<cart[4]+1 <<std::endl;
 			}
 		}
+		std::cout<<" Done" <<std::endl;
 	}
 }
 
@@ -951,24 +963,32 @@ void Histogram::CC_Write(std::shared_ptr<Environment> _envi){
 }
 //Missing Mass Cuts
 void Histogram::MM_Make(std::shared_ptr<Environment> _envi){
-	char hname[100];
-	std::vector<long> space_dims(4);
-	space_dims[0] = 4;  //Topology
-	space_dims[1] = 3;  //Cuts {pre, cut, anti}
-	space_dims[2] = 2; //squared vs linear
-	space_dims[3] = 2; //Fitting vs. not fitting plots
+	bool do_mm_plots = false;
+	for(int i = 0; i< 4; i++){
+		if(_envi->was_MM_plot(i)){
+			do_mm_plots = true;
+		}
+	}
+	if(do_mm_plots){
+		char hname[100];
+		std::vector<long> space_dims(4);
+		space_dims[0] = 4;  //Topology
+		space_dims[1] = 3;  //Cuts {pre, cut, anti}
+		space_dims[2] = 2; //squared vs linear
+		space_dims[3] = 2; //Fitting vs. not fitting plots
 
-	float MMmin = NAN; 
-	float MMmax = NAN; 
+		float MMmin = NAN; 
+		float MMmax = NAN; 
 
-	CartesianGenerator cart(space_dims);
+		CartesianGenerator cart(space_dims);
 
-	while(cart.GetNextCombination()){
-		if(_envi->was_MM_plot(cart[0])){
-			sprintf(hname,"%s_MM_%s_%s_%s",topologies[cart[0]+1],basic_cut[cart[1]],MM_sq[cart[2]],fit_q[cart[3]]);
-			MMmin = MMxmin2[cart[0]];
-			MMmax = MMxmax2[cart[0]];
-			MM_hist[cart[0]][cart[1]][cart[2]][cart[3]] = std::make_shared<TH1F>(hname,hname,MMxres,MMmin,MMmax);
+		while(cart.GetNextCombination()){
+			if(_envi->was_MM_plot(cart[0])){
+				sprintf(hname,"%s_MM_%s_%s_%s",topologies[cart[0]+1],basic_cut[cart[1]],MM_sq[cart[2]],fit_q[cart[3]]);
+				MMmin = MMxmin2[cart[0]];
+				MMmax = MMxmax2[cart[0]];
+				MM_hist[cart[0]][cart[1]][cart[2]][cart[3]] = std::make_shared<TH1F>(hname,hname,MMxres,MMmin,MMmax);
+			}
 		}
 	}
 }
@@ -981,39 +1001,47 @@ void Histogram::MM_Fill(std::shared_ptr<Environment> _envi,int top, float mm, in
 	}
 }
 void Histogram::MM_Write(std::shared_ptr<Environment> _envi){
-	
-	char dir_name[100];
-	TDirectory * MM_plot = RootOutputFile->mkdir("MM plots");
-	MM_plot->cd();
-	TDirectory * MM_dir[4][3][2];//top, cut, fit
-	for(int k = 0; k<2; k++){
-		for(int i = 0; i < 4; i++ ){
-			if(_envi->was_MM_plot(i)){
-				sprintf(dir_name,"MM %s %s",topologies[i+1],fit_q[k]);
-				MM_dir[i][0][k] = MM_plot->mkdir(dir_name);
-				for(int j = 1; j <3; j++){
-					sprintf(dir_name,"MM %s %s %s",topologies[i+1],MM_sq[j-1],fit_q[k]);
-					MM_dir[i][j][k] = MM_dir[i][0][k]->mkdir(dir_name);
+	bool do_mm_plots = false;
+	for(int i = 0; i< 4; i++){
+		if(_envi->was_MM_plot(i)){
+			do_mm_plots = true;
+		}
+	}
+	if(do_mm_plots){
+		char dir_name[100];
+		TDirectory * MM_plot = RootOutputFile->mkdir("MM plots");
+		MM_plot->cd();
+		TDirectory * MM_dir[4][3][2];//top, cut, fit
+		for(int k = 0; k<2; k++){
+			for(int i = 0; i < 4; i++ ){
+				if(_envi->was_MM_plot(i)){
+					sprintf(dir_name,"MM %s %s",topologies[i+1],fit_q[k]);
+					MM_dir[i][0][k] = MM_plot->mkdir(dir_name);
+					for(int j = 1; j <3; j++){
+						sprintf(dir_name,"MM %s %s %s",topologies[i+1],MM_sq[j-1],fit_q[k]);
+						MM_dir[i][j][k] = MM_dir[i][0][k]->mkdir(dir_name);
+					}
 				}
 			}
 		}
-	}
-	for(int p = 0; p<2 ; p++){
-		for(int i = 0; i < 4; i++ ){//Topology without "All"
-			if(_envi->was_MM_plot(i)){
-				MM_dir[i][0][p]->cd();
-				for(int j = 1; j <3; j++){//linear vs squared
-					MM_dir[i][j][p]->cd();
-					for( int k = 0 ; k<3; k++){//Cuts
-						sprintf(dir_name,"MM %s %s %s %s",topologies[i+1],MM_sq[j-1],basic_cut[k],fit_q[p]);
-						MM_hist[i][k][j-1][p]->SetXTitle(dir_name);
-						MM_hist[i][k][j-1][p]->SetYTitle("Events");
-						MM_hist[i][k][j-1][p]->Write();
+		for(int p = 0; p<2 ; p++){
+			for(int i = 0; i < 4; i++ ){//Topology without "All"
+				if(_envi->was_MM_plot(i)){
+					MM_dir[i][0][p]->cd();
+					for(int j = 1; j <3; j++){//linear vs squared
+						MM_dir[i][j][p]->cd();
+						for( int k = 0 ; k<3; k++){//Cuts
+							sprintf(dir_name,"MM %s %s %s %s",topologies[i+1],MM_sq[j-1],basic_cut[k],fit_q[p]);
+							MM_hist[i][k][j-1][p]->SetXTitle(dir_name);
+							MM_hist[i][k][j-1][p]->SetYTitle("Events");
+							MM_hist[i][k][j-1][p]->Write();
+						}
 					}
 				}
 			}
 		}
 	}
+	
 
 }
 
@@ -1150,25 +1178,28 @@ void Histogram::Friend_Fill(std::shared_ptr<Environment> _envi, int top_, float 
 }
 
 void Histogram::Friend_Write(std::shared_ptr<Environment> _envi){
-	char dir_name[100];
-	TDirectory * Friend_plot = RootOutputFile->mkdir("Friend plots");
-	Friend_plot->cd();
-	TH1D* MM_proj[3]; 
-	TH1D* alpha_proj[3];
-	TH1D* theta_proj[3];
+	if(_envi->Environment::was_Friend_plot()){
+		char dir_name[100];
+		TDirectory * Friend_plot = RootOutputFile->mkdir("Friend plots");
+		Friend_plot->cd();
+		TH1D* MM_proj[3]; 
+		TH1D* alpha_proj[3];
+		TH1D* theta_proj[3];
 
-	for(int i = 0; i< 3; i++){
-		MM_proj[i] = Friend[i]->Projection(3);
-		alpha_proj[i] = Friend[i]->Projection(5);
-		theta_proj[i] = Friend[i]->Projection(4);
-		Friend[i]->Write(); 
-		MM_proj[i]->Draw();
-		MM_proj[i]->Write();
-		alpha_proj[i]->Draw();
-		alpha_proj[i]->Write();
-		theta_proj[i]->Draw();
-		theta_proj[i]->Write();
+		for(int i = 0; i< 3; i++){
+			MM_proj[i] = Friend[i]->Projection(3);
+			alpha_proj[i] = Friend[i]->Projection(5);
+			theta_proj[i] = Friend[i]->Projection(4);
+			Friend[i]->Write(); 
+			MM_proj[i]->Draw();
+			MM_proj[i]->Write();
+			alpha_proj[i]->Draw();
+			alpha_proj[i]->Write();
+			theta_proj[i]->Draw();
+			theta_proj[i]->Write();
+		}
 	}
+	
 }
 /*
 void Histogram::Fill_EID(std::shared_ptr<Particle> par, float W_, float Q2_){

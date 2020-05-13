@@ -12,7 +12,7 @@ int main(int argc, char **argv){
 
 	//start timer
 	auto start = std::chrono::high_resolution_clock::now();
-
+	//std::cout<<"The res for DTx is: " <<DTxres <<" and the rest for DTy is: " <<DTyres <<std::endl;
 
 	//for threading
 	std::vector<std::vector<std::string>> infilenames(NUM_THREADS);
@@ -27,7 +27,7 @@ int main(int argc, char **argv){
 	//Make the environment tracker
 	auto envi = std::make_shared<Environment>();
 	//std::cout<<"Test of Environment pre copy| dc_hit: " <<envi->Environment::was_dc_hit();
-	Setup::set_envi(envi,3); //setup.hpp
+	
 	//std::cout<<std::endl <<"Test of Environment pos copy| dc_hit: " <<envi->Environment::was_dc_hit() <<std::endl;
 	
 	/*
@@ -69,6 +69,7 @@ int main(int argc, char **argv){
 	       	}
        	}
        	data_set = filetype_map[comp];
+       	Setup::set_envi(envi,data_set); //setup.hpp
 	}
 	//Case 2
 	if(argc >4){
@@ -84,16 +85,16 @@ int main(int argc, char **argv){
 	std::cout<<"Brought Data in though Case: " <<_case <<std::endl; 
 	
 	//Assigning environment parameters
-	if(_case == 1){
+	/*if(_case == 1){
 		if(data_set == 1 || data_set == 2){//Data
 			envi->Environment::env_sim(false);
 			envi->Environment::env_data_set(data_set);
 		}else if(data_set == 3 || data_set == 4){//Simulation
 			envi->Environment::env_sim(true);
-			envi->Environment::env_data_set(data_set-2);
+			envi->Environment::env_data_set(data_set%2);
 		}else if(data_set == 5 || data_set == 6){//Empty Target
 			envi->Environment::env_sim(false);
-			envi->Environment::env_data_set(data_set-4);
+			envi->Environment::env_data_set(data_set%4);
 		}
 	}else if(_case == 2){
 		if(sim_status == 1){
@@ -101,7 +102,7 @@ int main(int argc, char **argv){
 		}else if(sim_status==-1){
 			envi->Environment::env_sim(true);
 		}
-	}
+	}*/
 	//Output a file listing the inputs for the environment
 	Setup::make_envi_file(output_name,envi);
 

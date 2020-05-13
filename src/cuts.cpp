@@ -80,6 +80,21 @@ float cuts::dt_p_high(float p){
 	return DTH[0]+DTH[1]*p+DTH[2]*p*p+DTH[3]*p*p*p;
 }
 
+bool cuts::delta_t_cut_iso(int part, int part_iso, float p, float d0, float d, float t0, float t) //Note: d and t need the sc_index 
+{
+	bool pass = false;
+
+	float dt = physics::delta_t(part, p, d, t, d0, t0);
+	//std::cout<<std::endl <<"delta t cut: p: " <<p <<" dt: " <<dt <<" cut_low: " <<cuts::dt_p_low(p) <<" cut_high:" <<cuts::dt_p_high(p) <<std::endl;  
+	if(dt>cuts::dt_p_low(p) && dt<cuts::dt_p_high(p) )
+	{
+		pass = true;
+	}else if(part == part_iso && TMath::Abs(dt) < 10){//part allowing a wiiiide delta t cut
+		pass = true; 
+	}
+	return pass;
+}
+
 bool cuts::delta_t_cut(int part, float p, float d0, float d, float t0, float t) //Note: d and t need the sc_index 
 {
 	bool pass = false;
@@ -89,6 +104,8 @@ bool cuts::delta_t_cut(int part, float p, float d0, float d, float t0, float t) 
 	if(dt>cuts::dt_p_low(p) && dt<cuts::dt_p_high(p) )
 	{
 		pass = true;
+	}else if(part == 1 && TMath::Abs(dt) < 10){//part allowing a wiiiide delta t cut
+		pass = true; 
 	}
 	return pass;
 }
@@ -304,6 +321,65 @@ bool cuts::pim_e_sep(std::shared_ptr<Branches> data, std::shared_ptr<Environment
 	return pass; 
 }
 
+/*
+bool cuts::elec_p_cut(int set, float W_, float Q2_, float p, int had){
+	bool pass = false;
+	float W_width = 0.05;
+	float Q2_width = 0.05;
+	float p_beam = NAN; 
+	switch(set){
+		case 1:
+			p_beam = energy_e16;
+		break;
+		case 0:
+			p_beam = energy_e1f;
+		break;
+	}
+	if(had!=2){
+		pass = true;
+	}else{
+		//W width
+		if(p >= (-(W_-W_width)*(W_-W_width)+Q2_-mp*mp-2*mp*p_beam)/(2*mp) || p <= (-(W_+W_width)*(W_+W_width)+Q2_-mp*mp-2*mp*p_beam)/(2*mp)){
+			//Q2 Width
+			if(p >= (-(W_)*(W_-W_width)+(Q2_+Q2_width)-mp*mp-2*mp*p_beam)/(2*mp) || p <= (-(W_)*(W_)+(Q2_-Q2_width)-mp*mp-2*mp*p_beam)/(2*mp)){
+				pass = true; 
+			}
+		}
+	}
+	return pass;
+}*/
+
+
+bool cuts::elec_p_cut(int set, std::shared_ptr<Branches> data, int part, int had){
+	bool pass = false;
+	float W_width = 0.05;
+	float Q2_width = 0.05;
+	float p_beam = NAN; 
+	float W_ = physics::WP(set,data);
+	float Q2_ = physics::Qsquared(set,data);
+	float p = data->Branches::p(part);
+	switch(set){
+		case 1:
+			p_beam = energy_e16;
+		break;
+		case 0:
+			p_beam = energy_e1f;
+		break;
+	}
+	if(had!=2){
+		pass = true;
+	}else{
+		//W width
+		if(p >= (-(W_-W_width)*(W_-W_width)+Q2_-mp*mp-2*mp*p_beam)/(2*mp) || p <= (-(W_+W_width)*(W_+W_width)+Q2_-mp*mp-2*mp*p_beam)/(2*mp)){
+			//Q2 Width
+			if(p >= (-(W_)*(W_-W_width)+(Q2_+Q2_width)-mp*mp-2*mp*p_beam)/(2*mp) || p <= (-(W_)*(W_)+(Q2_-Q2_width)-mp*mp-2*mp*p_beam)/(2*mp)){
+				pass = true; 
+			}
+		}
+	}
+	return pass;
+}
+
 bool cuts::eid(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi){
 	bool pass = true;
 	if(envi->was_eid_fid()){
@@ -321,7 +397,9 @@ bool cuts::eid(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi
 	return pass; 
 }
 
-bool cuts::hid(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int par, int had){
+
+
+bool cuts::hid(int set, std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int par, int had){
 	bool pass = true;
 	if(envi->was_hid_fid(had)){
 		pass &= cuts::h_fid(data,envi,par,had);
@@ -332,6 +410,7 @@ bool cuts::hid(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi
 	if(envi->was_hid_e()){
 		pass &= cuts::pim_e_sep(data,envi,par,had);
 	}
+	pass &= cuts::elec_p_cut(set,data,par,had);
 	return pass; 
 }
 
@@ -372,4 +451,6 @@ bool cuts::eff_cut(std::shared_ptr<Branches> data, std::shared_ptr<Environment> 
 	bool pass = false; 
 	return pass; 
 }
+
+
 

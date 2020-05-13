@@ -392,7 +392,7 @@ bool Environment::was_sf_plot() //Were Sampling Fraction plots made?
 }
 bool Environment::was_MM_plot(int species_) //Were missing mass plots made? {pmiss,pipmiss,pimmiss,zmiss}
 {
-	return _MM_plot;
+	return _MM_plot[species_];
 }
 bool Environment::was_WQ2_plot() //Were W Qsquared plots made?
 {

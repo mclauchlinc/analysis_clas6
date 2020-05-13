@@ -6,11 +6,8 @@
 
 Branches::Branches(std::shared_ptr<TChain> tree, int run_type) {
   _tree = tree;
-  if(run_type >=3 ){
+  if(run_type == 3 || run_type == 4){
     _MC = true; 
-    if(run_type < 5){
-        _include_weights = true; 
-    }
   }
   Branches::init();
 }
@@ -114,10 +111,6 @@ void Branches::init() {
     _tree->SetBranchAddress("pypart", &_pypart);
     _tree->SetBranchAddress("pzpart", &_pzpart);
     _tree->SetBranchAddress("qpart", &_qpart);
-     _tree->SetBranchAddress("mcp", &_mcp);
-    _tree->SetBranchAddress("mctheta", &_mctheta);
-    _tree->SetBranchAddress("mcphi", &_mcphi);
-    _tree->SetBranchAddress("mcid", &_mcid);
     /*_tree->SetBranchAddress("sc", &_sc);
     _tree->SetBranchAddress("sc_r", &_sc_r);
     _tree->SetBranchAddress("sc_t" , &_sc_t);
@@ -131,9 +124,7 @@ void Branches::init() {
     _tree->SetBranchAddress("cc_segm", &_cc_segm);
     _tree->SetBranchAddress("nphe", &_nphe);
     _tree->SetBranchAddress("q", &_q);*/
-    if(_include_weights){
-      _tree->SetBranchAddress("sigma_total", &_weight);
-    }
+    _tree->SetBranchAddress("sigma_total", &_weight);
   }
 }
 bool Branches::MC() {return _MC;}
@@ -711,20 +702,6 @@ float Branches::weight(){
   }else{//For when there is no simulation and you're taking data at its face. 
     return 1.0; 
   }
-}
-
-float Branches::mcp(int i){
-  return _mcp[i];
-}
-float Branches::mctheta(int i){
-  return _mctheta[i];
-}
-float Branches::mcphi(int i){
-  return _mcphi[i];
-}
-
-int Branches::mcid(int i){
-  return _mcid[i];
 }
 
 

@@ -25,7 +25,7 @@ void loadChain(std::shared_ptr<TChain> c, std::string file, int thread_id, int m
 
 char* appendCharToCharArray(char* array, char a);
 
-
+bool no_pro_pip_match(int idx1, int idx2[20]);
 
 }
 

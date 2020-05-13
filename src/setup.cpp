@@ -1,87 +1,120 @@
 #include "setup.hpp"
 
 void Setup::set_envi(std::shared_ptr<Environment> setup, int run_type){
-	setup->Environment::env_data_set(0); //Which data set? {1,2}->{e16,e1f} //Not Setting
-	setup->Environment::env_dc_hit(true); //Was a hit on the DC required?
-	setup->Environment::env_cc_hit(true);  //Was a hit on the CC required for electrons?
-	setup->Environment::env_ec_hit(true); //Was a hit on the EC required for electrons?
-	setup->Environment::env_sc_hit(true); //Was a hit on the SC required?
-	setup->Environment::env_stat_cut(false); //Was a nonzero stat required?
-	setup->Environment::env_dc_stat_cut(false);  //Was a nonzero dc_stat required?
-	//setup->Environment::env_sim(false);  //Was this simulation data?
-	//Which topologies are included {pmiss,pipmiss,pimmiss,zeromiss,combined}
-	setup->Environment::env_top(0, true);//Proton Missing
-	setup->Environment::env_top(1, true);//Pip Missing
-	setup->Environment::env_top(2, true);//Pim Missing
-	setup->Environment::env_top(3, true); //Zero MissingWhich topologies are included {pmiss,pipmiss,pimmiss,zeromiss,combined}
-	setup->Environment::env_p_corr(false); //Were momentum corrections performed?
-	
-	setup->Environment::env_pvpip(true); //Were procedures allowed for dual identified positive hadrons?
-	setup->Environment::env_npart(-1); //Number of particles allowed in an event (-1 means no limits)
-	setup->Environment::env_Qmin(Q2minAna); //Lower range of Q squared allowed
-	setup->Environment::env_Qmax(Q2maxAna); //Upper range of Q squared allowed
-	setup->Environment::env_Wmin(WminAna); //Lower limit on W allowed
-	setup->Environment::env_Wmax(WmaxAna); //Upper limit on W allowed 
-	setup->Environment::env_golden(false);//Was this a golden run?
-	setup->Environment::env_frac(1.0); //Fraction of the run analyzed
-	setup->Environment::env_num_file(-1); //Number of files analyzed. This is assigned in the program from the get go. -1 means all of them
-	setup->Environment::env_skim(true);//Were the files initially skimmed
-	setup->Environment::env_skim_type(1); //What type of skim was performed? See documentation 
-	setup->Environment::env_efficiency(false); //Efficiencies of detector used
-	setup->Environment::env_empty(false);//Is this an empty target run?
-	setup->Environment::env_COM(false); //Are the four vectors already put into the center of mass?
-	//For cut versions look setup->Environment:: the notes on the analysis
-	setup->Environment::env_fid_ver(0, 1); //Which electron fiducial cut version was used? See documentation on fiducial cut history
-	setup->Environment::env_fid_ver(1, 1);//Which proton fiducial cut version was used? See documentation on fiducial cut history
-	setup->Environment::env_fid_ver(2, 1);//Which pip fiducial cut version was used? See documentation on fiducial cut history
-	setup->Environment::env_fid_ver(3, 1);//Which pim fiducial cut version was used? See documentation on fiducial cut history
-	setup->Environment::env_dt_ver(0, 0);//which proton delta t cut version was used? See documentation on delta t cuts
-	setup->Environment::env_dt_ver(1, 0);//which pip delta t cut version was used? See documentation on delta t cuts
-	setup->Environment::env_dt_ver(2, 0);//which pim delta t cut version was used? See documentation on delta t cuts
-	setup->Environment::env_MM_ver(0, 1);//Which P missing cut version was used? See documentation on missing mass cuts
-	setup->Environment::env_MM_ver(1, 1);//Which Pip missing cut version was used? See documentation on missing mass cuts
-	setup->Environment::env_MM_ver(2, 1);//Which Pim missing cut version was used? See documentation on missing mass cuts
-	setup->Environment::env_MM_ver(3, 1);//Which Z missing cut version was used? See documentation on missing mass cuts 
-	setup->Environment::env_cc_ver(1); //Version of Min-CC cut. 
-	setup->Environment::env_ec_ver(0); //Version of Min EC cut. 
-	setup->Environment::env_sf_ver(0); //Version of Sampling Fraction cut. 
-	//Eid Cuts applied
-	setup->Environment::env_eid_fid(true); //Did eid include a fiducial cut?
-	setup->Environment::env_eid_ec(true); //Did eid include a min ec cut?
-	setup->Environment::env_eid_cc(true); //Did eid include a min cc cut?
-	setup->Environment::env_eid_sf(true); //Did eid include a sampling fraction cut?
-	//Hadron cuts applied {p,pip,pim}
-	setup->Environment::env_hid_fid(0, true);//Did proton ID include a fiducial cut?
-	setup->Environment::env_hid_fid(1, true);//Did pip ID include a fiducial cut?
-	setup->Environment::env_hid_fid(2, true);//Did pim ID include a fiducial cut?
-	setup->Environment::env_hid_dt(0, true);//Did proton ID include a delta t cut?
-	setup->Environment::env_hid_dt(1, true);//Did pip ID include a delta t cut?
-	setup->Environment::env_hid_dt(2, true);//Did pim ID include a delta t cut?
-	setup->Environment::env_hid_beta(0, true);//Did proton ID include a beta cut?
-	setup->Environment::env_hid_beta(1, true);//Did pip ID include a beta cut?
-	setup->Environment::env_hid_beta(2, true);//Did pim ID include a beta cut?
-	setup->Environment::env_hid_e(true); //Did hid cut out a band of electrons for pim ID?
+	switch(run_type%2){
+		case 1:
+			setup->Environment::env_data_set(1); //Which data set? {1,2}->{e16,e1f}
+		break;
+		case 0:
+			setup->Environment::env_data_set(2); //Which data set? {1,2}->{e16,e1f}
+		break;
+		default:
+			setup->Environment::env_data_set(1); //Which data set? {1,2}->{e16,e1f}
+		break;
+	}
+	if(run_type >= 3){
+		setup->Environment::env_sim(true);
+	}
+	if(run_type < 5){//Everything running on normal banks
+		setup->Environment::env_dc_hit(true); //Was a hit on the DC required?
+		if(run_type < 3){//Only for experiment do we work with the CC
+			setup->Environment::env_cc_hit(true);  //Was a hit on the CC required for electrons?
+			setup->Environment::env_cc_ver(1); //Version of Min-CC cut. 
+			setup->Environment::env_eid_cc(true); //Did eid include a min cc cut?
+			setup->Environment::env_cc_plot(true); //Were Min CC plots made?
+			setup->Environment::env_sim(false); 
+		}
+		setup->Environment::env_ec_hit(true); //Was a hit on the EC required for electrons?
+		setup->Environment::env_sc_hit(true); //Was a hit on the SC required?
+		setup->Environment::env_stat_cut(false); //Was a nonzero stat required?
+		setup->Environment::env_dc_stat_cut(false);  //Was a nonzero dc_stat required?
+		//setup->Environment::env_sim(false);  //Was this simulation data?
+		//Which topologies are included {pmiss,pipmiss,pimmiss,zeromiss,combined}
+		setup->Environment::env_top(0, true);//Proton Missing
+		setup->Environment::env_top(1, true);//Pip Missing
+		setup->Environment::env_top(2, true);//Pim Missing
+		setup->Environment::env_top(3, true); //Zero MissingWhich topologies are included {pmiss,pipmiss,pimmiss,zeromiss,combined}
+		setup->Environment::env_p_corr(false); //Were momentum corrections performed?
+		
+		setup->Environment::env_pvpip(true); //Were procedures allowed for dual identified positive hadrons?
+		setup->Environment::env_npart(-1); //Number of particles allowed in an event (-1 means no limits)
+		setup->Environment::env_Qmin(Q2minAna); //Lower range of Q squared allowed
+		setup->Environment::env_Qmax(Q2maxAna); //Upper range of Q squared allowed
+		setup->Environment::env_Wmin(WminAna); //Lower limit on W allowed
+		setup->Environment::env_Wmax(WmaxAna); //Upper limit on W allowed 
+		setup->Environment::env_golden(false);//Was this a golden run?
+		setup->Environment::env_frac(1.0); //Fraction of the run analyzed
+		setup->Environment::env_num_file(-1); //Number of files analyzed. This is assigned in the program from the get go. -1 means all of them
+		setup->Environment::env_skim(true);//Were the files initially skimmed
+		setup->Environment::env_skim_type(1); //What type of skim was performed? See documentation 
+		setup->Environment::env_efficiency(false); //Efficiencies of detector used
+		setup->Environment::env_empty(false);//Is this an empty target run?
+		setup->Environment::env_COM(false); //Are the four vectors already put into the center of mass?
+		//For cut versions look setup->Environment:: the notes on the analysis
+		setup->Environment::env_fid_ver(0, 1); //Which electron fiducial cut version was used? See documentation on fiducial cut history
+		setup->Environment::env_fid_ver(1, 1);//Which proton fiducial cut version was used? See documentation on fiducial cut history
+		setup->Environment::env_fid_ver(2, 1);//Which pip fiducial cut version was used? See documentation on fiducial cut history
+		setup->Environment::env_fid_ver(3, 1);//Which pim fiducial cut version was used? See documentation on fiducial cut history
+		setup->Environment::env_dt_ver(0, 0);//which proton delta t cut version was used? See documentation on delta t cuts
+		setup->Environment::env_dt_ver(1, 0);//which pip delta t cut version was used? See documentation on delta t cuts
+		setup->Environment::env_dt_ver(2, 0);//which pim delta t cut version was used? See documentation on delta t cuts
+		setup->Environment::env_MM_ver(0, 1);//Which P missing cut version was used? See documentation on missing mass cuts
+		setup->Environment::env_MM_ver(1, 1);//Which Pip missing cut version was used? See documentation on missing mass cuts
+		setup->Environment::env_MM_ver(2, 1);//Which Pim missing cut version was used? See documentation on missing mass cuts
+		setup->Environment::env_MM_ver(3, 1);//Which Z missing cut version was used? See documentation on missing mass cuts 
+		
+		setup->Environment::env_ec_ver(0); //Version of Min EC cut. 
+		setup->Environment::env_sf_ver(0); //Version of Sampling Fraction cut. 
+		//Eid Cuts applied
+		setup->Environment::env_eid_fid(true); //Did eid include a fiducial cut?
+		setup->Environment::env_eid_ec(true); //Did eid include a min ec cut?
+		
+		setup->Environment::env_eid_sf(true); //Did eid include a sampling fraction cut?
+		//Hadron cuts applied {p,pip,pim}
+		setup->Environment::env_hid_fid(0, true);//Did proton ID include a fiducial cut?
+		setup->Environment::env_hid_fid(1, true);//Did pip ID include a fiducial cut?
+		setup->Environment::env_hid_fid(2, true);//Did pim ID include a fiducial cut?
+		setup->Environment::env_hid_dt(0, true);//Did proton ID include a delta t cut?
+		setup->Environment::env_hid_dt(1, true);//Did pip ID include a delta t cut?
+		setup->Environment::env_hid_dt(2, true);//Did pim ID include a delta t cut?
+		setup->Environment::env_hid_beta(0, true);//Did proton ID include a beta cut?
+		setup->Environment::env_hid_beta(1, true);//Did pip ID include a beta cut?
+		setup->Environment::env_hid_beta(2, true);//Did pim ID include a beta cut?
+		setup->Environment::env_hid_e(true); //Did hid cut out a band of electrons for pim ID?
 
-	//Were fiducial cuts plotted? {e,p,pip,pim}
-	setup->Environment::env_fid_plot(0, true); //Are electron fiducial plots being created?
-	setup->Environment::env_fid_plot(1, true); //Are proton fiducial plots being created?
-	setup->Environment::env_fid_plot(2, true);	// Are Pip fiducial plots being created?
-	setup->Environment::env_fid_plot(3, true);//Are PIM fiducial plots being created?
-	//Were delta t plots made performed {p,pip,pim}
-	setup->Environment::env_dt_plot(0, true);//Are proton delta t plots being created?
-	setup->Environment::env_dt_plot(1, true);//Are pip delta t plots being created?
-	setup->Environment::env_dt_plot(2, true); //Are PIM delta t plots being created?
-	setup->Environment::env_cc_plot(true); //Were Min CC plots made? 
-  	setup->Environment::env_ec_plot(true); //were Min EC plots made?
-  	setup->Environment::env_sf_plot(true); //Were Sampling Fraction plots made?
-  	setup->Environment::env_MM_plot(0,true); //Were missing mass plots made? {pmiss,pipmiss,pimmiss,zmiss}
-  	setup->Environment::env_MM_plot(1,true);
-  	setup->Environment::env_MM_plot(2,true);
-  	setup->Environment::env_MM_plot(3,true);
-  	setup->Environment::env_WQ2_plot(true); //Were W Qsquared plots made?
-  	setup->Environment::env_p_dep_plot(true); //Is there momentum dependence in the relevant plots?
-  	setup->Environment::env_W_dep_plot(true); //Is there W dependence in the relevant plots? 
-  	setup->Environment::env_Friend_plot(true);//Construct the multi dimensional histogram and fill it
+		//Were fiducial cuts plotted? {e,p,pip,pim}
+		setup->Environment::env_fid_plot(0, true); //Are electron fiducial plots being created?
+		setup->Environment::env_fid_plot(1, true); //Are proton fiducial plots being created?
+		setup->Environment::env_fid_plot(2, true);	// Are Pip fiducial plots being created?
+		setup->Environment::env_fid_plot(3, true);//Are PIM fiducial plots being created?
+		//Were delta t plots made performed {p,pip,pim}
+		setup->Environment::env_dt_plot(0, true);//Are proton delta t plots being created?
+		setup->Environment::env_dt_plot(1, true);//Are pip delta t plots being created?
+		setup->Environment::env_dt_plot(2, true); //Are PIM delta t plots being created?
+		
+	  	setup->Environment::env_ec_plot(true); //were Min EC plots made?
+	  	setup->Environment::env_sf_plot(true); //Were Sampling Fraction plots made?
+	  	setup->Environment::env_MM_plot(0,true); //Were missing mass plots made? {pmiss,pipmiss,pimmiss,zmiss}
+	  	setup->Environment::env_MM_plot(1,true);
+	  	setup->Environment::env_MM_plot(2,true);
+	  	setup->Environment::env_MM_plot(3,true);
+	  	setup->Environment::env_WQ2_plot(true); //Were W Qsquared plots made?
+	  	setup->Environment::env_p_dep_plot(true); //Is there momentum dependence in the relevant plots?
+	  	setup->Environment::env_W_dep_plot(true); //Is there W dependence in the relevant plots? 
+	  	setup->Environment::env_Friend_plot(true);//Construct the multi dimensional histogram and fill it
+  	}else if(run_type >= 5){
+  		setup->Environment::env_npart(4); //Number of particles allowed in an event (-1 means no limits)
+  		setup->Environment::env_Qmin(Q2minAna); //Lower range of Q squared allowed
+		setup->Environment::env_Qmax(Q2maxAna); //Upper range of Q squared allowed
+		setup->Environment::env_Wmin(WminAna); //Lower limit on W allowed
+		setup->Environment::env_Wmax(WmaxAna); //Upper limit on W allowed 
+  		setup->Environment::env_WQ2_plot(true); //Were W Qsquared plots made?
+  		setup->Environment::env_MM_plot(0,false); //Were missing mass plots made? {pmiss,pipmiss,pimmiss,zmiss}
+	  	setup->Environment::env_MM_plot(1,false);
+	  	setup->Environment::env_MM_plot(2,false);
+	  	setup->Environment::env_MM_plot(3,false);
+
+  	}
 }
 
 void Setup::make_envi_file(const std::string& output_name, std::shared_ptr<Environment> envi){
