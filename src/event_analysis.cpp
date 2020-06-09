@@ -103,7 +103,7 @@ Analysis::Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> h
 		Particle ePart[_npart]; 
 		for(int a = 0; a< _npart; a++){
 			ePart[a].Particle::Fill_Particle(data_,a,_set,_sim);
-			ePart[a].Particle::PID(data_,envi_,hist_,_W[1]);
+			ePart[a].Particle::PID(data_,envi_,hist_,_W[0]);
 			std::cout<<"	Particle " <<a <<" sim status: " <<ePart[a].Particle::Is_Sim() <<std::endl;
 			std::cout<<"	Particle " <<a <<" ID status: " <<ePart[a].Particle::Is_Elec() <<" " <<ePart[a].Particle::Is_Pro() <<" "<<ePart[a].Particle::Is_Pip() <<" "<<ePart[a].Particle::Is_Pim() <<std::endl;
 		}
@@ -140,7 +140,7 @@ Analysis::Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> h
 							std::cout<<"	Event Combo: "<<_evnt_idx_ <<" top:Pro Miss"<<std::endl;
 							std::cout<<"		Pre Event Fill for event Combo: " <<_evnt_idx_ <<std::endl;
 							std::cout<<"			Elec " <<ePart[0].Particle::Get_idx() <<" sim: " <<ePart[0].Particle::Is_Sim() <<"| Pip " <<ePart[g].Particle::Get_idx() <<" sim: " <<ePart[g].Particle::Is_Sim() <<"| Pim " <<ePart[h].Particle::Get_idx() <<" sim: " <<ePart[h].Particle::Is_Sim() <<std::endl;
-							eEvent[_evnt_idx_].Event::Fill_Event(envi_,hist_,0,_W[1],_Q2[1],ePart[0],ePart[g],ePart[h]);
+							eEvent[_evnt_idx_].Event::Fill_Event(envi_,hist_,0,_W[0],_Q2[0],ePart[0],ePart[g],ePart[h]);
 							std::cout<<"		Post Event Fill for event Combo: " <<_evnt_idx_ <<std::endl;
 							std::cout<<"			Elec " <<ePart[0].Particle::Get_idx() <<" sim: " <<ePart[0].Particle::Is_Sim() <<"| Pip " <<ePart[g].Particle::Get_idx() <<" sim: " <<ePart[g].Particle::Is_Sim() <<"| Pim " <<ePart[h].Particle::Get_idx() <<" sim: " <<ePart[h].Particle::Is_Sim() <<std::endl;
 							_evnt_idx_+=1;
@@ -154,7 +154,7 @@ Analysis::Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> h
 							std::cout<<"	Event Combo: " <<_evnt_idx_ <<" top:PIP Miss"<<std::endl;
 							std::cout<<"		Pre Event Fill for event Combo: " <<_evnt_idx_ <<std::endl;
 							std::cout<<"			Elec " <<ePart[0].Particle::Get_idx() <<" sim: " <<ePart[0].Particle::Is_Sim() <<"| Pro " <<ePart[g].Particle::Get_idx() <<" sim: " <<ePart[g].Particle::Is_Sim() <<"| Pim " <<ePart[s].Particle::Get_idx() <<" sim: " <<ePart[s].Particle::Is_Sim() <<std::endl;
-							eEvent[_evnt_idx_].Event::Fill_Event(envi_,hist_,1,_W[1],_Q2[1],ePart[0],ePart[g],ePart[s]);
+							eEvent[_evnt_idx_].Event::Fill_Event(envi_,hist_,1,_W[0],_Q2[0],ePart[0],ePart[g],ePart[s]);
 							std::cout<<"		Post Event Fill for event Combo: " <<_evnt_idx_ <<std::endl;
 							std::cout<<"			Elec " <<ePart[0].Particle::Get_idx() <<" sim: " <<ePart[0].Particle::Is_Sim() <<"| Pro " <<ePart[g].Particle::Get_idx() <<" sim: " <<ePart[g].Particle::Is_Sim() <<"| Pim " <<ePart[s].Particle::Get_idx() <<" sim: " <<ePart[s].Particle::Is_Sim() <<std::endl;
 							_evnt_idx_+=1;
@@ -163,7 +163,7 @@ Analysis::Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> h
 							std::cout<<"	Event Combo: "<<_evnt_idx_ <<" top:PIM Miss"<<std::endl;
 							std::cout<<"		Pre Event Fill for event Combo: " <<_evnt_idx_ <<std::endl;
 							std::cout<<"			Elec " <<ePart[0].Particle::Get_idx() <<" sim: " <<ePart[0].Particle::Is_Sim() <<"| Pro " <<ePart[g].Particle::Get_idx() <<" sim: " <<ePart[g].Particle::Is_Sim() <<"| Pip " <<ePart[s].Particle::Get_idx() <<" sim: " <<ePart[s].Particle::Is_Sim() <<std::endl;
-							eEvent[_evnt_idx_].Event::Fill_Event(envi_,hist_,2,_W[1],_Q2[1],ePart[0],ePart[g],ePart[s]);
+							eEvent[_evnt_idx_].Event::Fill_Event(envi_,hist_,2,_W[0],_Q2[0],ePart[0],ePart[g],ePart[s]);
 							std::cout<<"		Post Event Fill for event Combo: " <<_evnt_idx_ <<std::endl;
 							std::cout<<"			Elec " <<ePart[0].Particle::Get_idx() <<" sim: " <<ePart[0].Particle::Is_Sim() <<"| Pro " <<ePart[g].Particle::Get_idx() <<" sim: " <<ePart[g].Particle::Is_Sim() <<"| Pip " <<ePart[s].Particle::Get_idx() <<" sim: " <<ePart[s].Particle::Is_Sim() <<std::endl;
 							_evnt_idx_+=1;
@@ -173,7 +173,7 @@ Analysis::Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> h
 									std::cout<<"	Event Combo: "<<_evnt_idx_ <<" top:zero"<<std::endl;
 									std::cout<<"		Pre Event Fill for event Combo: " <<_evnt_idx_ <<std::endl;
 									std::cout<<"			Elec " <<ePart[0].Particle::Get_idx() <<" sim: " <<ePart[0].Particle::Is_Sim() <<"| Pro " <<ePart[g].Particle::Get_idx() <<" sim: " <<ePart[g].Particle::Is_Sim() <<"| Pip " <<ePart[s].Particle::Get_idx() <<" sim: " <<ePart[s].Particle::Is_Sim() <<"| Pim " <<ePart[u].Particle::Get_idx() <<" sim: " <<ePart[u].Particle::Is_Sim() <<std::endl;
-									eEvent[_evnt_idx_].Event::Fill_Event(envi_,hist_,3,_W[1],_Q2[1],ePart[0],ePart[g],ePart[s],ePart[u]);
+									eEvent[_evnt_idx_].Event::Fill_Event(envi_,hist_,3,_W[0],_Q2[0],ePart[0],ePart[g],ePart[s],ePart[u]);
 									std::cout<<"		Post Event Fill for event Combo: " <<_evnt_idx_ <<std::endl;
 									std::cout<<"			Elec " <<ePart[0].Particle::Get_idx() <<" sim: " <<ePart[0].Particle::Is_Sim() <<"| Pro " <<ePart[g].Particle::Get_idx() <<" sim: " <<ePart[g].Particle::Is_Sim() <<"| Pip " <<ePart[s].Particle::Get_idx() <<" sim: " <<ePart[s].Particle::Is_Sim() <<"| Pim " <<ePart[u].Particle::Get_idx() <<" sim: " <<ePart[u].Particle::Is_Sim() <<std::endl;
 									_evnt_idx_+=1;

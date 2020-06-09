@@ -10,6 +10,7 @@ void Event::Fill_Event(std::shared_ptr<Environment> envi_, std::shared_ptr<Histo
 	}else{ 
 		_W = W_;
 		_Q2 = Q2_;
+		_hel = hel_;
 		//Check to make sure all particles were either simulated or not
 		if(p1.Particle::Is_Sim() == p2.Particle::Is_Sim() && p2.Particle::Is_Sim() == p3.Particle::Is_Sim()){
 			_sim = p1.Particle::Is_Sim();
@@ -33,19 +34,19 @@ void Event::Fill_Event(std::shared_ptr<Environment> envi_, std::shared_ptr<Histo
 							_vec_lab[2] = physics::Make_4Vector(true,_p_lab[2],_theta_lab[2],_phi_lab[2],mpi);
 							_vec_lab[3] = physics::Make_4Vector(true,_p_lab[3],_theta_lab[3],_phi_lab[3],mpi);
 							_top[0] = true;
-							hist_->MM_Fill(envi_,0,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[3]),0,0,true);
-							hist_->MM_Fill(envi_,0,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[3]),0,1,true);
+							hist_->Histogram::MM_Fill(envi_,0,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[3]),0,0,true);
+							hist_->Histogram::MM_Fill(envi_,0,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[3]),0,1,true);
 							_pass = Selection::Event_Selection(top_,_k1, _vec_lab[0], _vec_lab[2], _vec_lab[3]);
 							p1.Particle::Fill_Par_Event(envi_,hist_,_W,top_,0,_pass); 
 							p2.Particle::Fill_Par_Event(envi_,hist_,_W,top_,2,_pass); 
 							p3.Particle::Fill_Par_Event(envi_,hist_,_W,top_,3,_pass); 
 							if(_pass){
 								_vec_lab[1] = _k1 + p_mu - _vec_lab[0] - _vec_lab[2] - _vec_lab[3];
-								hist_->MM_Fill(envi_,0,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[3]),1,0,true);
-								hist_->MM_Fill(envi_,0,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[3]),1,1,true);
+								hist_->Histogram::MM_Fill(envi_,0,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[3]),1,0,true);
+								hist_->Histogram::MM_Fill(envi_,0,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[3]),1,1,true);
 							}else{
-								hist_->MM_Fill(envi_,0,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[3]),2,0,true);
-								hist_->MM_Fill(envi_,0,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[3]),2,1,true);
+								hist_->Histogram::MM_Fill(envi_,0,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[3]),2,0,true);
+								hist_->Histogram::MM_Fill(envi_,0,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[3]),2,1,true);
 							}
 						}
 					break;
@@ -65,24 +66,26 @@ void Event::Fill_Event(std::shared_ptr<Environment> envi_, std::shared_ptr<Histo
 							_vec_lab[1] = physics::Make_4Vector(true,_p_lab[1],_theta_lab[1],_phi_lab[1],mp);
 							_vec_lab[3] = physics::Make_4Vector(true,_p_lab[3],_theta_lab[3],_phi_lab[3],mpi);
 							_top[1] = true;
-							hist_->MM_Fill(envi_,1,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[3]),0,0,true);
-							hist_->MM_Fill(envi_,1,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[3]),0,1,true);
+							hist_->Histogram::MM_Fill(envi_,1,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[3]),0,0,true);
+							hist_->Histogram::MM_Fill(envi_,1,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[3]),0,1,true);
 							_pass = Selection::Event_Selection(top_,_k1, _vec_lab[0], _vec_lab[1], _vec_lab[3]);
 							p1.Particle::Fill_Par_Event(envi_,hist_,_W,top_,0,_pass); 
 							p2.Particle::Fill_Par_Event(envi_,hist_,_W,top_,1,_pass); 
 							p3.Particle::Fill_Par_Event(envi_,hist_,_W,top_,3,_pass);
 							if(_pass){
 								_vec_lab[2] = _k1 + p_mu - _vec_lab[0] - _vec_lab[1] - _vec_lab[3]; 
-								hist_->MM_Fill(envi_,1,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[3]),1,0,true);
-								hist_->MM_Fill(envi_,1,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[3]),1,1,true);
+								hist_->Histogram::MM_Fill(envi_,1,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[3]),1,0,true);
+								hist_->Histogram::MM_Fill(envi_,1,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[3]),1,1,true);
 							}else{
-								hist_->MM_Fill(envi_,1,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[3]),2,0,true);
-								hist_->MM_Fill(envi_,1,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[3]),2,1,true);
+								hist_->Histogram::MM_Fill(envi_,1,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[3]),2,0,true);
+								hist_->Histogram::MM_Fill(envi_,1,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[3]),2,1,true);
 							}
 						}
 					break;
 					case 2://PIM missing
 						if(p1.Particle::Is_Elec() && p2.Particle::Is_Pro() && p3.Particle::Is_Pip()){
+							std::cout<<"		Inside Event pt1 Fill for event Combo: " <<std::endl;
+							std::cout<<"			Elec " <<p1.Particle::Get_idx() <<" sim: " <<p1.Particle::Is_Sim() <<"| Pro " <<p2.Particle::Get_idx() <<" sim: " <<p2.Particle::Is_Sim() <<"| Pip " <<p3.Particle::Get_idx() <<" sim: " <<p3.Particle::Is_Sim() <<std::endl;
 							_filled_correctly = true; 
 							_p_lab[0] = p1.Particle::Get_p();
 							_p_lab[1] = p2.Particle::Get_p();
@@ -97,19 +100,27 @@ void Event::Fill_Event(std::shared_ptr<Environment> envi_, std::shared_ptr<Histo
 							_vec_lab[1] = physics::Make_4Vector(true,_p_lab[1],_theta_lab[1],_phi_lab[1],mp);
 							_vec_lab[2] = physics::Make_4Vector(true,_p_lab[2],_theta_lab[2],_phi_lab[2],mpi);
 							_top[2] = true;
-							hist_->MM_Fill(envi_,2,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2]),0,0,true);
-							hist_->MM_Fill(envi_,2,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2]),0,1,true);
+							hist_->Histogram::MM_Fill(envi_,2,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2]),0,0,true);
+							hist_->Histogram::MM_Fill(envi_,2,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2]),0,1,true);
+							std::cout<<"		Inside Event pt2 Fill for event Combo: " <<std::endl;
+							std::cout<<"			Elec " <<p1.Particle::Get_idx() <<" sim: " <<p1.Particle::Is_Sim() <<"| Pro " <<p2.Particle::Get_idx() <<" sim: " <<p2.Particle::Is_Sim() <<"| Pip " <<p3.Particle::Get_idx() <<" sim: " <<p3.Particle::Is_Sim() <<std::endl;
 							_pass = Selection::Event_Selection(top_,_k1, _vec_lab[0], _vec_lab[1], _vec_lab[2]);
 							p1.Particle::Fill_Par_Event(envi_,hist_,_W,top_,0,_pass); 
 							p2.Particle::Fill_Par_Event(envi_,hist_,_W,top_,1,_pass); 
 							p3.Particle::Fill_Par_Event(envi_,hist_,_W,top_,2,_pass);
+							std::cout<<"		Inside Event pt3 Fill for event Combo: " <<std::endl;
+							std::cout<<"			Elec " <<p1.Particle::Get_idx() <<" sim: " <<p1.Particle::Is_Sim() <<"| Pro " <<p2.Particle::Get_idx() <<" sim: " <<p2.Particle::Is_Sim() <<"| Pip " <<p3.Particle::Get_idx() <<" sim: " <<p3.Particle::Is_Sim() <<std::endl;
 							if(_pass){
 								_vec_lab[3] = _k1 + p_mu - _vec_lab[0] - _vec_lab[1] - _vec_lab[2]; 
-								hist_->MM_Fill(envi_,2,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2]),1,0,true);
-								hist_->MM_Fill(envi_,2,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2]),1,1,true);
+								hist_->Histogram::MM_Fill(envi_,2,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2]),1,0,true);
+								hist_->Histogram::MM_Fill(envi_,2,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2]),1,1,true);
+								std::cout<<"		Inside Event pt4 Fill for event Combo: " <<std::endl;
+								std::cout<<"			Elec " <<p1.Particle::Get_idx() <<" sim: " <<p1.Particle::Is_Sim() <<"| Pro " <<p2.Particle::Get_idx() <<" sim: " <<p2.Particle::Is_Sim() <<"| Pip " <<p3.Particle::Get_idx() <<" sim: " <<p3.Particle::Is_Sim() <<std::endl;
 							}else{
-								hist_->MM_Fill(envi_,2,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2]),2,0,true);
-								hist_->MM_Fill(envi_,2,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2]),2,1,true);
+								hist_->Histogram::MM_Fill(envi_,2,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2]),2,0,true);
+								hist_->Histogram::MM_Fill(envi_,2,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2]),2,1,true);
+								std::cout<<"		Inside Event pt5 Fill for event Combo: " <<std::endl;
+								std::cout<<"			Elec " <<p1.Particle::Get_idx() <<" sim: " <<p1.Particle::Is_Sim() <<"| Pro " <<p2.Particle::Get_idx() <<" sim: " <<p2.Particle::Is_Sim() <<"| Pip " <<p3.Particle::Get_idx() <<" sim: " <<p3.Particle::Is_Sim() <<std::endl;
 							}
 						}
 					break;
@@ -124,9 +135,6 @@ void Event::Fill_Event(std::shared_ptr<Environment> envi_, std::shared_ptr<Histo
 			std::cout<<"			p2 sim status: " <<p2.Particle::Is_Sim() <<std::endl;
 			std::cout<<"			p3 sim status: " <<p3.Particle::Is_Sim() <<std::endl;
 		}
-		
-		
-		
 	}
 }
 
@@ -136,6 +144,7 @@ if(top_ != 3){
 	}else{ 
 		_W = W_;
 		_Q2 = Q2_;
+		_hel = hel_;
 		//Check to make sure all particles were either simulated or not
 		if(p1.Particle::Is_Sim() == p2.Particle::Is_Sim() && p2.Particle::Is_Sim() == p3.Particle::Is_Sim()){
 			_sim = p1.Particle::Is_Sim();
@@ -161,19 +170,19 @@ if(top_ != 3){
 					_vec_lab[2] = physics::Make_4Vector(true,_p_lab[2],_theta_lab[2],_phi_lab[2],mpi);
 					_vec_lab[3] = physics::Make_4Vector(true,_p_lab[3],_theta_lab[3],_phi_lab[3],mpi);
 					_top[3] = true; 
-					hist_->MM_Fill(envi_,3,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),0,0,true);
-					hist_->MM_Fill(envi_,3,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[2],_vec_lab[3]),0,1,true);
+					hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),0,0,true);
+					hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[2],_vec_lab[3]),0,1,true);
 					_pass = Selection::Event_Selection(top_,_k1, _vec_lab[0], _vec_lab[1], _vec_lab[2], _vec_lab[3]);
 					p1.Particle::Fill_Par_Event(envi_,hist_,_W,top_,0,_pass); 
 					p2.Particle::Fill_Par_Event(envi_,hist_,_W,top_,1,_pass); 
 					p3.Particle::Fill_Par_Event(envi_,hist_,_W,top_,2,_pass); 
 					p4.Particle::Fill_Par_Event(envi_,hist_,_W,top_,3,_pass); 
 					if(_pass){
-						hist_->MM_Fill(envi_,3,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),1,0,true);
-						hist_->MM_Fill(envi_,3,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),1,1,true);
+						hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),1,0,true);
+						hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),1,1,true);
 					}else{
-						hist_->MM_Fill(envi_,3,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),2,0,true);
-						hist_->MM_Fill(envi_,3,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),2,1,true);
+						hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),2,0,true);
+						hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),2,1,true);
 					}
 				}
 			}else{
