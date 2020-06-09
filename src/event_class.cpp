@@ -120,14 +120,14 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 	//electron ID
 	//if(in_range && data->Branches::q(0)==-1 && data->Branches::cc(0)!=0 && data->Branches::dc(0)!=0 && data->Branches::sc(0)!=0 && data->Branches::ec(0)!=0){//Sanity are q = -1, cc, dc, ec, and sc hits
 	//for fitting purposes we need to get rid of the "in range" criteria 4/22/20
-	if(/*cuts::in_range(_W,_Q2,envi) &&*/ cuts::e_sanity(data,envi)){
+	if(/*cuts::in_range(_W,_Q2,envi) &&*/ cuts::e_sanity(data,envi,0)){
 	
 		_hists->Histogram::WQ2_Fill(envi,0,1,_W,_Q2);
 		_hists->Histogram::Fid_Fill(envi,0,physics::get_theta(data->Branches::cz(0)),physics::get_phi(data->Branches::cx(0),data->Branches::cy(0)),0,1,0,_W,data->Branches::p(0));
 		_hists->Histogram::SF_Fill(envi,0,data->Branches::p(0),data->Branches::etot(0),1,0,_W,sector[0]);
 		_hists->Histogram::CC_Fill(envi,0,data->Branches::cc_sect(0),data->Branches::cc_segm(0),data->Branches::nphe(0),1,0);
 		//if(cuts::fid_cut(0,data->Branches::p(0),data->Branches::cx(0),data->Branches::cy(0),data->Branches::cz(0))){
-		if(cuts::e_fid(data,envi)){
+		if(cuts::e_fid(data,envi,0)){
 			fid_e_pass = true;
 			_hists->Histogram::WQ2_Fill(envi,0,2,_W,_Q2);
 			_hists->Histogram::Fid_Fill(envi,0,physics::get_theta(data->Branches::cz(0)),physics::get_phi(data->Branches::cx(0),data->Branches::cy(0)),0,2,0,_W,data->Branches::p(0));
@@ -139,7 +139,7 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 			_hists->Histogram::CC_Fill(envi,0,data->Branches::cc_sect(0),data->Branches::cc_segm(0),data->Branches::nphe(0),2,1);
 		}
 		//if(cuts::sf_cut(data->Branches::p(0),data->Branches::etot(0),data->Branches::cx(0),data->Branches::cy(0))){
-		if(cuts::e_sf(data,envi)){
+		if(cuts::e_sf(data,envi,0)){
 			sf_e_pass = true;
 			_hists->Histogram::WQ2_Fill(envi,0,3,_W,_Q2);
 			_hists->Histogram::Fid_Fill(envi,0,physics::get_theta(data->Branches::cz(0)),physics::get_phi(data->Branches::cx(0),data->Branches::cy(0)),0,3,0,_W,data->Branches::p(0));
@@ -151,7 +151,7 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 			_hists->Histogram::CC_Fill(envi,0,data->Branches::cc_sect(0),data->Branches::cc_segm(0),data->Branches::nphe(0),3,1);
 		}
 		//if(cuts::min_cc(data->Branches::cc_segm(0),data->Branches::cc_sect(0),data->Branches::nphe(0))){
-		if(cuts::e_cc(data,envi)){
+		if(cuts::e_cc(data,envi,0)){
 			cc_e_pass = true;
 			_hists->Histogram::WQ2_Fill(envi,0,4,_W,_Q2);
 			_hists->Histogram::Fid_Fill(envi,0,physics::get_theta(data->Branches::cz(0)),physics::get_phi(data->Branches::cx(0),data->Branches::cy(0)),0,4,0,_W,data->Branches::p(0));
@@ -192,7 +192,7 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 			_hists->Histogram::SF_Fill(envi,0,data->Branches::p(0),data->Branches::etot(0),7,1,_W,sector[0]);
 			_hists->Histogram::CC_Fill(envi,0,data->Branches::cc_sect(0),data->Branches::cc_segm(0),data->Branches::nphe(0),7,1);
 		}
-		if(cuts::eid(data,envi)){//EID
+		if(cuts::eid(data,envi,0)){//EID
 			_hists->Histogram::WQ2_Fill(envi,0,8,_W,_Q2);
 			_hists->Histogram::Fid_Fill(envi,0,physics::get_theta(data->Branches::cz(0)),physics::get_phi(data->Branches::cx(0),data->Branches::cy(0)),0,8,0,_W,data->Branches::p(0));
 			_hists->Histogram::SF_Fill(envi,0,data->Branches::p(0),data->Branches::etot(0),8,0,_W,sector[0]);
@@ -257,7 +257,7 @@ Event_Class::Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogr
 				_hists->Histogram::DT_Fill(envi,0,part,data->Branches::p(h), data->Branches::sc_r(h), data->Branches::sc_t(h), data->Branches::sc_r(0), data->Branches::sc_t(0),0,0,_W,sector[h]);
 				//Sanity Cut
 				//if(data->Branches::q(h)==q_h && data->Branches::dc(h)!=0 && data->Branches::sc(h)!=0){
-				if(data->Branches::q(h)==q_h && cuts::h_sanity(data,envi,h)){
+				if(data->Branches::q(h)==q_h && cuts::h_sanity(data,envi,h,part)){
 					_hists->Histogram::Fid_Fill(envi,0,theta[h],phi[h],part+1,1,0,_W,data->Branches::p(h));
 					_hists->Histogram::DT_Fill(envi,0,part,data->Branches::p(h), data->Branches::sc_r(h), data->Branches::sc_t(h), data->Branches::sc_r(0), data->Branches::sc_t(0),1,0,_W,sector[h]);
 					//if(cuts::fid_cut(part+1,data->Branches::p(h),data->Branches::cx(h),data->Branches::cy(h),data->Branches::cz(h))){

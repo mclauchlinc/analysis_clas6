@@ -39,17 +39,19 @@ namespace cuts{
 	//Environment cuts
 	//Environment things
 	bool in_range(float W_, float Q2_, std::shared_ptr<Environment> envi);
-	bool e_sanity(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi);
-	bool h_sanity(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int par);
-	bool e_cc(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi);
-	bool e_ec(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi);
-	bool e_sf(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi);
-	bool e_fid(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi);
+	bool e_sanity(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int idx_);
+	bool h_sanity(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int idx_, int par);
+	bool e_cc(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int idx_);
+	bool e_ec(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int idx_);
+	bool e_sf(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int idx_);
+	bool e_fid(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int idx_);
+	//bool e_dt(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi);
 	bool h_fid(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int par, int had);
 	bool h_dt(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int par, int had);
 	bool pim_e_sep(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int par, int had);
 	bool elec_p_cut(int set, std::shared_ptr<Branches>, int part, int had);
-	bool eid(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi);
+	bool e_dt(int set, std::shared_ptr<Branches>, int part);
+	bool eid(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int idx_);
 	bool hid(int set, std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int par, int had);
 
 	bool p_miss(std::shared_ptr<Environment> envi);

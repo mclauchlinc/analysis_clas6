@@ -8,7 +8,7 @@
 //static int num_mixed_p_pip = 0; 
 
 static const int MAX_PARTS = 100; 
-static const int NUM_THREADS = 4;
+static const int NUM_THREADS = 1;
 
 static const float c_special = 29.9792458; //speed of light in cm/ns
 static const float c_convert = 10000000; //Convert c_special to m/s
@@ -254,6 +254,9 @@ static const std::string list3n = "three-";
 static const std::string list3h = "threeh";
 static const std::string lists1 = "sim_e16_1";
 static const std::string lists2 = "sim_pre";
+static const std::string lists3n = "sim_gsim_ngpp_nmcdata";
+static const std::string lists3y = "sim_gsim_ngpp_mcdata";
+static const std::string lists3 = "sim_pair";
 
 //Paths for file names
 static const std::string path1 = "/home/mclauchlinc/Desktop/analysis/nick_convert_e16.txt";
@@ -264,6 +267,9 @@ static const std::string path3p = "/Users/cmc/Desktop/analysis/NickSkim_e16_Plat
 static const std::string path3n = "/Users/cmc/Desktop/analysis/NickSkim_e16_PlateOUT.txt";
 static const std::string paths1 = "/Users/cmc/Desktop/analysis/simulation/sim_e16_group1.txt";
 static const std::string paths2 = "/Users/cmc/Desktop/analysis/simulation/sim_e16_pre_gpp.txt";
+static const std::string paths3n = "/Users/cmc/Desktop/analysis/analysis_clas6/Path_Files/gsim_no_gpp_nmcdata.txt";
+static const std::string paths3y = "/Users/cmc/Desktop/analysis/analysis_clas6/Path_Files/gsim_no_gpp_mcdata.txt";
+static const std::string paths3 = "/Users/cmc/Desktop/analysis/analysis_clas6/Path_Files/full_sim_pair.txt";
 
 //Run type for file lists {e16,e1f,e16sim,e1fsim} -> {1,2,3,4}
 static const int type1 = 1;
@@ -274,30 +280,39 @@ static const int type3p = 1;
 static const int type3n = 1; 
 static const int types1 = 3; 
 static const int types2 = 5; 
+static const int types3n = 5; 
+static const int types3y = 5; 
+static const int types3 = 1; 
 
 //Map of file lists to run type
-static std::unordered_map<std::string, std::string> filepath_map = 	{{list1,path1},
-																					{list2,path2},
-																					{list3,path3},
-																					{list4,path4},
-																					{list3p,path3p},
-																					{list3n,path3n},
-																					{lists1,paths1},
-																					{lists2,paths2}};
+static std::unordered_map<std::string, std::string> filepath_map = 	{	{list1,path1},
+																		{list2,path2},
+																		{list3,path3},
+																		{list4,path4},
+																		{list3p,path3p},
+																		{list3n,path3n},
+																		{lists1,paths1},
+																		{lists2,paths2},
+																		{lists3n,paths3n},
+																		{lists3y,paths3y},
+																		{lists3,paths3}};
 
-static std::unordered_map<std::string, int> filetype_map = 	{{list1,type1},
-																			{list2,type2},
-																			{list3,type3},
-																			{list4,type4},
-																			{list3p,type3p},
-																			{list3n,type3n},
-																			{lists1,types1},
-																			{lists2,types2}};
+static std::unordered_map<std::string, int> filetype_map = 	{	{list1,type1},
+																{list2,type2},
+																{list3,type3},
+																{list4,type4},
+																{list3p,type3p},
+																{list3n,type3n},
+																{lists1,types1},
+																{lists2,types2},
+																{lists3n,types3n},
+																{lists3y,types3y},
+																{lists3,types3}};
 
 static const char * species[] = {"ele","pro","pip","pim"};//4
 static const char * eid_cut[] = {"pre","sanity","fid","sf","min_cc","fid+sf","fid+cc","sf+cc","eid","bank","event"}; //11
 static const char * cut_ver[] = {"cut","anticut"};
-static const char * hid_cut[] = {"pre","sanity","fid","dt","hid","bank","event","pWQ2"}; //7
+static const char * hid_cut[] = {"pre","sanity","fid","dt","hid","bank","event"};//,"pWQ2"}; //7
 static const char * topologies[] = {"None","Pmiss","PIPmiss","PIMmiss","Zeromiss","ALLmiss"}; //6
 static const char * sec_list[] = {"all_sectors","sec1","sec2","sec3","sec4","sec5","sec6"}; //7`
 static const char * W_dep_list[] = {"No_W_Dep","W_Dep"};

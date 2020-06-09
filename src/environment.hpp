@@ -48,6 +48,7 @@ class Environment {
   bool _eid_ec = false; //Did eid include a min ec cut?
   bool _eid_cc = false; //Did eid include a min cc cut?
   bool _eid_sf = false; //Did eid include a sampling fraction cut?
+  bool _eid_dt = false; //Did eid include a delta t cut? 
   //Hadron cuts applied {p,pip,pim}
   bool _hid_fid[3] = {false,false,false};//Did hid include a fiducial cut?
   bool _hid_dt[3] = {false,false,false};//Did hid include a delta t cut?
@@ -105,6 +106,7 @@ class Environment {
   void env_eid_ec(bool e_ec_); //Did eid include a min ec cut?
   void env_eid_cc(bool e_cc_); //Did eid include a min cc cut?
   void env_eid_sf(bool e_sf_); //Did eid include a sampling fraction cut?
+  void env_eid_dt(bool e_dt_);
   //Hadron cuts applied {p,pip,pim}
   void env_hid_fid(int had_, bool fid_);//Did hid include a fiducial cut?
   void env_hid_dt(int had_, bool dt_);//Did hid include a delta t cut?
@@ -158,6 +160,7 @@ class Environment {
   bool was_eid_ec(); //Did eid include a min ec cut?
   bool was_eid_cc(); //Did eid include a min cc cut?
   bool was_eid_sf(); //Did eid include a sampling fraction cut?
+  bool was_eid_dt();
   //Hadron cuts applied {p,pip,pim}
   bool was_hid_fid(int species_);//Did hid include a fiducial cut?
   bool was_hid_dt(int species_);//Did hid include a delta t cut?

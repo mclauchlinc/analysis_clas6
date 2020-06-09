@@ -586,8 +586,8 @@ void Histogram::SF_Write(std::shared_ptr<Environment> _envi){
 void Histogram::DT_Make(std::shared_ptr<Environment> _envi){
 	char hname[100];
 	std::vector<long> space_dims(6);
-	space_dims[0] = 3;  //species
-	space_dims[1] = 8;//7;  //Cuts
+	space_dims[0] = 4;  //species
+	space_dims[1] = 7;  //Cuts
 	space_dims[2] = 30; //W Binning
 	space_dims[3] = 7; //Sector
 	space_dims[4] = 6; //topology
@@ -602,13 +602,13 @@ void Histogram::DT_Make(std::shared_ptr<Environment> _envi){
 		if(_envi->was_dt_plot(cart[0])){
 			if((cart[1] == 6 && cart[4]!=0) || (cart[1]!=6 && cart[4] ==0)){
 				if(cart[2] == 0){
-					sprintf(hname,"%s_DeltaT_%s_%s_%s_W:ALL_%s",species[cart[0]+1],hid_cut[cart[1]],cut_ver[cart[5]],sec_list[cart[3]],topologies[cart[4]]);
+					sprintf(hname,"%s_DeltaT_%s_%s_%s_W:ALL_%s",species[cart[0]],hid_cut[cart[1]],cut_ver[cart[5]],sec_list[cart[3]],topologies[cart[4]]);
 					DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]] = std::make_shared<TH2F>(hname,hname, DTxres, DTxmin, DTxmax, DTyres, DTymin, DTymax);
 					DT_made_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]] = true; 	
 				}else if(cart[3]==0 & cart[4] == 0 && cart[1]!=6){//Looking at specific Cuts on fiducial and pre cut regimes 
 					top = Wbin_start + cart[2]*Wbin_res;
 					bot = top - Wbin_res;
-					sprintf(hname,"%s_DeltaT_%s_%s_%s_W:%f-%f_%s",species[cart[0]+1],hid_cut[cart[1]],cut_ver[cart[5]],sec_list[cart[3]],bot,top,topologies[cart[4]]);
+					sprintf(hname,"%s_DeltaT_%s_%s_%s_W:%f-%f_%s",species[cart[0]],hid_cut[cart[1]],cut_ver[cart[5]],sec_list[cart[3]],bot,top,topologies[cart[4]]);
 					DT_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]] = std::make_shared<TH2F>(hname,hname, DTxres, DTxmin, DTxmax, DTyres, DTymin, DTymax);
 					DT_made_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]][cart[5]] = true;
 				}else{
@@ -647,6 +647,7 @@ void Histogram::DT_Fill(std::shared_ptr<Environment> _envi,int top, int part, fl
 }
 			
 void Histogram::DT_Fill(std::shared_ptr<Environment> _envi,int top, int part, float p, float dt, int cut, int anti, float W_, int sec){
+	//std::cout<<"Filling DT Plot" <<std::endl;
 	if(_envi->was_dt_plot(part)){
 		if(sec < 7){
 			if(cut!=6){//No event selection in the W variance. 
@@ -683,27 +684,27 @@ void Histogram::DT_Write(std::shared_ptr<Environment> _envi){
 		std::cout <<"Writing DT Plots: ";
 		char dir_name[100]; 
 		TDirectory* DT_plot = RootOutputFile->mkdir("DT_plots");
-		TDirectory* par_dt[3][9][2][8][6];//Particle, cut, anti
+		TDirectory* par_dt[4][9][2][8][6];//Particle, cut, anti
 		//std::cout<<"Did I get here?" <<std::endl; 
 		DT_plot->cd(); 
-		for(int i = 0; i<3; i++){
+		for(int i = 0; i<4; i++){
 			if(_envi->was_dt_plot(i)){
-				sprintf(dir_name,"%s_DT_plots",species[i+1]);
+				sprintf(dir_name,"%s_DT_plots",species[i]);
 				par_dt[i][0][0][0][0]= DT_plot->mkdir(dir_name);
 				DT_dir_made[i][0][0][0][0]=true;
 				//std::cout<<"Made pointer:" <<i <<" 0 0 0 0" <<std::endl;
-				for(int j = 1; j < 9; j++){//8; j++){//cut
-					sprintf(dir_name,"%s_DT_%s",species[i+1],hid_cut[j-1]);
+				for(int j = 1; j < 8; j++){//cut
+					sprintf(dir_name,"%s_DT_%s",species[i],hid_cut[j-1]);
 					par_dt[i][j][0][0][0] = par_dt[i][0][0][0][0]->mkdir(dir_name);
 					DT_dir_made[i][j][0][0][0]=true;
 					//std::cout<<"    Made Pointers" <<i <<j <<" 0 0 0"<<std::endl;
 					//W Dependence
-					sprintf(dir_name,"%s_DT_%s_%s",species[i+1],hid_cut[j-1],W_dep_list[1]);
+					sprintf(dir_name,"%s_DT_%s_%s",species[i],hid_cut[j-1],W_dep_list[1]);
 					par_dt[i][j][1][0][0] = par_dt[i][j][0][0][0]->mkdir(dir_name);
 					DT_dir_made[i][j][1][0][0]=true;
 					//std::cout<<"    Made Pointers" <<i <<j <<" 1 0 0"<<std::endl;
 					for(int k = 1; k < 8; k++){ //Sector 
-						sprintf(dir_name,"%s_DT_%s_%s",species[i+1],hid_cut[j-1],sec_list[k-1]);
+						sprintf(dir_name,"%s_DT_%s_%s",species[i],hid_cut[j-1],sec_list[k-1]);
 						par_dt[i][j][0][k][0] = par_dt[i][j][0][0][0]->mkdir(dir_name);
 						DT_dir_made[i][j][0][k][0]=true;
 						//std::cout<<"    Made Pointers" <<i <<j <<" 0 " <<k <<" 0"<<std::endl;
@@ -711,7 +712,7 @@ void Histogram::DT_Write(std::shared_ptr<Environment> _envi){
 						}
 					if(j == 7){//Event cut
 						for(int l = 1; l < 6; l++){ //topology 
-							sprintf(dir_name,"%s_DT_%s_%s",species[i+1],hid_cut[j-1],topologies[l]);
+							sprintf(dir_name,"%s_DT_%s_%s",species[i],hid_cut[j-1],topologies[l]);
 							par_dt[i][j][0][0][l] = par_dt[i][j][0][0][0]->mkdir(dir_name);
 							DT_dir_made[i][j][0][0][l]=true;
 							//std::cout<<"    Made Pointers" <<i <<j <<" 0 0 " <<k<<std::endl;
@@ -726,7 +727,7 @@ void Histogram::DT_Write(std::shared_ptr<Environment> _envi){
 
 		std::vector<long> space_dims(6);
 		space_dims[0] = 3;  //species
-		space_dims[1] = 8;//7;  //Cuts
+		space_dims[1] = 7;  //Cuts
 		space_dims[2] = 30; //W Binning
 		space_dims[3] = 7; //Sector
 		space_dims[4] = 6; //topology

@@ -214,77 +214,117 @@ bool cuts::in_range(float W_, float Q2_, std::shared_ptr<Environment> envi){
 	return pass; 
 }
 
-bool cuts::e_sanity(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi){
+bool cuts::e_sanity(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int idx_){
   bool pass = false; 
+  bool qcheck = false;
   bool dc = false;
   bool sc = false;
   bool ec = false;
   bool cc = false;
+  if(data->Branches::q(idx_) == -1){
+  	qcheck = true;
+  }
   //DC Cut
-  if(envi->was_dc_hit() && data->Branches::dc(0)){
+  if(envi->was_dc_hit() && data->Branches::dc(idx_)){
     dc = true;
   }else if(!(envi->was_dc_hit())){
     dc = true;
   }
-  if(envi->was_sc_hit() && data->Branches::sc(0)){
+  if(envi->was_sc_hit() && data->Branches::sc(idx_)){
     sc = true;
   }else if(!(envi->was_sc_hit())){
     sc = true;
   }
-  if(envi->was_ec_hit() && data->Branches::ec(0)){
+  if(envi->was_ec_hit() && data->Branches::ec(idx_)){
     ec = true;
   }else if(!(envi->was_ec_hit())){
     ec = true;
   }
-  if(envi->was_cc_hit() && data->Branches::cc(0) && !(envi->was_sim())){
+  if(envi->was_cc_hit() && data->Branches::cc(idx_) && !(envi->was_sim())){
     cc = true;
   }else if(!(envi->was_cc_hit()) || envi->was_sim()){
     cc = true;
   }
-  pass = dc && sc && ec && cc; 
+  pass = qcheck && dc && sc && ec && cc; 
   return pass; 
 }
-bool cuts::h_sanity(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int par){
-  bool pass = true;
+bool cuts::h_sanity(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int idx_, int par){
+  bool pass = false;
+  bool dc = false;
+  bool charge = false;
+  bool sc = false;
   //DC Cut
-  if(envi->was_dc_hit() && data->Branches::dc(par)){
-    pass &= true;
+  if(envi->was_dc_hit() && data->Branches::dc(idx_)){
+    dc = true;
+  }else{
+  	dc = false;
   }
-  if(envi->was_sc_hit() && data->Branches::sc(par)){
-   	pass &= true;
+  //SC
+  if(envi->was_sc_hit() && data->Branches::sc(idx_)){
+   	sc = true;
+  } else{
+  	sc = false;
+  }
+  //Charge Match
+  switch(par){
+  	case 0: 
+  		if(data->Branches::q(idx_) == 1){
+  			charge = true; 
+  		}else{
+  			charge = false;
+  		}
+  	break;
+  	case 1: 
+  		if(data->Branches::q(idx_) == 1){
+  			charge = true; 
+  		}else{
+  			charge = false;
+  		}
+  	break;
+  	case 2: 
+  		if(data->Branches::q(idx_) == -1){
+  			charge = true; 
+  		}else{
+  			charge = false;
+  		}
+  	break;
+  }
+  if(charge && dc && sc){
+  	pass = true;
   }
   return pass; 
 }
-bool cuts::e_cc(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi){
+bool cuts::e_cc(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int idx_){
 	bool cc = false;
 	if(!(envi->was_sim())){
-		if(envi->was_eid_cc() && cuts::min_cc(data->Branches::cc_segm(0),data->Branches::cc_sect(0),data->Branches::nphe(0))){
+		if(envi->was_eid_cc() && cuts::min_cc(data->Branches::cc_segm(idx_),data->Branches::cc_sect(idx_),data->Branches::nphe(idx_))){
 	    	cc = true;
 	  	}
 	}
   	return cc; 
 }
-bool cuts::e_ec(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi){
+bool cuts::e_ec(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int idx_){
 	bool ec = false;
-	if(envi->was_eid_ec() && cuts::min_ec(data->Branches::etot(0))){
+	if(envi->was_eid_ec() && cuts::min_ec(data->Branches::etot(idx_))){
     	ec = true;
   	}
   	return ec; 
 }
-bool cuts::e_sf(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi){
+bool cuts::e_sf(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int idx_){
 	bool sf = false;
-	if(envi->was_eid_sf() && cuts::sf_cut(data->Branches::p(0),data->Branches::etot(0),data->Branches::cx(0),data->Branches::cy(0))){
+	if(envi->was_eid_sf() && cuts::sf_cut(data->Branches::p(idx_),data->Branches::etot(idx_),data->Branches::cx(idx_),data->Branches::cy(idx_))){
     	sf = true;
   	}
   	return sf; 
 }
-bool cuts::e_fid(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi){
+bool cuts::e_fid(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int idx_){
 	bool fid = false;
-	if(envi->was_eid_fid() && cuts::fid_cut(0,data->Branches::p(0),data->Branches::cx(0),data->Branches::cy(0),data->Branches::cz(0))){
+	if(envi->was_eid_fid() && cuts::fid_cut(idx_,data->Branches::p(idx_),data->Branches::cx(idx_),data->Branches::cy(idx_),data->Branches::cz(idx_))){
     	fid = true;
   	}
   	return fid; 
 }
+
 bool cuts::h_fid(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int par, int had){
 	bool pass = false;
 	if(envi->was_hid_fid(had) && cuts::fid_cut(had+1,data->Branches::p(par),data->Branches::cx(par),data->Branches::cy(par),data->Branches::cz(par))){
@@ -294,7 +334,7 @@ bool cuts::h_fid(std::shared_ptr<Branches> data, std::shared_ptr<Environment> en
 }
 bool cuts::h_dt(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int par, int had){
 	bool pass = false;
-	if(envi->was_hid_dt(had) && cuts::delta_t_cut(had, data->Branches::p(par), data->Branches::sc_r(0), data->Branches::sc_r(par), data->Branches::sc_t(0), data->Branches::sc_t(par))){
+	if(envi->was_hid_dt(had) && cuts::delta_t_cut(had+1, data->Branches::p(par), data->Branches::sc_r(0), data->Branches::sc_r(par), data->Branches::sc_t(0), data->Branches::sc_t(par))){
     	pass = true;
   	}
   	return pass; 
@@ -370,29 +410,70 @@ bool cuts::elec_p_cut(int set, std::shared_ptr<Branches> data, int part, int had
 		pass = true;
 	}else{
 		//W width
-		if(p >= (-(W_-W_width)*(W_-W_width)+Q2_-mp*mp-2*mp*p_beam)/(2*mp) || p <= (-(W_+W_width)*(W_+W_width)+Q2_-mp*mp-2*mp*p_beam)/(2*mp)){
-			//Q2 Width
-			if(p >= (-(W_)*(W_-W_width)+(Q2_+Q2_width)-mp*mp-2*mp*p_beam)/(2*mp) || p <= (-(W_)*(W_)+(Q2_-Q2_width)-mp*mp-2*mp*p_beam)/(2*mp)){
-				pass = true; 
-			}
+		if(p >= (-(W_-W_width)*(W_-W_width)-(Q2_-Q2_width)+mp*mp+2*mp*p_beam)/(2*mp) || p <= (-(W_+W_width)*(W_+W_width)-(Q2_+Q2_width)+mp*mp+2*mp*p_beam)/(2*mp)){
+			pass == true;
 		}
 	}
 	return pass;
 }
 
-bool cuts::eid(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi){
+bool cuts::e_dt(int set, std::shared_ptr<Branches> data, int idx){
+	bool pass = false;
+	float W_width = 0.05;
+	float Q2_width = 0.05;
+	float p_beam = NAN; 
+	float W_ = physics::WP(set,data);
+	float Q2_ = physics::Qsquared(set,data);
+	float p = data->Branches::p(idx);
+	switch(set){
+		case 1:
+			p_beam = energy_e16;
+		break;
+		case 0:
+			p_beam = energy_e1f;
+		break;
+	}		
+	//W width
+	if(p <= (-(W_-W_width)*(W_-W_width)-(Q2_-Q2_width)+mp*mp+2*mp*p_beam)/(2*mp) && p >= (-(W_+W_width)*(W_+W_width)-(Q2_+Q2_width)+mp*mp+2*mp*p_beam)/(2*mp)){
+		pass == true;
+	}
+	return pass;
+
+}
+
+bool cuts::eid(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int idx_){
 	bool pass = true;
+	if(envi->was_dc_hit()){
+		if(data->Branches::dc(idx_)>0){
+			pass &= true;
+		}
+	}
+	if(envi->was_ec_hit()){
+		if(data->Branches::ec(idx_)>0){
+			pass &= true;
+		}
+	}
+	if(envi->was_sc_hit()){
+		if(data->Branches::sc(idx_)>0){
+			pass &= true;
+		}
+	}
+	if(envi->was_cc_hit()){
+		if(data->Branches::cc(idx_)>0){
+			pass &= true;
+		}
+	}
 	if(envi->was_eid_fid()){
-		pass &= cuts::e_fid(data,envi);
+		pass &= cuts::e_fid(data,envi,idx_);
 	}
 	if(envi->was_eid_sf()){
-		pass &= cuts::e_sf(data,envi);
+		pass &= cuts::e_sf(data,envi,idx_);
 	}
 	if(envi->was_eid_ec()){
-		pass &= cuts::e_ec(data,envi);
+		pass &= cuts::e_ec(data,envi,idx_);
 	}
 	if(envi->was_eid_cc()){
-		pass &= cuts::e_cc(data,envi);
+		pass &= cuts::e_cc(data,envi,idx_);
 	}
 	return pass; 
 }
@@ -400,17 +481,24 @@ bool cuts::eid(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi
 
 
 bool cuts::hid(int set, std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int par, int had){
-	bool pass = true;
+	bool pass = false;
+	bool fid = false;
+	bool san = false;
+	bool dt = false;
+	san = cuts::h_sanity(data,envi,par,had);
 	if(envi->was_hid_fid(had)){
-		pass &= cuts::h_fid(data,envi,par,had);
+		fid = cuts::h_fid(data,envi,par,had);
 	}
 	if(envi->was_hid_dt(had)){
-		pass &= cuts::h_dt(data,envi,par,had);
+		dt = cuts::h_dt(data,envi,par,had);
 	}
 	if(envi->was_hid_e()){
 		pass &= cuts::pim_e_sep(data,envi,par,had);
 	}
-	pass &= cuts::elec_p_cut(set,data,par,had);
+	//pass &= cuts::elec_p_cut(set,data,par,had);
+	if(san && fid && dt){
+		pass = true;
+	}
 	return pass; 
 }
 

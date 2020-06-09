@@ -147,6 +147,9 @@ void Environment::env_eid_sf(bool e_sf_)//Did eid include a sampling fraction cu
 {
 	_eid_sf = e_sf_; 
 }
+void Environment::env_eid_dt(bool e_dt_){
+	_eid_dt = e_dt_; 
+}
 //Hadron cuts applied {p,pip,pim}
 void Environment::env_hid_fid(int had_, bool fid_)//Did hid include a fiducial cut?
 {
@@ -351,6 +354,10 @@ bool Environment::was_eid_cc()//Did eid include a min cc cut?
 bool Environment::was_eid_sf()//Did eid include a sampling fraction cut?
 {
 	return _eid_sf; 
+}
+
+bool Environment::was_eid_dt(){
+	return _eid_dt;
 }
 //Hadron cuts applied {p,pip,pim}
 bool Environment::was_hid_fid(int species_)//Did hid include a fiducial cut?

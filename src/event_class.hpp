@@ -51,13 +51,13 @@ private:
 	float _weight = NAN;
 
 	//All four vectors in the center of mass frame 
-	TLorentzVector _beam;
-	TLorentzVector _elec;
-	TLorentzVector _gamma;
-	TLorentzVector _target;
-	TLorentzVector _pro;
-	TLorentzVector _pip;
-	TLorentzVector _pim;
+	TLorentzVector _beam = {NAN,NAN,NAN,NAN};
+	TLorentzVector _elec = {NAN,NAN,NAN,NAN};
+	TLorentzVector _gamma = {NAN,NAN,NAN,NAN};
+	TLorentzVector _target = {NAN,NAN,NAN,NAN};
+	TLorentzVector _pro = {NAN,NAN,NAN,NAN};
+	TLorentzVector _pip = {NAN,NAN,NAN,NAN};
+	TLorentzVector _pim = {NAN,NAN,NAN,NAN};
 
 	int good_electron = 0; 
 	int good_pro = 0;
@@ -142,7 +142,7 @@ private:
 	float _Q2t = NAN; 
 	
 public:
-	Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogram> _hists, int run_type, int plate_info, std::shared_ptr<Environment> eniv);//default to e16
+	Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogram> _hists, int run_type, int plate_info, std::shared_ptr<Environment> envi);//default to e16
 	//Run type reffers to simulation vs data
 	//~Event_Class();
 

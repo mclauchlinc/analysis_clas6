@@ -24,8 +24,10 @@ namespace physics{
 	float MM_event(int set, int squared, TLorentzVector k1_mu, TLorentzVector k2_mu, TLorentzVector k3_mu, TLorentzVector k4_mu={0.0,0.0,0.0,0.0});
 	float MM_event(int squared, TLorentzVector k0_mu, TLorentzVector k1_mu, TLorentzVector k2_mu, TLorentzVector k3_mu, TLorentzVector k4_mu={0.0,0.0,0.0,0.0});
 	float get_theta(float cz_);//in lab frame
+	float get_theta(int part, std::shared_ptr<Branches> data);
 	float get_phi(float cx_, float cy_);//in lab frame
-	float get_phi_pos(float c_, float cy_);//in lab frame, but going to 360 rather than -180->180. Keeping sector 1 centered on 0 degrees. 
+	float get_phi(int part, std::shared_ptr<Branches> data);//in lab frame
+	float get_phi_pos(float cx_, float cy_);//in lab frame, but going to 360 rather than -180->180. Keeping sector 1 centered on 0 degrees. 
 	int get_sector(float phi_);//Phi must be from lab frame
 	float phi_center(float phi_);//Center phi within the sector
 
@@ -33,6 +35,7 @@ namespace physics{
 	float vert_e(float d, float t);
 	float vert_h(float p, float d, float t, float m);
 	float delta_t(int part, float p, float d, float t, float d0, float t0);
+	float delta_t(int part, std::shared_ptr<Branches> data, int idx);
 
 
 	//Math

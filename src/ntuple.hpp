@@ -29,7 +29,7 @@ private:
 	Float_t _MM[3]= {NAN,NAN,NAN};//{p/pip,p/pim,pip/pim}
 	Float_t _theta[3]{NAN,NAN,NAN};//{p,pip,pim}
 	Float_t _alpha[3]{NAN,NAN,NAN};//[{pim,p},{pp,pip}],[{p,pp},{pip,pim}],[{pip,p},{pp,pim}]
-	Int_t _run_type= 0;//{1,2,3,4}->{e16,e1f,e16sim,e1f sim} 
+	Int_t _run_type= 0;//{1,2,3,4,5,6}->{e16,e1f,e16sim,e1f sim, e16sim_thrown, e1f sim_thrown}
 	Float_t _weight = NAN; 
 
 	//Variables for the individual threads
@@ -70,7 +70,7 @@ private:
 	TList* _the_forest;
 	//TTree* _b_tree[NUM_THREADS]; 
 	//std::shared_ptr<TDirectory> _almanac; 
-	int alive; 
+	int alive = 0; 
 
 public:
 	forest(int is_alive);//-1 thread_id gives the whole tree, but the others give pieces of trees

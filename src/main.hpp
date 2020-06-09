@@ -4,7 +4,7 @@
 #include <iostream>
 #include "TFile.h"
 #include "TH1.h"
-#include "event_class.hpp"
+//#include "event_class.hpp"
 #include "histogram.hpp" 
 #include "constants.hpp"
 #include "functions.hpp"
@@ -12,6 +12,7 @@
 #include "ntuple.hpp"
 #include "environment.hpp"
 #include "setup.hpp"
+#include "event_analysis.hpp"
 
 std::string comp; //Variable for choosing which data set will be used
 char* output_name;//Variable for the output file name. This is reassigned through input parameters
@@ -50,12 +51,14 @@ size_t run(std::shared_ptr<TChain> _chain, std::shared_ptr<Histogram> _hists, st
 		total_com++; 
 
 		//Analyze the event and look for particle ID and topology 
-		auto event = std::make_shared<Event_Class>(data,_hists,run_type,plate_,_envi);//All event selection happens in here 
+		//auto event = std::make_shared<Event_Class>(data,_hists,run_type,plate_,_envi);//All event selection happens in here 
+		std::cout<<"Going to event #" <<curr_event+1 <<std::endl;
+		auto analysis = std::make_shared<Analysis>(data,_hists,_envi,run_type);
 		//num_ppip += event->Event_Class::Get_ppip();
-		if(event->Event_Class::is_valid()){//event->Event::is_valid()){ //changed this out just to see if it will create the files
-			good_event++;
-			a_forest->forest::Fill_Thread_Tree(event,good_event,thread_id);//Filling the individual thread tree to later be merged 
-		}
+		//if(event->Event_Class::is_valid()){//event->Event::is_valid()){ //changed this out just to see if it will create the files
+		//	good_event++;
+		//	a_forest->forest::Fill_Thread_Tree(event,good_event,thread_id);//Filling the individual thread tree to later be merged 
+		//}
 	}
 }
 

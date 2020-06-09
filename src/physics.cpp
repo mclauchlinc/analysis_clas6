@@ -143,9 +143,17 @@ float physics::get_theta(float cz_){
 	return TMath::ACos(cz_)*degree;
 }
 
+float physics::get_theta(int part, std::shared_ptr<Branches> data){
+	return physics::get_theta(data->Branches::cz(part));
+}
+
 float physics::get_phi(float cx_, float cy_){
 	float degree = 180.0/TMath::Pi();
 	return TMath::ATan2(cy_,cx_)*degree;
+}
+
+float physics::get_phi(int part, std::shared_ptr<Branches> data){
+	return physics::get_phi(data->Branches::cx(part), data->Branches::cy(part));
 }
 
 float physics::get_phi_pos(float cx_, float cy_){
@@ -254,6 +262,27 @@ float physics::delta_t(int part, float p, float d, float t, float d0, float t0){
 	}
 	float vertex_e = physics::vert_e(d0,t0);
 	float vertex_h = physics::vert_h(p,d,t,mass);
+	return vertex_e - vertex_h;
+}
+
+float physics::delta_t(int part, std::shared_ptr<Branches> data, int idx){
+	float mass = -99;
+	switch(part){
+		case 0:
+			mass = me; 
+		break;
+		case 1:
+			mass = mp; 
+		break;
+		case 2:
+			mass = mpi;
+		break;
+		case 3:
+			mass = mpi;
+		break;
+	}
+	float vertex_e = physics::vert_e(data->Branches::sc_r(0),data->Branches::sc_t(0));
+	float vertex_h = physics::vert_h(data->Branches::p(part),data->Branches::sc_r(idx),data->Branches::sc_t(idx),mass);
 	return vertex_e - vertex_h;
 }
 

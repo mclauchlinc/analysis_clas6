@@ -120,7 +120,7 @@ void Setup::set_envi(std::shared_ptr<Environment> setup, int run_type){
 void Setup::make_envi_file(const std::string& output_name, std::shared_ptr<Environment> envi){
 	std::string envi_name = "$name_envi.txt";
 	fun::replace(envi_name, "$name", output_name);
-	std::cout<<" envi file name: " <<envi_name <<std::endl;
+	std::cout<<"	envi file name: " <<envi_name <<std::endl;
 	std::ofstream envi_f;
 	envi_f.open(envi_name);//main.hpp
 	time_t now = time(0);

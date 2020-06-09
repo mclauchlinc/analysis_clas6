@@ -104,10 +104,10 @@ protected:
 
 	 //Making the Histograms
 	TH2F_ptr WQ2_hist[11][6][2];//electron cuts, topologies (including pre), Recon vs. Raw (for data this should always be "Recon")
-	TH2F_ptr Fid_hist[7][4][11][30][12][6][2];//sector, species, cut, W binning, p binning, topology
+	TH2F_ptr Fid_hist[7][4][11][30][12][6][2];//sector, species, cut, W binning, p binning, topology, anti
 	TH2F_ptr SF_hist[10][30][7][6][2];//cuts, W Binning, Sector, topology
-	TH2F_ptr DT_hist[3][7][30][7][6][2]; //particle, cuts, W binning, sector, topology
-	TH1F_ptr CC_hist[6][18][11][4][6][2]; //Sector, segment, cut, side of detector, topology
+	TH2F_ptr DT_hist[4][7][30][7][6][2]; //particle, cuts, W binning, sector, topology
+	TH1F_ptr CC_hist[6][18][11][4][6][2]; //Sector, segment, cut, side of detector, topology, anti
 	TH1F_ptr MM_hist[4][3][2][2];//topology, cut, squared v linear, fitting vs. not fitting plots
 
 	bool Fid_made_hist[7][4][11][30][12][6][2];
@@ -118,10 +118,10 @@ protected:
 	bool CC_fill_hist[6][18][11][4][6][2];
 	bool CC_write_hist[6][18][11][4][6][2];
 
-	bool DT_made_hist[3][8][30][7][6][2];//Added one to the second bin for cuts to all for the electron WQ2
-	bool DT_fill_hist[3][8][30][7][6][2];
-	bool DT_dir_hist[3][8][30][7][6][2];
-	bool DT_dir_made[3][9][2][8][6];
+	bool DT_made_hist[4][7][30][7][6][2];//Added one to the second bin for cuts to all for the electron WQ2
+	bool DT_fill_hist[4][7][30][7][6][2];
+	bool DT_dir_hist[4][7][30][7][6][2];
+	bool DT_dir_made[4][8][2][8][6];
 
 	bool WQ2_made_hist[11][6][2];
 	bool WQ2_dir_made[11][6][2];
@@ -157,23 +157,28 @@ public:
 	//Fiducial Cuts
 	void Fid_Make(std::shared_ptr<Environment> _envi );
 	void Fid_Fill(std::shared_ptr<Environment> _envi, int top, float theta, float phi, int part, int cut, int cutvanti, float W_, float p);
+	//void Fid_Fill(std::shared_ptr<Environment> _envi, Particle par_, float W_);
 	void Fid_Write(std::shared_ptr<Environment> _envi);
 	//Sampling Fraction Cuts
 	void SF_Make(std::shared_ptr<Environment> _envi );
 	void SF_Fill(std::shared_ptr<Environment> _envi, int top, float p, float en, int cut, int cva, float W_, int sec);
+	//void SF_Fill(std::shared_ptr<Environment> _envi, Particle par_, float W_);
 	void SF_Write(std::shared_ptr<Environment> _envi);
 	//Delta T Cuts
 	void DT_Make(std::shared_ptr<Environment> _envi );
 	void DT_Fill(std::shared_ptr<Environment> _envi, int top, int part, float p, float d, float t, float d0, float t0, int cut, int anti, float W_, int sec);
-	void DT_Fill(std::shared_ptr<Environment> _envi,int top, int part, float p, float dt, int cut, int anti, float W_, int sec);
+	void DT_Fill(std::shared_ptr<Environment> _envi, int top, int part, float p, float dt, int cut, int anti, float W_, int sec);
+	//void DT_Fill(std::shared_ptr<Environment> _envi, Particle par_, float W_);
 	void DT_Write(std::shared_ptr<Environment> _envi);
 	//Min CC Cuts
 	void CC_Make(std::shared_ptr<Environment> _envi );
 	void CC_Fill(std::shared_ptr<Environment> _envi, int top, int sec, int segm, int nphe, int cut, int anti);
+	//void CC_Fill(std::shared_ptr<Environment> _envi, Particle par_);
 	void CC_Write(std::shared_ptr<Environment> _envi);
 	//Missing Mass Cuts
 	void MM_Make(std::shared_ptr<Environment> _envi );
 	void MM_Fill(std::shared_ptr<Environment> _envi, int top, float mm, int cut, int square, bool fit);
+	//void MM_Fill(std::shared_ptr<Environment> _envi, Particle _par);
 	void MM_Write(std::shared_ptr<Environment> _envi);
 
 	void Friend_Make(std::shared_ptr<Environment> _envi);
@@ -186,6 +191,12 @@ public:
 	int * Friend_binning(int top, float W_, float Q2_, float MM_, float theta_, float alpha_, float phi_ , int channel);
 	void Friend_Fill(std::shared_ptr<Environment> _envi, int top_, float W_, float Q2_, float MM_, float theta_, float alpha_, float phi_ , int chan_, float weight_);
 	void Friend_Write(std::shared_ptr<Environment> _envi);
+
+	//**Include functions to fill histograms from events and particle
+
+
+
+
 	/*//Signature Plots //We'll get there
 	void MM2_Make();
 	void MM2_Fill(int top, float mm, float W_, float Q2_);

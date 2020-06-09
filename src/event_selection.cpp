@@ -1,7 +1,7 @@
 #include "event_selection.hpp"
 
 
-bool Selection::Event_Selection(TLorentzVector k_mu_, Particle elec_, Particle h1_, Particle h2_){
+/*bool Selection::Event_Selection(TLorentzVector k_mu_, Particle elec_, Particle h1_, Particle h2_){
 	bool pass = false;
 	float MM = physics::MM_event(0,k_mu_,elec_.Particle::Par_4Vec(),h1_.Particle::Par_4Vec(),h2_.Particle::Par_4Vec());
 	if(h1_.Particle::Is_Pro() && h2_.Particle::Is_Pip()){ //Pim missing
@@ -18,8 +18,22 @@ bool Selection::Event_Selection(TLorentzVector k_mu_, Particle elec_, Particle h
 	bool pass = false;
 	float MM = physics::MM_event(0,k_mu_,elec_.Particle::Par_4Vec(),h1_.Particle::Par_4Vec(),h2_.Particle::Par_4Vec(),h3_.Particle::Par_4Vec());
 	if(h1_.Particle::Is_Pro() && h2_.Particle::Is_Pip() && h3_.Particle::Is_Pim()){ //Pim missing
-		pass = cuts::MM_cut(2,MM);
+		pass = cuts::MM_cut(3,MM);
 	}
+	return pass; 
+}*/
+
+bool Selection::Event_Selection( int top_, TLorentzVector k_mu_, TLorentzVector elec_, TLorentzVector h1_, TLorentzVector h2_){
+	bool pass = false;
+	float MM = physics::MM_event(0,k_mu_,elec_,h1_,h2_);
+	pass = cuts::MM_cut(top_,MM);
+	return pass; 
+}
+
+bool Selection::Event_Selection( int top_, TLorentzVector k_mu_, TLorentzVector elec_, TLorentzVector h1_, TLorentzVector h2_, TLorentzVector h3_){
+	bool pass = false;
+	float MM = physics::MM_event(0,k_mu_,elec_,h1_,h2_,h3_);
+	pass = cuts::MM_cut(top_,MM);
 	return pass; 
 }
 
