@@ -45,8 +45,11 @@ private:
 
 public:
 	Event();
-	void Fill_Event(std::shared_ptr<Environment> envi_, std::shared_ptr<Histogram> hist_, int top_, float W_, float Q2_, Particle p1, Particle p2, Particle p3, int hel_ = 1);
-	void Fill_Event(std::shared_ptr<Environment> envi_, std::shared_ptr<Histogram> hist_, int top_, float W_, float Q2_, Particle p1, Particle p2, Particle p3, Particle p4, int hel_ = 1);
+	void COM_4Vec();
+	void Vars();
+	void Fill_Event(std::shared_ptr<Environment> envi_, std::shared_ptr<Histogram> hist_, int top_, float W_, float Q2_, Particle &p1, Particle &p2, Particle &p3, int hel_ = 1);
+	void Fill_Event(std::shared_ptr<Environment> envi_, std::shared_ptr<Histogram> hist_, int top_, float W_, float Q2_, Particle &p1, Particle &p2, Particle &p3, Particle &p4, int hel_ = 1);
+	void Fill_Event_Hists(std::shared_ptr<Environment> envi_, std::shared_ptr<Histogram> hist_);
 	
 	void Assign_Weight(float weight_);
 

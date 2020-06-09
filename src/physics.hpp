@@ -51,14 +51,22 @@ namespace physics{
 	float Sin_Vecs(TVector3 v1, TVector3 v2);
 	float Sin_Vecs(TLorentzVector p1, TLorentzVector p2); //Get the Sin between two vectors 
 	float Get_phie(int set, TLorentzVector p0);
+	float Get_phie(TLorentzVector k0, TLorentzVector p0);
 	void Rotate_4Vec(int set, float theta, float phi, float phie, TLorentzVector &p1); //Rotate Four vectors along the theta and phi angles
+	void Rotate_4Vec(float theta, float phi, float phie, TLorentzVector &p1);
 	void Boost_4Vec(float beta, TLorentzVector &p1 );// Boost a four vector in the z direction 
 	void COM_gp(int set, TLorentzVector &p0, TLorentzVector &p1, TLorentzVector &p2, TLorentzVector &p3); //Bring four vectors into the COM reference frame for excited nucleon 
-	float alpha(int top, TLorentzVector p1, TLorentzVector p2, TLorentzVector p3, TLorentzVector p4, int set); //Alpha angle between scattering planes
-	float epsilon(int set, float Energy, float Q_2); //Virtual photon transverse polarization 
+	void COM_gp(TLorentzVector &k0, TLorentzVector &p0, TLorentzVector &p1, TLorentzVector &p2, TLorentzVector &p3);
+	TLorentzVector COM_gp(int par, TLorentzVector k0, TLorentzVector p0, TLorentzVector p1, TLorentzVector p2, TLorentzVector p3);
+	float alpha(int top, TLorentzVector p1, TLorentzVector p2, TLorentzVector p3, TLorentzVector p4, int set);
+	float alpha(int top, TLorentzVector k0, TLorentzVector p1, TLorentzVector p2, TLorentzVector p3, TLorentzVector p4, bool COM); //Alpha angle between scattering planes
+	float epsilon(int set, float Energy, float Q_2); //Virtual photon transverse polarization
+	float epsilon(TLorentzVector k0, float Energy, float Q_2); 
 	float MM_2(TLorentzVector p1, TLorentzVector p2);//Get the MM of a two particle system
 	float gamma_nu(int set, float Ep, float Q_2, float W_);//Virtual Photon Flux
 	int Qfaraday(int q_last, int q_next, int q_tot);//Faraday Cup counting 
+	float Ev_Theta(int top, TLorentzVector k0, TLorentzVector p1, TLorentzVector p2, TLorentzVector p3, TLorentzVector p4, bool COM);
+	float Ev_MM(int top, TLorentzVector k0, TLorentzVector p1, TLorentzVector p2, TLorentzVector p3, TLorentzVector p4, bool COM);
 
 
 	
