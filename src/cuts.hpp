@@ -22,6 +22,7 @@ namespace cuts{
 	float dt_p_high(float p);
 	bool delta_t_cut_iso(int part, int part_iso, float p, float d0, float d, float t0, float t);
 	bool delta_t_cut(int part, float p, float d0, float d, float t0, float t);
+	bool delta_t_cut(int species_, float p_, float dt_);
 
 	//CC Cuts
 	bool min_cc(int cc_segm, int cc_sect, int nphe);

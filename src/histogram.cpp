@@ -675,7 +675,7 @@ void Histogram::DT_Fill(std::shared_ptr<Environment> _envi,int top, int part, fl
 
 void Histogram::DT_Write(std::shared_ptr<Environment> _envi){
 	bool do_dt_plots = false;
-	for(int i = 0; i< 3; i++){
+	for(int i = 0; i< 4; i++){
 		if(_envi->was_dt_plot(i)){
 			do_dt_plots = true;
 		}
@@ -687,7 +687,7 @@ void Histogram::DT_Write(std::shared_ptr<Environment> _envi){
 		TDirectory* par_dt[4][9][2][8][6];//Particle, cut, anti
 		//std::cout<<"Did I get here?" <<std::endl; 
 		DT_plot->cd(); 
-		for(int i = 0; i<4; i++){
+		for(int i = 0; i<4; i++){//Species
 			if(_envi->was_dt_plot(i)){
 				sprintf(dir_name,"%s_DT_plots",species[i]);
 				par_dt[i][0][0][0][0]= DT_plot->mkdir(dir_name);
@@ -726,7 +726,7 @@ void Histogram::DT_Write(std::shared_ptr<Environment> _envi){
 		//std::cout<<"Made it through making directories" <<std::endl;
 
 		std::vector<long> space_dims(6);
-		space_dims[0] = 3;  //species
+		space_dims[0] = 4;  //species
 		space_dims[1] = 7;  //Cuts
 		space_dims[2] = 30; //W Binning
 		space_dims[3] = 7; //Sector
@@ -1201,6 +1201,34 @@ void Histogram::Friend_Write(std::shared_ptr<Environment> _envi){
 		}
 	}
 	
+}
+
+/*
+void Histogram::Event_Particle_Hist(std::shared_ptr<Environment> envi_, const Particle p1, float W_, int top_, int par_, bool pass_){
+	std::cout<<"		Filling Particle Event" <<std::endl;
+	int pass = -1; 
+	if(pass_){
+		pass = 0; 
+	}else{
+		pass = 1; 
+	}
+	//Electron
+	if(pass != -1){
+		if(par_ == 0 && _pid[0]){
+			std::cout<<"			Electron cc_segm: " <<_cc_seg <<std::endl;
+			Fid_Fill(envi_,top_+1,_theta,_phi,0,10,pass,W_,_p);
+			SF_Fill(envi_,top_+1,_p,_etot,10,pass,W_,physics::get_sector(_phi));
+			CC_Fill(envi_,top_+1,physics::get_sector(_phi),_cc_seg,_nphe,10,pass);
+		}else if(par_ ==0){
+			std::cout<<"			Electron issue, friend" <<std::endl;
+		}
+		if(par_ != 0 && _pid[par_]){
+			Fid_Fill(envi_,top_+1,_theta,_phi,par_,6,pass,W_,_p);
+			DT_Fill(envi_,top_+1,par_,_p,_dt[par_],6,pass,W_,physics::get_sector(_phi));
+		}else if(par_ !=0){
+			std::cout<<"			Hadron issue, friend" <<std::endl;
+		}
+	}
 }
 /*
 void Histogram::Fill_EID(std::shared_ptr<Particle> par, float W_, float Q2_){

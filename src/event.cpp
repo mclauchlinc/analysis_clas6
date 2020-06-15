@@ -19,32 +19,32 @@ void Event::Vars(){
 	}
 }
 
-void Event::Fill_Event(std::shared_ptr<Environment> envi_, std::shared_ptr<Histogram> hist_, int top_, float W_, float Q2_, Particle &p1, Particle &p2, Particle &p3, int hel_){
+void Event::Fill_Event(std::shared_ptr<Environment> envi_, std::shared_ptr<Histogram> hist_, int top_, float W_, float Q2_,  Particle p1,  Particle p2,  Particle p3, int hel_){
 	if(top_ == 3){
 		std::cout<<"Incorrectly Filled Event: Not enough particles for topology" <<std::endl;
 	}else{ 
 		_W = W_;
 		_Q2 = Q2_;
 		_hel = hel_;
-		std::cout<<"Fill event p1" <<std::endl;
-		std::cout<<"		Inside Event pt1 Fill for event Combo: " <<std::endl;
-		std::cout<<"			Elec " <<p1.Particle::Get_idx() <<" sim: " <<p1.Particle::Is_Elec() <<"| Pro " <<p2.Particle::Get_idx() <<" sim: " <<p2.Particle::Is_Pro() <<"| Pip " <<p3.Particle::Get_idx() <<" sim: " <<p3.Particle::Is_Pip() <<std::endl;
+		//std::cout<<"	Fill event p1" <<std::endl;
+		//std::cout<<"		Inside Event pt1 Fill for event Combo: " <<std::endl;
+		
 		//Check to make sure all particles were either simulated or not
 		if(p1.Particle::Is_Sim() == p2.Particle::Is_Sim() && p2.Particle::Is_Sim() == p3.Particle::Is_Sim()){
 			_sim = p1.Particle::Is_Sim();
-			std::cout<<"Fill event p2" <<std::endl;
-			std::cout<<"		Inside Event pt2 Fill for event Combo: " <<std::endl;
-			std::cout<<"			Elec " <<p1.Particle::Get_idx() <<" sim: " <<p1.Particle::Is_Elec() <<"| Pro " <<p2.Particle::Get_idx() <<" sim: " <<p2.Particle::Is_Pro() <<"| Pip " <<p3.Particle::Get_idx() <<" sim: " <<p3.Particle::Is_Pip() <<std::endl;
+			//std::cout<<"	Fill event p2" <<std::endl;
+			//std::cout<<"		Inside Event pt2 Fill for event Combo: " <<std::endl;
+			
 			if(p1.Particle::Is_Thrown() == p2.Particle::Is_Thrown() && p2.Particle::Is_Thrown() == p3.Particle::Is_Thrown()){
-				std::cout<<"Fill event p3" <<std::endl;
-				std::cout<<"		Inside Event pt3a Fill for event Combo: " <<std::endl;
-				std::cout<<"			Elec " <<p1.Particle::Get_idx() <<" sim: " <<p1.Particle::Is_Elec() <<"| Pro " <<p2.Particle::Get_idx() <<" sim: " <<p2.Particle::Is_Pro() <<"| Pip " <<p3.Particle::Get_idx() <<" sim: " <<p3.Particle::Is_Pip() <<std::endl;
+				//std::cout<<"	Fill event p3" <<std::endl;
+				//std::cout<<"		Inside Event pt3a Fill for event Combo: " <<std::endl;
+				
 				_thrown = p1.Particle::Is_Thrown();
-				std::cout<<"		Inside Event pt3b Fill for event Combo: " <<std::endl;
-				std::cout<<"			Elec " <<p1.Particle::Get_idx() <<" sim: " <<p1.Particle::Is_Elec() <<"| Pro " <<p2.Particle::Get_idx() <<" sim: " <<p2.Particle::Is_Pro() <<"| Pip " <<p3.Particle::Get_idx() <<" sim: " <<p3.Particle::Is_Pip() <<std::endl;
-				_k1 = physics::Set_k_mu(p1.Particle::Get_set());
-				std::cout<<"		Inside Event pt3c Fill for event Combo: " <<std::endl;
-				std::cout<<"			Elec " <<p1.Particle::Get_idx() <<" sim: " <<p1.Particle::Is_Elec() <<"| Pro " <<p2.Particle::Get_idx() <<" sim: " <<p2.Particle::Is_Pro() <<"| Pip " <<p3.Particle::Get_idx() <<" sim: " <<p3.Particle::Is_Pip() <<std::endl;
+				//std::cout<<"		Inside Event pt3b Fill for event Combo: " <<std::endl;
+				
+				//_k1 = physics::Set_k_mu(p1.Particle::Get_set());
+				//std::cout<<"		Inside Event pt3c Fill for event Combo: " <<std::endl;
+				
 				switch(top_){
 					case 0: //Electron, Pip, Pim => Pro Missing
 						if(p1.Particle::Is_Elec() && p2.Particle::Is_Pip() && p3.Particle::Is_Pim()){
@@ -111,47 +111,57 @@ void Event::Fill_Event(std::shared_ptr<Environment> envi_, std::shared_ptr<Histo
 						}
 					break;
 					case 2://PIM missing
-						std::cout<<"Fill event p4" <<std::endl;
-						std::cout<<"		Inside Event pt1 Fill for event Combo: " <<std::endl;
-							std::cout<<"			Elec " <<p1.Particle::Get_idx() <<" sim: " <<p1.Particle::Is_Elec() <<"| Pro " <<p2.Particle::Get_idx() <<" sim: " <<p2.Particle::Is_Pro() <<"| Pip " <<p3.Particle::Get_idx() <<" sim: " <<p3.Particle::Is_Pip() <<std::endl;
+						//std::cout<<"	Fill event p4" <<std::endl;
+						//std::cout<<"		Inside Event pt1 Fill for event Combo: " <<std::endl;
+							
 						if(p1.Particle::Is_Elec() && p2.Particle::Is_Pro() && p3.Particle::Is_Pip()){
-							std::cout<<"		Inside Event pt5 Fill for event Combo: " <<std::endl;
-							std::cout<<"			Elec " <<p1.Particle::Get_idx() <<" sim: " <<p1.Particle::Is_Elec() <<"| Pro " <<p2.Particle::Get_idx() <<" sim: " <<p2.Particle::Is_Pro() <<"| Pip " <<p3.Particle::Get_idx() <<" sim: " <<p3.Particle::Is_Pip() <<std::endl;
+						//	std::cout<<"		Inside Event pt5a Fill for event Combo: " <<std::endl;
+							
 							_filled_correctly = true; 
 							_p_lab[0] = p1.Particle::Get_p();
 							_p_lab[1] = p2.Particle::Get_p();
 							_p_lab[2] = p3.Particle::Get_p();
+							//std::cout<<"		Inside Event pt5b Fill for event Combo: " <<std::endl;
+							
 							_theta_lab[0] = p1.Particle::Get_theta();
 							_theta_lab[1] = p2.Particle::Get_theta();
 							_theta_lab[2] = p3.Particle::Get_theta();
+							//std::cout<<"		Inside Event pt5c Fill for event Combo: " <<std::endl;
+							
 							_phi_lab[0] = p1.Particle::Get_phi();
 							_phi_lab[1] = p2.Particle::Get_phi();
 							_phi_lab[2] = p3.Particle::Get_phi();
+							//std::cout<<"		Inside Event pt5d Fill for event Combo: " <<std::endl;
+							
 							_vec_lab[0] = physics::Make_4Vector(true,_p_lab[0],_theta_lab[0],_phi_lab[0],me);
 							_vec_lab[1] = physics::Make_4Vector(true,_p_lab[1],_theta_lab[1],_phi_lab[1],mp);
 							_vec_lab[2] = physics::Make_4Vector(true,_p_lab[2],_theta_lab[2],_phi_lab[2],mpi);
-							_top[2] = true;
+							//std::cout<<"		Inside Event pt5e Fill for event Combo: " <<std::endl;
+							
+							_top[2] = true; //For some reason this misplaces the index for electrons
 							hist_->Histogram::MM_Fill(envi_,2,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2]),0,0,true);
 							hist_->Histogram::MM_Fill(envi_,2,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2]),0,1,true);
-							std::cout<<"		Inside Event pt6 Fill for event Combo: " <<std::endl;
-							std::cout<<"			Elec " <<p1.Particle::Get_idx() <<" sim: " <<p1.Particle::Is_Elec() <<"| Pro " <<p2.Particle::Get_idx() <<" sim: " <<p2.Particle::Is_Pro() <<"| Pip " <<p3.Particle::Get_idx() <<" sim: " <<p3.Particle::Is_Pip() <<std::endl;
+							//std::cout<<"		Inside Event pt6 Fill for event Combo: " <<std::endl;
+							
 							_pass = Selection::Event_Selection(top_,_k1, _vec_lab[0], _vec_lab[1], _vec_lab[2]);
 							p1.Particle::Fill_Par_Event(envi_,hist_,_W,top_,0,_pass); 
 							p2.Particle::Fill_Par_Event(envi_,hist_,_W,top_,1,_pass); 
 							p3.Particle::Fill_Par_Event(envi_,hist_,_W,top_,2,_pass);
-							std::cout<<"		Inside Event pt7 Fill for event Combo: " <<std::endl;
-							std::cout<<"			Elec " <<p1.Particle::Get_idx() <<" sim: " <<p1.Particle::Is_Elec() <<"| Pro " <<p2.Particle::Get_idx() <<" sim: " <<p2.Particle::Is_Pro() <<"| Pip " <<p3.Particle::Get_idx() <<" sim: " <<p3.Particle::Is_Pip() <<std::endl;
+							//std::cout<<"		Inside Event pt7 Fill for event Combo: " <<std::endl;
+							
 							if(_pass){
 								_vec_lab[3] = _k1 + p_mu - _vec_lab[0] - _vec_lab[1] - _vec_lab[2]; 
 								hist_->Histogram::MM_Fill(envi_,2,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2]),1,0,true);
 								hist_->Histogram::MM_Fill(envi_,2,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2]),1,1,true);
-								std::cout<<"		Inside Event pt8 Fill for event Combo: " <<std::endl;
-								std::cout<<"			Elec " <<p1.Particle::Get_idx() <<" sim: " <<p1.Particle::Is_Elec() <<"| Pro " <<p2.Particle::Get_idx() <<" sim: " <<p2.Particle::Is_Pro() <<"| Pip " <<p3.Particle::Get_idx() <<" sim: " <<p3.Particle::Is_Pip() <<std::endl;
+								//std::cout<<"		Inside Event pt8 Fill for event Combo: " <<std::endl;
+								
 							}else{
 								hist_->Histogram::MM_Fill(envi_,2,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2]),2,0,true);
 								hist_->Histogram::MM_Fill(envi_,2,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2]),2,1,true);
-								std::cout<<"		Inside Event pt9 Fill for event Combo: " <<std::endl;
-								std::cout<<"			Elec " <<p1.Particle::Get_idx() <<" sim: " <<p1.Particle::Is_Sim() <<"| Pro " <<p2.Particle::Get_idx() <<" sim: " <<p2.Particle::Is_Pro() <<"| Pip " <<p3.Particle::Get_idx() <<" sim: " <<p3.Particle::Is_Pip() <<std::endl;
+								//std::cout<<"		Inside Event pt9 Fill for event Combo: " <<std::endl;
+								p1.Particle::Check_Particle();
+								p2.Particle::Check_Particle();
+								p3.Particle::Check_Particle();
 							}
 						}
 					break;
@@ -169,7 +179,7 @@ void Event::Fill_Event(std::shared_ptr<Environment> envi_, std::shared_ptr<Histo
 	}
 }
 
-void Event::Fill_Event(std::shared_ptr<Environment> envi_, std::shared_ptr<Histogram> hist_, int top_, float W_, float Q2_, Particle &p1, Particle &p2, Particle &p3, Particle &p4, int hel_){
+void Event::Fill_Event(std::shared_ptr<Environment> envi_, std::shared_ptr<Histogram> hist_, int top_, float W_, float Q2_,  Particle p1,  Particle p2,  Particle p3,  Particle p4, int hel_){
 if(top_ != 3){
 		std::cout<<"Incorrectly Filled Event: Too many particles for topology" <<std::endl;
 	}else{ 
@@ -235,9 +245,15 @@ if(top_ != 3){
 	}
 }
 
-void Fill_Event_Hists(std::shared_ptr<Environment> envi_, std::shared_ptr<Histogram> hist_){
-	//hist_->Histogram::WQ2_Fill(envi_, _top, _cut, _W, _Q2, _thrown)
-	//hist_->Histogram::Friend_Fill(envi_, _top, _W, _Q2, _MM, _theta, _alpha, _phi , chan, _weight)
+void Event::Fill_Event_Hists(std::shared_ptr<Environment> envi_, std::shared_ptr<Histogram> hist_){
+	for(int i = 0; i< 4; i++){//Over the different topologies
+		if(_top[i]){
+			hist_->Histogram::WQ2_Fill(envi_, i+1, 10, _W, _Q2, _thrown);
+			for(int j = 0; j< 3; j++){
+				hist_->Histogram::Friend_Fill(envi_, i+1, _W, _Q2, _MMb[j], _thetab[j], _alphab[j], _phi[j] , j, _weight);
+			}
+		}
+	}
 }
 
 void Event::Assign_Weight(float weight_){

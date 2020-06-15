@@ -11,7 +11,7 @@
 class Particle{
 private:
 	int _idx = -1; 
-	int _set = -1; //{0,1} -> {e16,e1f}
+	int _set = -1; //{1,0} -> {e16,e1f}
 	bool _sim = false;
 	bool _thrown = false;
 
@@ -23,7 +23,7 @@ private:
 	float _sf = NAN;//In lab frame
 	float _etot = NAN;//Energy deposited in EC
 	int _cc_seg = -1; //Segment of CC hit
-	float _nphe = NAN;//number photo electrons generated in CC
+	int _nphe = -1;//number photo electrons generated in CC
 
 	bool _sanity_pass[4] = {false,false,false,false}; 
 	bool _min_ec_pass = false;
@@ -73,6 +73,8 @@ public:
 	int Get_idx();
 
 	void Fill_Par_Event(std::shared_ptr<Environment> envi_, std::shared_ptr<Histogram> hist_, float W_, int top_, int par_, bool pass_);
+
+	void Check_Particle();
 	
 };
 

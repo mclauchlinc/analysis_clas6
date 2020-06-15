@@ -52,7 +52,7 @@ size_t run(std::shared_ptr<TChain> _chain, std::shared_ptr<Histogram> _hists, st
 
 		//Analyze the event and look for particle ID and topology 
 		//auto event = std::make_shared<Event_Class>(data,_hists,run_type,plate_,_envi);//All event selection happens in here 
-		std::cout<<"Going to event #" <<curr_event+1 <<std::endl;
+		//std::cout<<"Going to event #" <<curr_event+1 <<std::endl;
 		auto analysis = std::make_shared<Analysis>(data,_hists,_envi,run_type);
 		//num_ppip += event->Event_Class::Get_ppip();
 		//if(event->Event_Class::is_valid()){//event->Event::is_valid()){ //changed this out just to see if it will create the files

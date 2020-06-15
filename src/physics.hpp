@@ -14,10 +14,11 @@ namespace physics{
 	bool Check_4Vec(TLorentzVector k1);
 	TLorentzVector Make_4Vector(float p, float cx, float cy, float cz, float m);
 	TLorentzVector Make_4Vector(float px, float py, float pz, float m);
-	TLorentzVector Make_4Vector(bool nope, float p, float theta, float phi, float m);
+	TLorentzVector Make_4Vector(bool here, float p, float theta, float phi, float m);
 	TLorentzVector Set_k_mu(int set);
 	int event_helicity(std::shared_ptr<Branches> data, int plate_stat);
 	float Qsquared(int set, std::shared_ptr<Branches> data, int thr = 0);
+	float Qsquared(int set, std::shared_ptr<Branches> data, bool thrown_);
 	float WP(int set, std::shared_ptr<Branches> data, int thr = 0);
 
 	float beta_calc(float m, std::shared_ptr<Branches> data, int i);

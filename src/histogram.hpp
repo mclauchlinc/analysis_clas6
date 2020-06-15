@@ -192,6 +192,9 @@ public:
 	void Friend_Fill(std::shared_ptr<Environment> _envi, int top_, float W_, float Q2_, float MM_, float theta_, float alpha_, float phi_ , int chan_, float weight_);
 	void Friend_Write(std::shared_ptr<Environment> _envi);
 
+	//void Event_Particle_Hist(std::shared_ptr<Environment> envi_, const Particle p1, float W_, int top_, int par_, bool pass_);
+
+
 	//**Include functions to fill histograms from events and particle
 
 

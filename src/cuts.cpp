@@ -104,9 +104,22 @@ bool cuts::delta_t_cut(int part, float p, float d0, float d, float t0, float t) 
 	if(dt>cuts::dt_p_low(p) && dt<cuts::dt_p_high(p) )
 	{
 		pass = true;
-	}else if(part == 1 && TMath::Abs(dt) < 10){//part allowing a wiiiide delta t cut
-		pass = true; 
-	}
+	}else //if(part == 1 && TMath::Abs(dt) < 10){//part allowing a wiiiide delta t cut
+	//	pass = true; 
+	//}
+	return pass;
+}
+
+bool cuts::delta_t_cut(int species_, float p_, float dt_){
+	bool pass = false;
+	//std::cout<<std::endl <<"delta t cut: p: " <<p <<" dt: " <<dt <<" cut_low: " <<cuts::dt_p_low(p) <<" cut_high:" <<cuts::dt_p_high(p) <<std::endl;  
+	if(dt_>cuts::dt_p_low(p_) && dt_<cuts::dt_p_high(p_)){
+		std::cout<<"Low: " <<cuts::dt_p_low(p_) <<"	| Value: " <<dt_ <<"	|High: " <<cuts::dt_p_high(p_);
+		pass = true;
+		std::cout<<"	| " <<species_ <<" Dt Pass: " <<pass <<std::endl;; 
+	}else //if(part == 1 && TMath::Abs(dt) < 10){//part allowing a wiiiide delta t cut
+	//	pass = true; 
+	//}
 	return pass;
 }
 
@@ -332,6 +345,8 @@ bool cuts::h_fid(std::shared_ptr<Branches> data, std::shared_ptr<Environment> en
   	}
   	return pass; 
 }
+
+
 bool cuts::h_dt(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int par, int had){
 	bool pass = false;
 	if(envi->was_hid_dt(had) && cuts::delta_t_cut(had+1, data->Branches::p(par), data->Branches::sc_r(0), data->Branches::sc_r(par), data->Branches::sc_t(0), data->Branches::sc_t(par))){
@@ -339,6 +354,7 @@ bool cuts::h_dt(std::shared_ptr<Branches> data, std::shared_ptr<Environment> env
   	}
   	return pass; 
 }
+
 bool cuts::pim_e_sep(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int par, int had){
 	bool pass = false; 
 	if(envi->was_hid_e()){

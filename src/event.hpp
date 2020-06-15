@@ -31,7 +31,7 @@ private:
 	float _theta[4] = {NAN,NAN,NAN,NAN};//Particle theta in COM frame
 	float _phi[4] = {NAN,NAN,NAN,NAN}; //Particle phi in COM frame
 
-	TLorentzVector _k1 = {NAN,NAN,NAN,NAN};
+	TLorentzVector _k1 = physics::Make_4Vector(energy_e16,0.0,0.0,1.0,me);//{NAN,NAN,NAN,NAN};
 	TLorentzVector _vec_lab[4] = {{NAN,NAN,NAN,NAN},{NAN,NAN,NAN,NAN},{NAN,NAN,NAN,NAN},{NAN,NAN,NAN,NAN}};//4 vectors in lab frame
 	TLorentzVector _vec[4] = {{NAN,NAN,NAN,NAN},{NAN,NAN,NAN,NAN},{NAN,NAN,NAN,NAN},{NAN,NAN,NAN,NAN}};//4 vectors in COM frame
 
@@ -47,8 +47,8 @@ public:
 	Event();
 	void COM_4Vec();
 	void Vars();
-	void Fill_Event(std::shared_ptr<Environment> envi_, std::shared_ptr<Histogram> hist_, int top_, float W_, float Q2_, Particle &p1, Particle &p2, Particle &p3, int hel_ = 1);
-	void Fill_Event(std::shared_ptr<Environment> envi_, std::shared_ptr<Histogram> hist_, int top_, float W_, float Q2_, Particle &p1, Particle &p2, Particle &p3, Particle &p4, int hel_ = 1);
+	void Fill_Event(std::shared_ptr<Environment> envi_, std::shared_ptr<Histogram> hist_, int top_, float W_, float Q2_,  Particle p1,  Particle p2,  Particle p3, int hel_ = 1);
+	void Fill_Event(std::shared_ptr<Environment> envi_, std::shared_ptr<Histogram> hist_, int top_, float W_, float Q2_,  Particle p1,  Particle p2,  Particle p3,  Particle p4, int hel_ = 1);
 	void Fill_Event_Hists(std::shared_ptr<Environment> envi_, std::shared_ptr<Histogram> hist_);
 	
 	void Assign_Weight(float weight_);

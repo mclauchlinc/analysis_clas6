@@ -30,9 +30,9 @@ TLorentzVector physics::Make_4Vector(float px, float py, float pz, float m){
 	return k_mu;
 }
 
-TLorentzVector physics::Make_4Vector(bool nope, float p, float theta, float phi, float m){
+TLorentzVector physics::Make_4Vector(bool here, float p, float theta, float phi, float m){
 	TLorentzVector k_mu;
-	if(nope){
+	if(here){
 		TVector3 k_mu_3(p*TMath::Sin(theta*TMath::Pi()/180.0)*TMath::Cos(phi*TMath::Pi()/180.0), p*TMath::Sin(theta*TMath::Pi()/180.0)*TMath::Sin(phi*TMath::Pi()/180.0), p*TMath::Cos(theta*TMath::Pi()/180.0));
 		k_mu.SetVectM(k_mu_3,m);
 	}
@@ -66,18 +66,22 @@ int physics::event_helicity(std::shared_ptr<Branches> data, int plate_stat){
 
 float physics::Qsquared(int set, std::shared_ptr<Branches> data, int thr){
 	TLorentzVector k_mu_prime; 
-	if(set < 5){
-		if(thr==1){
-			k_mu_prime = Make_4Vector(data->pxpart(0),data->pypart(0),data->pzpart(0),me);
-		}else{
-			k_mu_prime = Make_4Vector(data->p(0)*data->cx(0),data->p(0)*data->cy(0),data->p(0)*data->cz(0),me);
-		}
-	}else if(set >= 5){
-		for(int i = 0; i<4; i++){
-			if(data->mcid(i)==ELECTRON){
-				k_mu_prime = Make_4Vector(true,data->mcp(i),data->mctheta(i),data->mcphi(i),me);
-			}
-		}
+	//TLorentzVector k_mu_prime; 
+	if(thr == 1){
+		k_mu_prime = Make_4Vector(true,data->mcp(0),data->mctheta(0),data->mcphi(0),me);
+	}else{
+		k_mu_prime = Make_4Vector(data->p(0)*data->cx(0),data->p(0)*data->cy(0),data->p(0)*data->cz(0),me);
+	}
+	TLorentzVector k_mu = physics::Set_k_mu(set);
+	return -(k_mu - k_mu_prime).Mag2();
+}
+
+float physics::Qsquared(int set, std::shared_ptr<Branches> data, bool thrown_){
+	TLorentzVector k_mu_prime; 
+	if(thrown_){
+		k_mu_prime = Make_4Vector(true,data->mcp(0),data->mctheta(0),data->mcphi(0),me);
+	}else{
+		k_mu_prime = Make_4Vector(data->p(0)*data->cx(0),data->p(0)*data->cy(0),data->p(0)*data->cz(0),me);
 	}
 	TLorentzVector k_mu = physics::Set_k_mu(set);
 	return -(k_mu - k_mu_prime).Mag2();
@@ -282,7 +286,7 @@ float physics::delta_t(int part, std::shared_ptr<Branches> data, int idx){
 		break;
 	}
 	float vertex_e = physics::vert_e(data->Branches::sc_r(0),data->Branches::sc_t(0));
-	float vertex_h = physics::vert_h(data->Branches::p(part),data->Branches::sc_r(idx),data->Branches::sc_t(idx),mass);
+	float vertex_h = physics::vert_h(data->Branches::p(idx),data->Branches::sc_r(idx),data->Branches::sc_t(idx),mass);
 	return vertex_e - vertex_h;
 }
 
