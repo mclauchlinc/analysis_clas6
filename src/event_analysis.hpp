@@ -33,6 +33,7 @@ private:
 	int _set = -1; //{0,1} -> {e16,e1f}
 	bool _sim = false;
 	bool _thrown = false;
+	bool _recon = false;
 
 
 
