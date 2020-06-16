@@ -8,7 +8,7 @@
 //static int num_mixed_p_pip = 0; 
 
 static const int MAX_PARTS = 100; 
-static const int NUM_THREADS = 1;
+static const int NUM_THREADS = 4;
 
 static const float c_special = 29.9792458; //speed of light in cm/ns
 static const float c_convert = 10000000; //Convert c_special to m/s
@@ -256,7 +256,7 @@ static const std::string lists1 = "sim_e16_1";
 static const std::string lists2 = "sim_pre";
 static const std::string lists3n = "sim_gsim_ngpp_nmcdata";
 static const std::string lists3y = "sim_gsim_ngpp_mcdata";
-static const std::string lists3 = "sim_pair";
+static const std::string lists3 = "sim_e16";
 
 //Paths for file names
 static const std::string path1 = "/home/mclauchlinc/Desktop/analysis/nick_convert_e16.txt";
@@ -269,7 +269,7 @@ static const std::string paths1 = "/Users/cmc/Desktop/analysis/simulation/sim_e1
 static const std::string paths2 = "/Users/cmc/Desktop/analysis/simulation/sim_e16_pre_gpp.txt";
 static const std::string paths3n = "/Users/cmc/Desktop/analysis/analysis_clas6/Path_Files/gsim_no_gpp_nmcdata.txt";
 static const std::string paths3y = "/Users/cmc/Desktop/analysis/analysis_clas6/Path_Files/gsim_no_gpp_mcdata.txt";
-static const std::string paths3 = "/Users/cmc/Desktop/analysis/analysis_clas6/Path_Files/full_sim_pair.txt";
+static const std::string paths3 = "/Users/cmc/Desktop/analysis/analysis_clas6/Path_Files/sim_e16_fix.txt";
 
 //Run type for file lists {e16,e1f,e16sim,e1fsim} -> {1,2,3,4}
 static const int type1 = 1;

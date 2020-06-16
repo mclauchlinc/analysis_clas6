@@ -256,6 +256,7 @@ void Particle::HID(std::shared_ptr<Branches> data_, std::shared_ptr<Environment>
 				}
 			}
 			//Delta T cut
+			//std::cout<<"Delta t cut had " <<species[i+1] <<": " <<cuts::delta_t_cut(i+1,_p,_dt[i+1]) <<std::endl;
 			if(cuts::delta_t_cut(i+1,_p,_dt[i+1])){//cuts::h_dt(data_,envi_,_idx,i)){
 				_dt_pass[i+1] = true;
 				if(_ntrig_){
@@ -277,7 +278,7 @@ void Particle::HID(std::shared_ptr<Branches> data_, std::shared_ptr<Environment>
 				hist_->Histogram::DT_Fill(envi_,0,i+1,_p,_dt[i+1],1,1,W_,physics::get_sector(_phi));
 			}
 		}
-		if(cuts::hid(_set, data_, envi_, _idx, i)){
+		if(_dt_pass[i+1] && _fid_pass[i+1] && _sanity_pass[i+1]){//cuts::hid(_set, data_, envi_, _idx, i)){
 			_pid[i+1] = true;
 			_ided = true; 
 			if(_ntrig_){
@@ -415,7 +416,7 @@ int Particle::Get_idx(){
 }
 
 void Particle::Fill_Par_Event(std::shared_ptr<Environment> envi_, std::shared_ptr<Histogram> hist_, float W_, int top_, int par_, bool pass_){
-	std::cout<<"		Filling Particle Event" <<std::endl;
+	//std::cout<<"		Filling Particle Event" <<std::endl;
 	int _pass_ = -1; 
 	if(pass_){
 		_pass_ = 0; 
@@ -425,7 +426,7 @@ void Particle::Fill_Par_Event(std::shared_ptr<Environment> envi_, std::shared_pt
 	//Electron
 	if(_pass_ != -1){
 		if(par_ == 0 && _pid[0]){
-			std::cout<<"			Electron cc_segm: " <<_cc_seg <<std::endl;
+			//std::cout<<"			Electron cc_segm: " <<_cc_seg <<std::endl;
 			hist_->Histogram::Fid_Fill(envi_,top_+1,_theta,_phi,0,10,_pass_,W_,_p);
 			hist_->Histogram::SF_Fill(envi_,top_+1,_p,_etot,10,_pass_,W_,physics::get_sector(_phi));
 			hist_->Histogram::CC_Fill(envi_,top_+1,physics::get_sector(_phi),_cc_seg,_nphe,10,_pass_);

@@ -114,10 +114,10 @@ bool cuts::delta_t_cut(int species_, float p_, float dt_){
 	bool pass = false;
 	//std::cout<<std::endl <<"delta t cut: p: " <<p <<" dt: " <<dt <<" cut_low: " <<cuts::dt_p_low(p) <<" cut_high:" <<cuts::dt_p_high(p) <<std::endl;  
 	if(dt_>cuts::dt_p_low(p_) && dt_<cuts::dt_p_high(p_)){
-		std::cout<<"Low: " <<cuts::dt_p_low(p_) <<"	| Value: " <<dt_ <<"	|High: " <<cuts::dt_p_high(p_);
+		//std::cout<<"Low: " <<cuts::dt_p_low(p_) <<"	| Value: " <<dt_ <<"	|High: " <<cuts::dt_p_high(p_);
 		pass = true;
-		std::cout<<"	| " <<species_ <<" Dt Pass: " <<pass <<std::endl;; 
-	}else //if(part == 1 && TMath::Abs(dt) < 10){//part allowing a wiiiide delta t cut
+		//std::cout<<"	| " <<species_ <<" Dt Pass: " <<pass <<std::endl;; 
+	} //if(part == 1 && TMath::Abs(dt) < 10){//part allowing a wiiiide delta t cut
 	//	pass = true; 
 	//}
 	return pass;

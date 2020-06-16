@@ -42,7 +42,7 @@ void Event::Fill_Event(std::shared_ptr<Environment> envi_, std::shared_ptr<Histo
 				_thrown = p1.Particle::Is_Thrown();
 				//std::cout<<"		Inside Event pt3b Fill for event Combo: " <<std::endl;
 				
-				//_k1 = physics::Set_k_mu(p1.Particle::Get_set());
+				_k1 = physics::Set_k_mu(p1.Particle::Get_set());
 				//std::cout<<"		Inside Event pt3c Fill for event Combo: " <<std::endl;
 				
 				switch(top_){
@@ -159,9 +159,9 @@ void Event::Fill_Event(std::shared_ptr<Environment> envi_, std::shared_ptr<Histo
 								hist_->Histogram::MM_Fill(envi_,2,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2]),2,0,true);
 								hist_->Histogram::MM_Fill(envi_,2,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2]),2,1,true);
 								//std::cout<<"		Inside Event pt9 Fill for event Combo: " <<std::endl;
-								p1.Particle::Check_Particle();
-								p2.Particle::Check_Particle();
-								p3.Particle::Check_Particle();
+								//p1.Particle::Check_Particle();
+								//p2.Particle::Check_Particle();
+								//p3.Particle::Check_Particle();
 							}
 						}
 					break;
