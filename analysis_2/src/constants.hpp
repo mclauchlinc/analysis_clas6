@@ -167,34 +167,12 @@ const double WQymax = 8.99;
 const int WQ2xres = 20;
 const int WQ2yres = 20;
 
-//Electron Sampling Fraction
-const int SFxres = 100;
-const int SFyres = 100;
-const double SFxmin = 0.0;
-const double SFymin = 0.0;
-const double SFxmax = 6.0;
-const double SFymax = 1.0;
-//Minimum Electron Energy
-const int MEExres = 100;
-const int MEEyres = 100;
-const double MEExmin = 0.0;
-const double MEEymin = 0.0;
-const double MEExmax = 6.0;
-const double MEEymax = 1.0;
-//Fiducial Cuts
-const int FIDxres = 200;
-const int FIDyres = 200;
-const double FIDxmin = -30.0;
-const double FIDymin = 0.0;
-const double FIDxmax = 30.0;
-const double FIDymax = 180.0;
-//Delta_t
-const int DTxres = 25;//300;
-const int DTyres = 100;
-const double DTxmin = 0.0;
-const double DTymin = -5.0;//-4.0;
-const double DTxmax = 4.5;//7.0;
-const double DTymax = 5.0;//4.0;
+//Binning {pim,p,pip}
+static const int Wbin[3] = {29,29,29};
+static const int Q2bin[3] = {5,5,5};
+static const int MMbin[3] = {13,12,12};
+static const int theta
+
 //Missing Mass
 static const int MMxres = 1500;//[2][4] = {
 	//{1500,500,500,500},

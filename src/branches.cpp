@@ -4,8 +4,14 @@
 
 
 
-Branches::Branches(std::shared_ptr<TChain> tree) {
+Branches::Branches(std::shared_ptr<TChain> tree, int run_type) {
   _tree = tree;
+  if(run_type >=3 ){
+    _MC = true; 
+    if(run_type < 5){
+        _include_weights = true; 
+    }
+  }
   Branches::init();
 }
 
@@ -24,87 +30,113 @@ void Branches::init() {
   _tree->SetBranchAddress("rf_time1", &_rf_time1);
   _tree->SetBranchAddress("rf_time2", &_rf_time2);
   _tree->SetBranchAddress("gpart", &_gpart);
-  _tree->SetBranchAddress("id", _id);
-  _tree->SetBranchAddress("stat", _stat);
-  _tree->SetBranchAddress("dc", _dc);
-  _tree->SetBranchAddress("cc", _cc);
-  _tree->SetBranchAddress("sc", _sc);
-  _tree->SetBranchAddress("ec", _ec);
-  _tree->SetBranchAddress("lec", _lec);
-  _tree->SetBranchAddress("ccst", _ccst);
-  _tree->SetBranchAddress("p", _p);
-  _tree->SetBranchAddress("q", _q);
-  _tree->SetBranchAddress("b", _b);
-  _tree->SetBranchAddress("cx", _cx);
-  _tree->SetBranchAddress("cy", _cy);
-  _tree->SetBranchAddress("cz", _cz);
-  _tree->SetBranchAddress("vx", _vx);
-  _tree->SetBranchAddress("vy", _vy);
-  _tree->SetBranchAddress("vz", _vz);
+  _tree->SetBranchAddress("id", &_id);
+  _tree->SetBranchAddress("stat", &_stat);
+  _tree->SetBranchAddress("dc", &_dc);
+  _tree->SetBranchAddress("cc", &_cc);
+  _tree->SetBranchAddress("sc", &_sc);
+  _tree->SetBranchAddress("ec", &_ec);
+  _tree->SetBranchAddress("lec", &_lec);
+  _tree->SetBranchAddress("ccst", &_ccst);
+  _tree->SetBranchAddress("p", &_p);
+  _tree->SetBranchAddress("q", &_q);
+  _tree->SetBranchAddress("b", &_b);
+  _tree->SetBranchAddress("cx", &_cx);
+  _tree->SetBranchAddress("cy", &_cy);
+  _tree->SetBranchAddress("cz", &_cz);
+  _tree->SetBranchAddress("vx", &_vx);
+  _tree->SetBranchAddress("vy", &_vy);
+  _tree->SetBranchAddress("vz", &_vz);
   _tree->SetBranchAddress("dc_part", &_dc_part);
-  _tree->SetBranchAddress("dc_sect", _dc_sect);
-  _tree->SetBranchAddress("dc_trk", _dc_trk);
-  _tree->SetBranchAddress("dc_stat", _dc_stat);
-  _tree->SetBranchAddress("dc_vx", _dc_vx);
-  _tree->SetBranchAddress("dc_vy", _dc_vy);
-  _tree->SetBranchAddress("dc_vz", _dc_vz);
-  _tree->SetBranchAddress("dc_vr", _dc_vr);
-  _tree->SetBranchAddress("dc_xsc", _dc_xsc);
-  _tree->SetBranchAddress("dc_ysc", _dc_ysc);
-  _tree->SetBranchAddress("dc_zsc", _dc_zsc);
-  _tree->SetBranchAddress("dc_cxsc", _dc_cxsc);
-  _tree->SetBranchAddress("dc_cysc", _dc_cysc);
-  _tree->SetBranchAddress("dc_czsc", _dc_czsc);
-  _tree->SetBranchAddress("dc_c2", _dc_c2);
+  _tree->SetBranchAddress("dc_sect", &_dc_sect);
+  _tree->SetBranchAddress("dc_trk", &_dc_trk);
+  _tree->SetBranchAddress("dc_stat", &_dc_stat);
+  _tree->SetBranchAddress("dc_vx", &_dc_vx);
+  _tree->SetBranchAddress("dc_vy", &_dc_vy);
+  _tree->SetBranchAddress("dc_vz", &_dc_vz);
+  _tree->SetBranchAddress("dc_vr", &_dc_vr);
+  _tree->SetBranchAddress("dc_xsc", &_dc_xsc);
+  _tree->SetBranchAddress("dc_ysc", &_dc_ysc);
+  _tree->SetBranchAddress("dc_zsc", &_dc_zsc);
+  _tree->SetBranchAddress("dc_cxsc", &_dc_cxsc);
+  _tree->SetBranchAddress("dc_cysc", &_dc_cysc);
+  _tree->SetBranchAddress("dc_czsc", &_dc_czsc);
+  _tree->SetBranchAddress("dc_c2", &_dc_c2);
   _tree->SetBranchAddress("ec_part", &_ec_part);
-  _tree->SetBranchAddress("ec_stat", _ec_stat);
-  _tree->SetBranchAddress("ec_sect", _ec_sect);
-  _tree->SetBranchAddress("ec_whol", _ec_whol);
-  _tree->SetBranchAddress("ec_inst", _ec_inst);
-  _tree->SetBranchAddress("ec_oust", _ec_oust);
-  _tree->SetBranchAddress("etot", _etot);
-  _tree->SetBranchAddress("ec_ei", _ec_ei);
-  _tree->SetBranchAddress("ec_eo", _ec_eo);
-  _tree->SetBranchAddress("ec_t", _ec_t);
-  _tree->SetBranchAddress("ec_r", _ec_r);
-  _tree->SetBranchAddress("ech_x", _ech_x);
-  _tree->SetBranchAddress("ech_y", _ech_y);
-  _tree->SetBranchAddress("ech_z", _ech_z);
-  _tree->SetBranchAddress("ec_m2", _ec_m2);
-  _tree->SetBranchAddress("ec_m3", _ec_m3);
-  _tree->SetBranchAddress("ec_m4", _ec_m4);
-  _tree->SetBranchAddress("ec_c2", _ec_c2);
+  _tree->SetBranchAddress("ec_stat", &_ec_stat);
+  _tree->SetBranchAddress("ec_sect", &_ec_sect);
+  _tree->SetBranchAddress("ec_whol", &_ec_whol);
+  _tree->SetBranchAddress("ec_inst", &_ec_inst);
+  _tree->SetBranchAddress("ec_oust", &_ec_oust);
+  _tree->SetBranchAddress("etot", &_etot);
+  _tree->SetBranchAddress("ec_ei", &_ec_ei);
+  _tree->SetBranchAddress("ec_eo", &_ec_eo);
+  _tree->SetBranchAddress("ec_t", &_ec_t);
+  _tree->SetBranchAddress("ec_r", &_ec_r);
+  _tree->SetBranchAddress("ech_x", &_ech_x);
+  _tree->SetBranchAddress("ech_y", &_ech_y);
+  _tree->SetBranchAddress("ech_z", &_ech_z);
+  _tree->SetBranchAddress("ec_m2", &_ec_m2);
+  _tree->SetBranchAddress("ec_m3", &_ec_m3);
+  _tree->SetBranchAddress("ec_m4", &_ec_m4);
+  _tree->SetBranchAddress("ec_c2", &_ec_c2);
   _tree->SetBranchAddress("sc_part", &_sc_part);
-  _tree->SetBranchAddress("sc_sect", _sc_sect);
-  _tree->SetBranchAddress("sc_hit", _sc_hit);
-  _tree->SetBranchAddress("sc_pd", _sc_pd);
-  _tree->SetBranchAddress("sc_stat", _sc_stat);
-  _tree->SetBranchAddress("edep", _edep);
-  _tree->SetBranchAddress("sc_t", _sc_t);
-  _tree->SetBranchAddress("sc_r", _sc_r);
-  _tree->SetBranchAddress("sc_c2", _sc_c2);
+  _tree->SetBranchAddress("sc_sect", &_sc_sect);
+  _tree->SetBranchAddress("sc_hit", &_sc_hit);
+  _tree->SetBranchAddress("sc_pd", &_sc_pd);
+  _tree->SetBranchAddress("sc_stat", &_sc_stat);
+  _tree->SetBranchAddress("edep", &_edep);
+  _tree->SetBranchAddress("sc_t", &_sc_t);
+  _tree->SetBranchAddress("sc_r", &_sc_r);
+  _tree->SetBranchAddress("sc_c2", &_sc_c2);
   _tree->SetBranchAddress("cc_part", &_cc_part);
-  _tree->SetBranchAddress("cc_sect", _cc_sect);
-  _tree->SetBranchAddress("cc_hit", _cc_hit);
-  _tree->SetBranchAddress("cc_segm", _cc_segm);
-  _tree->SetBranchAddress("nphe", _nphe);
-  _tree->SetBranchAddress("cc_t", _cc_t);
-  _tree->SetBranchAddress("cc_r", _cc_r);
-  _tree->SetBranchAddress("cc_c2", _cc_c2);
-  if (_MC) {
+  _tree->SetBranchAddress("cc_sect", &_cc_sect);
+  _tree->SetBranchAddress("cc_hit", &_cc_hit);
+  _tree->SetBranchAddress("cc_segm", &_cc_segm);
+  _tree->SetBranchAddress("nphe", &_nphe);
+  _tree->SetBranchAddress("cc_t", &_cc_t);
+  _tree->SetBranchAddress("cc_r", &_cc_r);
+  _tree->SetBranchAddress("cc_c2", &_cc_c2);
+  if(_MC) {
     _tree->SetBranchAddress("nprt", &_nprt);
-    _tree->SetBranchAddress("pidpart", _pidpart);
-    _tree->SetBranchAddress("xpart", _xpart);
-    _tree->SetBranchAddress("ypart", _ypart);
-    _tree->SetBranchAddress("zpart", _zpart);
-    _tree->SetBranchAddress("epart", _epart);
-    _tree->SetBranchAddress("pxpart", _pxpart);
-    _tree->SetBranchAddress("pypart", _pypart);
-    _tree->SetBranchAddress("pzpart", _pzpart);
-    _tree->SetBranchAddress("qpart", _qpart);
+    //_tree->SetBranchAddress("gpart", &_gpart);//Write to gpart because that's what we have to work with in the sim
+    _tree->SetBranchAddress("pidpart", &_pidpart);
+    //_tree->SetBranchAddress("stat", &_stat);
+    //_tree->SetBranchAddress("p", &_p);
+    //_tree->SetBranchAddress("cx", &_cx);
+    //_tree->SetBranchAddress("cy", &_cy);
+    //_tree->SetBranchAddress("cz", &_cz);
+    _tree->SetBranchAddress("xpart", &_xpart);
+    _tree->SetBranchAddress("ypart", &_ypart);
+    _tree->SetBranchAddress("zpart", &_zpart);
+    _tree->SetBranchAddress("epart", &_epart);
+    _tree->SetBranchAddress("pxpart", &_pxpart);
+    _tree->SetBranchAddress("pypart", &_pypart);
+    _tree->SetBranchAddress("pzpart", &_pzpart);
+    _tree->SetBranchAddress("qpart", &_qpart);
+     _tree->SetBranchAddress("mcp", &_mcp);
+    _tree->SetBranchAddress("mctheta", &_mctheta);
+    _tree->SetBranchAddress("mcphi", &_mcphi);
+    _tree->SetBranchAddress("mcid", &_mcid);
+    /*_tree->SetBranchAddress("sc", &_sc);
+    _tree->SetBranchAddress("sc_r", &_sc_r);
+    _tree->SetBranchAddress("sc_t" , &_sc_t);
+    _tree->SetBranchAddress("evntclas2", &_evntclas2);
+    _tree->SetBranchAddress("id", &_id);
+    _tree->SetBranchAddress("dc", &_dc);
+    _tree->SetBranchAddress("dc_stat", &_dc_stat);
+    _tree->SetBranchAddress("ec", &_ec);
+    _tree->SetBranchAddress("cc", &_cc);
+    _tree->SetBranchAddress("cc_sect", &_cc_sect);
+    _tree->SetBranchAddress("cc_segm", &_cc_segm);
+    _tree->SetBranchAddress("nphe", &_nphe);
+    _tree->SetBranchAddress("q", &_q);*/
+    if(_include_weights){
+      _tree->SetBranchAddress("sigma_total", &_weight);
+    }
   }
 }
-
+bool Branches::MC() {return _MC;}
 int Branches::npart() { return _npart; }
 int Branches::evstat() { return _evstat; }
 int Branches::intt() { return _intt; }
@@ -672,5 +704,27 @@ float Branches::qpart(int i) {
     return (float)NULL;
   }
 }  //[nprt]
+
+float Branches::weight(){
+  if(_MC){
+    return _weight;
+  }else{//For when there is no simulation and you're taking data at its face. 
+    return 1.0; 
+  }
+}
+
+float Branches::mcp(int i){
+  return _mcp[i];
+}
+float Branches::mctheta(int i){
+  return _mctheta[i];
+}
+float Branches::mcphi(int i){
+  return _mcphi[i];
+}
+
+int Branches::mcid(int i){
+  return _mcid[i];
+}
 
 

@@ -8,6 +8,8 @@
 #include "branches.hpp"
 #include "eid.hpp"//Electron ID Cuts
 #include "cuts.hpp"
+#include "environment.hpp"
+#include "functions.hpp"
 //#include "particle.hpp"
 //#include "hid.hpp"//Hadron ID Cuts
 
@@ -45,16 +47,17 @@ private:
 	bool _valid = false; //Valid trigger electron from eid 
 	int _top = 0; //Topology this fits under {bad, pmiss, pipmiss,pimmiss,zeromiss }->{0,1,2,3,4}
 	bool _assigned_4vecs = false; 
-	int _run_type = 0; 
+	int _run_type = 0; //{e1-6,e1f, e1-6 sim, e1f sim, e16 empty, e1f empty} ->{1,2,3,4,5,6}
+	float _weight = NAN;
 
 	//All four vectors in the center of mass frame 
-	TLorentzVector _beam;
-	TLorentzVector _elec;
-	TLorentzVector _gamma;
-	TLorentzVector _target;
-	TLorentzVector _pro;
-	TLorentzVector _pip;
-	TLorentzVector _pim;
+	TLorentzVector _beam = {NAN,NAN,NAN,NAN};
+	TLorentzVector _elec = {NAN,NAN,NAN,NAN};
+	TLorentzVector _gamma = {NAN,NAN,NAN,NAN};
+	TLorentzVector _target = {NAN,NAN,NAN,NAN};
+	TLorentzVector _pro = {NAN,NAN,NAN,NAN};
+	TLorentzVector _pip = {NAN,NAN,NAN,NAN};
+	TLorentzVector _pim = {NAN,NAN,NAN,NAN};
 
 	int good_electron = 0; 
 	int good_pro = 0;
@@ -67,32 +70,32 @@ private:
 
 	int check_idx[3] = {-99,-99,-99};
 
-	float _alpha1 = -99;
-	float _alpha2 = -99;
-	float _alpha3 = -99;
-	float _theta1 = -99;
-	float _theta2 = -99;
-	float _theta3 = -99;
-	float _MMt1 = -99; //MM proton/pip
-	float _MMt2 = -99;	//MM proton/pim
-	float _MMt3 = -99;	//MM Pip/pim
+	float _alpha1 = NAN;
+	float _alpha2 = NAN;
+	float _alpha3 = NAN;
+	float _theta1 = NAN;
+	float _theta2 = NAN;
+	float _theta3 = NAN;
+	float _MMt1 = NAN; //MM proton/pip
+	float _MMt2 = NAN;	//MM proton/pim
+	float _MMt3 = NAN;	//MM Pip/pim
 
-	float _MM = -99; 
-	float _MM2 = -99; 
+	float _MM = NAN; 
+	float _MM2 = NAN; 
 
-	float _W = -99;
-	float _Q2 = -99; 
+	float _W = NAN;
+	float _Q2 = NAN; 
 
 	int _helicity = 0; 
 
-	float MM_p = -99;
-	float MM_p2 = -99;
-	float MM_pip = -99;
-	float MM_pip2 = -99;
-	float MM_pim = -99;
-	float MM_pim2 = -99;
-	float MM_z = -99;
-	float MM_z2 = -99;
+	float MM_p = NAN;
+	float MM_p2 = NAN;
+	float MM_pip = NAN;
+	float MM_pip2 = NAN;
+	float MM_pim = NAN;
+	float MM_pim2 = NAN;
+	float MM_z = NAN;
+	float MM_z2 = NAN;
 
 
 	//Variables for multiple particles being Identified
@@ -123,6 +126,7 @@ private:
 	int h_secpim[20] = {-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99};
 	int pim_idx[20] = {-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99,-99};
 
+	//Pieces for the hadrons because they're harder to track
 	float d[3]= {NAN,NAN,NAN}; 
 	float t[3]= {NAN,NAN,NAN};
 	float cx[3]= {NAN,NAN,NAN}; 
@@ -132,9 +136,13 @@ private:
 	int h_sec[3]= {-99,-99,-99};
 
 	bool top_possible[4]= {false,false,false,false};
+
+	//Some simlation specific pieces
+	float _Wt = NAN; 
+	float _Q2t = NAN; 
 	
 public:
-	Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogram> _hists, int run_type, int plate_info, int data_set = 0);//default to e16
+	Event_Class(std::shared_ptr<Branches> data, std::shared_ptr<Histogram> _hists, int run_type, int plate_info, std::shared_ptr<Environment> envi);//default to e16
 	//Run type reffers to simulation vs data
 	//~Event_Class();
 
@@ -149,6 +157,7 @@ public:
 	int Get_run_type();
 
 	int Get_ppip(int idx);
+	float Get_weight();
 	//void Fill_Tree(forest tree, int event_n);
 	/*
 	void Assign_electron(float p, float cx, float cy, float cz);
