@@ -4,19 +4,23 @@ Analysis::Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> h
 	switch(run_type_){
 		case 1:
 			_set = 1;
-			_sim = false;
+			_recon = true;
 		break;
 		case 2:
 			_set = 0;
-			_sim = false;
+			_recon = true;
 		break;
 		case 3:
 			_set = 1;
 			_sim = true;
+			_thrown = true;
+			_recon = true;
 		break;
 		case 4:
 			_set = 0;
 			_sim = true;
+			_thrown = true;
+			_recon = true;
 		break;
 		case 5:
 			_set = 1; 
@@ -29,6 +33,7 @@ Analysis::Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> h
 			_thrown = true;
 		break;
 	}
+	//std::cout<<"Set: " <<_set <<"	| Sim: " <<_sim <<"	| Thrown: " <<_thrown <<"	| Recon: " <<_recon <<std::endl;
 
 	if(_sim){
 		_npart = data_->Branches::npart();
@@ -40,14 +45,12 @@ Analysis::Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> h
 
 	//Not sure if I actually need this, because I think I'm doing everything already inside the events? 
 	if(_thrown){
+		//std::cout<<"Making Thrown W and Q2: " ;
 		_W[1] = physics::WP(run_type_,data_,1);
 		_Q2[1] = physics::Qsquared(run_type_,data_,1);
-	}else if(_sim){
-		_W[0] = physics::WP(run_type_,data_,0);
-		_Q2[0] = physics::Qsquared(run_type_,data_,0);
-		_W[1] = physics::WP(run_type_,data_,1);
-		_Q2[1] = physics::Qsquared(run_type_,data_,1);
-	}else{
+		//std::cout<<_W[1] <<" " <<_Q2[1] <<std::endl;
+	}
+	if(_recon){
 		_W[0] = physics::WP(run_type_,data_,0);
 		_Q2[0] = physics::Qsquared(run_type_,data_,0);
 	}
@@ -59,7 +62,7 @@ Analysis::Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> h
 		Event tEvent[4];
 		for(int j = 0; j< 4; j++){
 			tPart[j].Particle::Fill_Particle(data_,j,_set,_sim,true);
-			tPart[j].Particle::PID(data_,envi_,hist_,_W[0]);
+			tPart[j].Particle::PID(data_,envi_,hist_,_W[1]);
 			//tPart[j].Particle::Check_Particle();
 		}
 		//Topology Assignment and Particle Histogram Filling
@@ -91,12 +94,12 @@ Analysis::Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> h
 			}
 		}
 		for(int x = 0; x<4; x++){
-			tEvent[x].Event::Assign_Weight(1.0/4.0);
+			tEvent[x].Event::Assign_Weight(data_->Branches::weight()/4.0);
 		}
 		//*filling event Histogram here*
 	}
 
-	if(!_thrown){//Experimental or reconstructed data
+	if(_recon){//Experimental or reconstructed data
 		//std::cout<<"Entered Non-Sim Event" <<std::endl;
 		//Particle Loop
 		int _nevnt_ = -1; 
@@ -242,7 +245,11 @@ Analysis::Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> h
 			//Assign Event Weights
 			for(int ev2 = 0; ev2 < _evnt_idx_; ev2++){
 				if(eEvent[ev2].Event::Gevnt()){
-					eEvent[ev2].Event::Assign_Weight(1.0/_gevts);
+					if(_sim){
+						eEvent[ev2].Event::Assign_Weight(data_->Branches::weight()/_gevts);
+					}else{
+						eEvent[ev2].Event::Assign_Weight(1.0/_gevts);
+					}
 				}
 				//*Fill Event Histogram here*
 			}

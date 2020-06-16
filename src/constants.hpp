@@ -282,7 +282,7 @@ static const int types1 = 3;
 static const int types2 = 5; 
 static const int types3n = 5; 
 static const int types3y = 5; 
-static const int types3 = 1; 
+static const int types3 = 3; 
 
 //Map of file lists to run type
 static std::unordered_map<std::string, std::string> filepath_map = 	{	{list1,path1},
