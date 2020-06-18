@@ -10,6 +10,7 @@
 #include "functions.hpp"
 #include "constants.hpp"
 #include <iostream>
+#include "event.hpp"
 
 
 //Output Event files which will contain event selected information 
@@ -29,8 +30,9 @@ private:
 	Float_t _MM[3]= {NAN,NAN,NAN};//{p/pip,p/pim,pip/pim}
 	Float_t _theta[3]{NAN,NAN,NAN};//{p,pip,pim}
 	Float_t _alpha[3]{NAN,NAN,NAN};//[{pim,p},{pp,pip}],[{p,pp},{pip,pim}],[{pip,p},{pp,pim}]
-	Int_t _run_type= 0;//{1,2,3,4,5,6}->{e16,e1f,e16sim,e1f sim, e16sim_thrown, e1f sim_thrown}
+	Int_t _run_type= 0;//{1,2,3,4,5,6,7,8}->{e16,e1f,e16sim,e1f sim, e16sim_thrown, e1f sim_thrown,e16empty,e1fempty}
 	Float_t _weight = NAN; 
+	Int_t _COM = -1; 
 
 	//Variables for the individual threads
 	Int_t _evntb[NUM_THREADS]; //The #event for the given file
@@ -49,6 +51,7 @@ private:
 	Float_t _alphab[NUM_THREADS][3];//[{pim,p},{pp,pip}],[{p,pp},{pip,pim}],[{pip,p},{pp,pim}]
 	Int_t _run_typeb[NUM_THREADS];//{1,2,3,4}->{e16,e1f,e16sim,e1f sim} 
 	Float_t _weightb[NUM_THREADS]; 
+	Int_t _COMb[NUM_THREADS];
 	/*
 	Int_t _evntc[NUM_THREADS]; //The #event for the given file
 	Int_t _apartc[NUM_THREADS];//The particle in each event  
@@ -80,6 +83,7 @@ public:
 	//void mktree(int thread_id);
 	void mkfile(std::string tree_file_name);
 	void Fill_Thread_Tree(std::shared_ptr<Event_Class> event_friend, int event_n, int thread_id);//For multithreading there need to be separate trees for each thread
+	void Fill_Thread_Tree(Event event_, int event_n, int thread_id);//For multithreading there need to be separate trees for each thread
 	void scan_thread_tree(int thread_id);
 	void fill_evnt(int event_, int thread_id);
 	void fill_apart(int apart_, int thread_id);

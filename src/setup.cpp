@@ -88,9 +88,10 @@ void Setup::set_envi(std::shared_ptr<Environment> setup, int run_type){
 		setup->Environment::env_fid_plot(2, true);	// Are Pip fiducial plots being created?
 		setup->Environment::env_fid_plot(3, true);//Are PIM fiducial plots being created?
 		//Were delta t plots made performed {p,pip,pim}
-		setup->Environment::env_dt_plot(0, true);//Are proton delta t plots being created?
-		setup->Environment::env_dt_plot(1, true);//Are pip delta t plots being created?
-		setup->Environment::env_dt_plot(2, true); //Are PIM delta t plots being created?
+		setup->Environment::env_dt_plot(0, true);//Are elec delta t plots being created?
+		setup->Environment::env_dt_plot(1, true);//Are pro delta t plots being created?
+		setup->Environment::env_dt_plot(2, true); //Are PIp delta t plots being created?
+		setup->Environment::env_dt_plot(3, true); //Are PIM delta t plots being created?
 		
 	  	setup->Environment::env_ec_plot(true); //were Min EC plots made?
 	  	setup->Environment::env_sf_plot(true); //Were Sampling Fraction plots made?

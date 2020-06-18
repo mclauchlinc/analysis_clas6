@@ -56,7 +56,7 @@ class Environment {
   bool _hid_e = false; //Did hid cut out a band of electrons for pim ID?
   //Plots being made
   bool _fid_plot[4] = {false,false,false,false};//Were fiducial cuts performed {e,p,pip,pim}
-  bool _dt_plot[3] = {false,false,false}; //Were delta t cuts performed {p,pip,pim}
+  bool _dt_plot[4] = {false,false,false,false}; //Were delta t cuts performed {p,pip,pim}
   bool _cc_plot = false; //Were Min CC plots made? 
   bool _ec_plot = false; //were Min EC plots made?
   bool _sf_plot = false; //Were Sampling Fraction plots made?

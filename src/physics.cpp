@@ -91,24 +91,12 @@ float physics::Qsquared(int set, std::shared_ptr<Branches> data, bool thrown_){
 float physics::WP(int set, std::shared_ptr<Branches> data, int thr){
 	TLorentzVector k_mu = physics::Set_k_mu(set);
 	TLorentzVector k_mu_prime; 
-	if(set < 5){
-		if(thr==1){
-			k_mu_prime = Make_4Vector(data->pxpart(0),data->pypart(0),data->pzpart(0),me);
+	if(thr==1){
+		k_mu_prime = Make_4Vector(true,data->mcp(0),data->mctheta(0),data->mcphi(0),me);
 			//Print_4Vec(k_mu_prime);
 			//std::cout<<std::endl <<"again particle ID: " <<data->pidpart(0) <<" px: " <<data->pxpart(0) <<" py: " <<data->pypart(0) <<" pz: " <<data->pzpart(0);  
-		}else{
+	}else{
 			k_mu_prime = Make_4Vector(data->p(0)*data->cx(0),data->p(0)*data->cy(0),data->p(0)*data->cz(0),me);
-		}
-	}else if(set >= 5){
-		for(int i = 0; i<4; i++){
-			//std::cout<<std::endl <<"ID: " <<data->mcid(i);
-			if(data->mcid(i)==ELECTRON){
-				//std::cout<<std::endl <<"p: " <<data->mcp(i);
-				//std::cout<<"  theta: " <<data->mctheta(i);
-				//std::cout<<"  phi: " <<data->mcphi(i);
-				k_mu_prime = Make_4Vector(true,data->mcp(i),data->mctheta(i),data->mcphi(i),me);
-			}
-		}
 	}
 	TLorentzVector q_mu; 
 	q_mu = k_mu - k_mu_prime;
@@ -138,6 +126,16 @@ float physics::MM_event(int squared, TLorentzVector k0_mu, TLorentzVector k1_mu,
 		MM = (k0_mu + p_mu - k1_mu - k2_mu - k3_mu - k4_mu).Mag();
 	} else{
 		MM = (k0_mu + p_mu - k1_mu - k2_mu - k3_mu - k4_mu).Mag2();
+	}
+	return  MM;
+}
+
+float physics::MM_event(int squared, TLorentzVector k0_mu, TLorentzVector k1_mu, TLorentzVector k2_mu, TLorentzVector k3_mu){
+	float MM = NAN; 
+	if(squared == 0 ){
+		MM = (k0_mu + p_mu - k1_mu - k2_mu - k3_mu).Mag();
+	} else{
+		MM = (k0_mu + p_mu - k1_mu - k2_mu - k3_mu).Mag2();
 	}
 	return  MM;
 }
@@ -439,7 +437,7 @@ void COM_gp(TLorentzVector &k0, TLorentzVector &p0, TLorentzVector &p1, TLorentz
 }
 
 TLorentzVector physics::COM_gp(int par, TLorentzVector k0, TLorentzVector p0, TLorentzVector p1, TLorentzVector p2, TLorentzVector p3){
-	TLorentzVector output; 
+	TLorentzVector output;
 	TLorentzVector q_mu = k0 - p0;//Four vector for virtual particle
 	TLorentzVector nstar_mu = p_mu + q_mu; //Combined photon-target system
 	switch(par){
@@ -447,6 +445,8 @@ TLorentzVector physics::COM_gp(int par, TLorentzVector k0, TLorentzVector p0, TL
 		case 1: output = p1; break;
 		case 2: output = p2; break;
 		case 3: output = p3; break;
+		case 4: output = k0; break;
+		case 5: output = p_mu; break;
 	}
 	float phigp = TMath::ATan2(nstar_mu[1],nstar_mu[0]);//Phi angle out of the x-plane
 	nstar_mu.RotateZ(-phigp);//Get all horizontal momentum on x axis by roating around z axis

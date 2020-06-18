@@ -1,22 +1,28 @@
 #include "event_analysis.hpp"
 		  
-Analysis::Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> hist_, std::shared_ptr<Environment> envi_, int run_type_){
+Analysis::Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> hist_, std::shared_ptr<Environment> envi_, int run_type_,std::shared_ptr<forest> a_forest_, int thread_id_){
 	switch(run_type_){
 		case 1:
 			_set = 1;
 			_sim = false;
+			_recon = true;
 		break;
 		case 2:
 			_set = 0;
 			_sim = false;
+			_recon = true;
 		break;
 		case 3:
 			_set = 1;
 			_sim = true;
+			_thrown = true;
+			_recon = true;
 		break;
 		case 4:
 			_set = 0;
 			_sim = true;
+			_thrown = true;
+			_recon = true;
 		break;
 		case 5:
 			_set = 1; 
@@ -42,12 +48,8 @@ Analysis::Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> h
 	if(_thrown){
 		_W[1] = physics::WP(run_type_,data_,1);
 		_Q2[1] = physics::Qsquared(run_type_,data_,1);
-	}else if(_sim){
-		_W[0] = physics::WP(run_type_,data_,0);
-		_Q2[0] = physics::Qsquared(run_type_,data_,0);
-		_W[1] = physics::WP(run_type_,data_,1);
-		_Q2[1] = physics::Qsquared(run_type_,data_,1);
-	}else{
+	}
+	if(_recon){
 		_W[0] = physics::WP(run_type_,data_,0);
 		_Q2[0] = physics::Qsquared(run_type_,data_,0);
 	}
@@ -59,7 +61,7 @@ Analysis::Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> h
 		Event tEvent[4];
 		for(int j = 0; j< 4; j++){
 			tPart[j].Particle::Fill_Particle(data_,j,_set,_sim,true);
-			tPart[j].Particle::PID(data_,envi_,hist_,_W[0]);
+			tPart[j].Particle::PID(data_,envi_,hist_,_W[1]);
 			//tPart[j].Particle::Check_Particle();
 		}
 		//Topology Assignment and Particle Histogram Filling
@@ -91,12 +93,12 @@ Analysis::Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> h
 			}
 		}
 		for(int x = 0; x<4; x++){
-			tEvent[x].Event::Assign_Weight(1.0/4.0);
+			tEvent[x].Event::Assign_Weight(data_->Branches::weight()/4.0);
 		}
 		//*filling event Histogram here*
 	}
 
-	if(!_thrown){//Experimental or reconstructed data
+	if(_recon){//Experimental or reconstructed data
 		//std::cout<<"Entered Non-Sim Event" <<std::endl;
 		//Particle Loop
 		int _nevnt_ = -1; 
@@ -132,10 +134,7 @@ Analysis::Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> h
 			}
 		}
 		_nevnt_ = (_gpart[1]*_gpart[3]+_gpart[2]*_gpart[3]+(_gpart[1]*_gpart[2]-mix)*(1+_gpart[3]))*ePart[0].Particle::Is_Elec();
-		//if(ePart[0].Particle::Is_Elec()){
-			//std::cout<<"Ele: " <<ePart[0].Particle::Is_Elec() <<"	| Pro: " <<_gpart[1] <<"	| Pip: " <<_gpart[2] <<"	| Pim: " <<_gpart[3] <<"	| Mix: " <<mix <<std::endl;
-			//std::cout<<"Possible events: " <<_nevnt_ <<std::endl;
-		//}
+		
 		if(_nevnt_ > 0){
 			Event eEvent[_nevnt_];
 
@@ -147,17 +146,7 @@ Analysis::Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> h
 					if(ePart[g].Particle::Is_Pip()){//Pro Miss
 						for(int h = 1; h< _npart; h++){
 							if(h!=g && ePart[h].Particle::Is_Pim()){
-								//std::cout<<"		Event Combo: "<<_evnt_idx_ <<" top: Pro Miss"<<std::endl;
-								//std::cout<<"		Pre Event Fill for event Combo: " <<_evnt_idx_ <<std::endl;
-								//ePart[0].Particle::Check_Particle();
-								//ePart[g].Particle::Check_Particle();
-								//ePart[h].Particle::Check_Particle();
 								eEvent[_evnt_idx_].Event::Fill_Event(envi_,hist_,0,_W[0],_Q2[0],ePart[0],ePart[g],ePart[h]);
-								//std::cout<<"		Post Event Fill for event Combo: " <<_evnt_idx_ <<std::endl;
-								//std::cout<<"			Elec " <<ePart[0].Particle::Get_idx() <<" pid: " <<ePart[0].Particle::Is_Elec() <<"| Pip " <<ePart[g].Particle::Get_idx() <<" pid: " <<ePart[g].Particle::Is_Pip() <<"| Pim " <<ePart[h].Particle::Get_idx() <<" pid: " <<ePart[h].Particle::Is_Pim() <<std::endl;
-								//ePart[0].Particle::Check_Particle();
-								//ePart[g].Particle::Check_Particle();
-								//ePart[h].Particle::Check_Particle();
 								_evnt_idx_+=1;
 								_mtop[0]+=1;
 							}
@@ -166,52 +155,16 @@ Analysis::Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> h
 					if(ePart[g].Particle::Is_Pro()){//
 						for(int s = 1; s< _npart; s++){
 							if(s!=g && ePart[s].Particle::Is_Pim()){//Pip Miss
-								//std::cout<<"		Event Combo: " <<_evnt_idx_ <<" top: PIP Miss"<<std::endl;
-								//std::cout<<"		Pre Event Fill for event Combo: " <<_evnt_idx_ <<std::endl;
-								//std::cout<<"			Elec " <<ePart[0].Particle::Get_idx() <<" pid: " <<ePart[0].Particle::Is_Sim() <<"| Pro " <<ePart[g].Particle::Get_idx() <<" pid: " <<ePart[g].Particle::Is_Pro() <<"| Pim " <<ePart[s].Particle::Get_idx() <<" pid: " <<ePart[s].Particle::Is_Pim() <<std::endl;
-								//ePart[0].Particle::Check_Particle();
-								//ePart[g].Particle::Check_Particle();
-								//ePart[s].Particle::Check_Particle();
 								eEvent[_evnt_idx_].Event::Fill_Event(envi_,hist_,1,_W[0],_Q2[0],ePart[0],ePart[g],ePart[s]);
-								//std::cout<<"		Post Event Fill for event Combo: " <<_evnt_idx_ <<std::endl;
-								//std::cout<<"			Elec " <<ePart[0].Particle::Get_idx() <<" pid: " <<ePart[0].Particle::Is_Sim() <<"| Pro " <<ePart[g].Particle::Get_idx() <<" pid: " <<ePart[g].Particle::Is_Pro() <<"| Pim " <<ePart[s].Particle::Get_idx() <<" pid: " <<ePart[s].Particle::Is_Pim() <<std::endl;
-								//ePart[0].Particle::Check_Particle();
-								//ePart[g].Particle::Check_Particle();
-								//ePart[s].Particle::Check_Particle();
 								_evnt_idx_+=1;
 								_mtop[1]+=1;
 							}else if(s!=g && ePart[s].Particle::Is_Pip()){//Pim
-								//std::cout<<"		Event Combo: "<<_evnt_idx_ <<" top: PIM Miss"<<std::endl;
-								//std::cout<<"		Pre Event Fill for event Combo: " <<_evnt_idx_ <<std::endl;
-								//std::cout<<"			Elec " <<ePart[0].Particle::Get_idx() <<" pid: " <<ePart[0].Particle::Is_Sim() <<"| Pro " <<ePart[g].Particle::Get_idx() <<" pid: " <<ePart[g].Particle::Is_Pro() <<"| Pip " <<ePart[s].Particle::Get_idx() <<" pid: " <<ePart[s].Particle::Is_Pip() <<std::endl;
-								//ePart[0].Particle::Check_Particle();
-								//ePart[g].Particle::Check_Particle();
-								//ePart[s].Particle::Check_Particle();
-									 							    //(envi_,hist_,top_,W_,Q2_,&p1,&p2,&p3,hel_)
 								eEvent[_evnt_idx_].Event::Fill_Event(envi_,hist_,2,_W[0],_Q2[0],ePart[0],ePart[g],ePart[s]);
-								//std::cout<<"		Post Event Fill for event Combo: " <<_evnt_idx_ <<std::endl;
-								//std::cout<<"			Elec " <<ePart[0].Particle::Get_idx() <<" pid: " <<ePart[0].Particle::Is_Sim() <<"| Pro " <<ePart[g].Particle::Get_idx() <<" pid: " <<ePart[g].Particle::Is_Pro() <<"| Pip " <<ePart[s].Particle::Get_idx() <<" pid: " <<ePart[s].Particle::Is_Pip() <<std::endl;
-								//ePart[g].Particle::Check_Particle();
-								//ePart[0].Particle::Check_Particle();
-								//ePart[s].Particle::Check_Particle();
 								_evnt_idx_+=1;
 								_mtop[2]+=1;
 								for(int u = 1; u<_npart; u++){
 									if(u!=g && u!=s && ePart[u].Particle::Is_Pim()){//Zero Miss
-										//std::cout<<"		Event Combo: "<<_evnt_idx_ <<" top:zero"<<std::endl;
-										//std::cout<<"		Pre Event Fill for event Combo: " <<_evnt_idx_ <<std::endl;
-										//std::cout<<"			Elec " <<ePart[0].Particle::Get_idx() <<" pid: " <<ePart[0].Particle::Is_Sim() <<"| Pro " <<ePart[g].Particle::Get_idx() <<" pid: " <<ePart[g].Particle::Is_Pro() <<"| Pip " <<ePart[s].Particle::Get_idx() <<" pid: " <<ePart[s].Particle::Is_Pip() <<"| Pim " <<ePart[u].Particle::Get_idx() <<" pid: " <<ePart[u].Particle::Is_Pim() <<std::endl;									
-										//ePart[0].Particle::Check_Particle();
-										//ePart[g].Particle::Check_Particle();
-										//ePart[s].Particle::Check_Particle();
-										//ePart[u].Particle::Check_Particle();
 										eEvent[_evnt_idx_].Event::Fill_Event(envi_,hist_,3,_W[0],_Q2[0],ePart[0],ePart[g],ePart[s],ePart[u]);
-										//std::cout<<"		Post Event Fill for event Combo: " <<_evnt_idx_ <<std::endl;
-										//std::cout<<"			Elec " <<ePart[0].Particle::Get_idx() <<" pid: " <<ePart[0].Particle::Is_Sim() <<"| Pro " <<ePart[g].Particle::Get_idx() <<" pid: " <<ePart[g].Particle::Is_Pro() <<"| Pip " <<ePart[s].Particle::Get_idx() <<" pid: " <<ePart[s].Particle::Is_Pip() <<"| Pim " <<ePart[u].Particle::Get_idx() <<" pid: " <<ePart[u].Particle::Is_Pim() <<std::endl;
-										//ePart[0].Particle::Check_Particle();
-										//ePart[g].Particle::Check_Particle();
-										//ePart[s].Particle::Check_Particle();
-										//ePart[u].Particle::Check_Particle();
 										_evnt_idx_+=1;
 										_mtop[3]+=1;
 									}
@@ -239,13 +192,27 @@ Analysis::Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> h
 					}
 				}
 			}
+			
 			//Assign Event Weights
+			//std::cout<<"There were " <<_gevts <<" good events" <<std::endl;
 			for(int ev2 = 0; ev2 < _evnt_idx_; ev2++){
 				if(eEvent[ev2].Event::Gevnt()){
-					eEvent[ev2].Event::Assign_Weight(1.0/_gevts);
+					if(!_sim){
+						eEvent[ev2].Event::Assign_Weight(1.0/_gevts);
+					}else if(_sim){
+						eEvent[ev2].Event::Assign_Weight(data_->Branches::weight()/_gevts);
+					}
+					_weight = eEvent[ev2].Event::Get_Weight();
+					//std::cout<<"The Weight per event is: " <<eEvent[ev2].Event::Get_Weight() <<std::endl;
+					a_forest_->forest::Fill_Thread_Tree(eEvent[ev2],ev2,thread_id_);
 				}
-				//*Fill Event Histogram here*
+				for(int w = 0; w < 4; w++){
+					if(eEvent[ev2].Event::Top(w)){
+						eEvent[ev2].Event::Fill_Event_Hists(envi_,hist_, (_mtop[w]==1) && eEvent[ev2].Event::Top(w));
+					}
+				}
 			}
+			hist_->Histogram::Cross_Fill(envi_,_ntop,_weight);
 		}	
 	}
 }

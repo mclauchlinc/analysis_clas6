@@ -32,7 +32,7 @@ namespace cuts{
 	float sf(Float_t etot, Float_t p);
 	float sf_low(Float_t p, int sidx, int r =1);
 	float sf_high(Float_t p, int sidx, int r=1);
-	bool sf_cut(Float_t p, Float_t etot, Float_t cx, Float_t cy, int r = 1);
+	bool sf_cut(Float_t p, Float_t etot, Float_t cx, Float_t cy, int run, bool sim = false);
 
 	//Missing Mass Cuts
 	bool MM_cut(int top, float MM);

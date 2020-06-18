@@ -22,7 +22,8 @@ forest::forest(int is_alive){
 	_the_tree->Branch("theta",&_theta,"theta[bpart]/F");
 	_the_tree->Branch("alpha",&_alpha,"alpha[bpart]/F");
 	_the_tree->Branch("run_type",&_run_type,"run_type/I");
-	_the_tree->Branch("weight",&_weight,"weight/I");
+	_the_tree->Branch("weight",&_weight,"weight/F");
+	_the_tree->Branch("COM",&_COM,"COM/I");
 	Float_t _MM_sp[3]= {NAN,NAN,NAN};//{p/pip,p/pim,pip/pim}
 	Float_t _theta_sp[3]{NAN,NAN,NAN};//{p,pip,pim}
 	Float_t _alpha_sp[3]{NAN,NAN,NAN};//[{pim,p},{pp,pip}],[{p,pp},{pip,pim}],[{pip,p},{pp,pim}]
@@ -47,7 +48,8 @@ forest::forest(int is_alive){
 		_a_tree[thread_id]->Branch("theta",&_thetab[thread_id],"theta[bpart]/F");
 		_a_tree[thread_id]->Branch("alpha",&_alphab[thread_id],"alpha[bpart]/F");
 		_a_tree[thread_id]->Branch("run_type",&_run_typeb[thread_id],"run_type/I");
-		_a_tree[thread_id]->Branch("weight",&_weightb[thread_id],"weight/I");
+		_a_tree[thread_id]->Branch("weight",&_weightb[thread_id],"weight/F");
+		_a_tree[thread_id]->Branch("COM",&_COMb[thread_id],"COM/I");
 		//The B Trees
 		/*
 		_b_tree[thread_id] = std::make_shared<TTree>("TREEsb","Tree to hold Thread Event Fourvectors");//
@@ -124,6 +126,59 @@ void forest::Fill_Thread_Tree(std::shared_ptr<Event_Class> event_friend, int eve
 		_MMb[thread_id][0] = (k[3]+k[4]).Mag();
 		_MMb[thread_id][1] = (k[3]+k[5]).Mag();
 		_MMb[thread_id][2] = (k[5]+k[4]).Mag();
+		_a_tree[thread_id]->TTree::Fill();
+		//std::cout<<"   successfully filled?"; 
+	//}
+}
+
+void forest::Fill_Thread_Tree(Event event_, int event_n, int thread_id){
+		//std::cout<<"Filling tree: " <<event_n <<std::endl;
+		TLorentzVector k[6]; 
+		_evntb[thread_id] = event_n; 
+		_apartb[thread_id] = 6;
+		_bpartb[thread_id] = 3; 
+
+		bool want_COM = true;//Do you want things in Center of Mass Frame?
+
+		for(int i = 0; i<6; i++){
+			if(i >= 2){
+				_pxb[thread_id][i] = event_.Event::Get_Px(i-2,want_COM);
+				_pyb[thread_id][i] = event_.Event::Get_Py(i-2,want_COM);
+				_pzb[thread_id][i] = event_.Event::Get_Pz(i-2,want_COM);
+				_p0b[thread_id][i] = event_.Event::Get_P0(i-2,want_COM);
+				_pidb[thread_id][i] = event_.Event::Get_PID(i-2);
+				k[i] = {_pxb[thread_id][i],_pyb[thread_id][i],_pzb[thread_id][i],_p0b[thread_id][i]};
+			}else{
+				if(i == 0){//beam
+					_pxb[thread_id][i] = event_.Event::Get_Beam_Comp(0,true);
+					_pyb[thread_id][i] = event_.Event::Get_Beam_Comp(1,true);
+					_pzb[thread_id][i] = event_.Event::Get_Beam_Comp(2,true);
+					_p0b[thread_id][i] = event_.Event::Get_Beam_Comp(3,true);
+					_pidb[thread_id][i] = ELECTRON;
+				}else if(i ==1){ //Target
+					_pxb[thread_id][i] = event_.Event::Get_Target_Comp(0,true);
+					_pyb[thread_id][i] = event_.Event::Get_Target_Comp(1,true);
+					_pzb[thread_id][i] = event_.Event::Get_Target_Comp(2,true);
+					_p0b[thread_id][i] = event_.Event::Get_Target_Comp(3,true);
+					_pidb[thread_id][i] = PROTON;
+				}
+			}
+		}
+		_helb[thread_id] = event_.Event::Get_Hel();
+		_topb[thread_id] = event_.Event::Get_Top();
+		_run_typeb[thread_id] = event_.Event::Get_Set();//{1,0}.{e16,e1f}
+		for(int j = 0; j< 3; j++){
+			_MMb[thread_id][j] = event_.Event::Get_MMb(j);
+			_thetab[thread_id][j] = event_.Event::Get_Thetab(j);
+			_alphab[thread_id][j] = event_.Event::Get_Alphab(j);
+		}
+		_weightb[thread_id] = event_.Event::Get_Weight();
+		//std::cout<<"In Tree thread " <<thread_id <<" the weight is: " <<_weightb[thread_id] <<std::endl;
+		if(event_.Event::Get_COM()){
+			_COMb[thread_id] = 1;
+		}else{
+			_COMb[thread_id] = 0; 
+		}
 		_a_tree[thread_id]->TTree::Fill();
 		//std::cout<<"   successfully filled?"; 
 	//}

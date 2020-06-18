@@ -11,6 +11,7 @@ Histogram::Histogram(std::shared_ptr<Environment> _envi, const std::string& outp
 	Histogram::CC_Make(_envi);
 	Histogram::MM_Make(_envi);
 	Histogram::Friend_Make(_envi);
+	Histogram::Cross_Make(_envi);
 }
 
 //Histogram::~Histogram() { this->Write(); }
@@ -25,6 +26,7 @@ void Histogram::Write(std::shared_ptr<Environment> _envi){
 	Histogram::CC_Write( _envi);
 	Histogram::MM_Write( _envi);
 	Friend_Write(_envi);
+	Histogram::Cross_Write(_envi);
 	RootOutputFile->Close();
 	std::cout<<"Histograms Done!" <<std::endl;
 
@@ -1201,6 +1203,113 @@ void Histogram::Friend_Write(std::shared_ptr<Environment> _envi){
 		}
 	}
 	
+}
+
+void Histogram::Cross_Make(std::shared_ptr<Environment> envi_){
+	char hname[100];
+	
+	/*
+	0 - Pmiss Only
+	1 - Pipmiss Only
+	2 - Pimmiss Only
+	3 - Zeromiss Only
+	4 - Zeromiss + 3
+	5 - Zeromiss + 2
+	6 - Zeromiss + 1
+	7 - Pmiss + Pipmiss
+	8 - Pmiss + Pimmiss
+	9 - Pipmiss + Pimmiss
+	10 - No Zeromiss + 3
+	11 - Multiples Pmiss
+	12 - Multiples Pipmiss
+	13 - Multiples Pimmiss
+	14 - Multiples Zeromiss
+	*/
+	sprintf(hname,"Topology_Crossing_no_weights");
+	Cross_hist[0] = std::make_shared<TH1F>(hname,hname, 15, -0.5, 14.5);
+	sprintf(hname,"Topology_Crossing__weights");
+	Cross_hist[1] = std::make_shared<TH1F>(hname,hname, 15, -0.5, 14.5);
+}
+
+void Histogram::Cross_Fill(std::shared_ptr<Environment> envi_, int gevnt_[4], float weight_){
+	bool top_pass[4] = {false,false,false,false};
+	bool top_mult[4] = {false,false,false,false};
+	int num_hadmiss = 0;
+	int tot_evnt = 0; 
+	for(int i = 0; i< 4; i++){
+		if(gevnt_[i] > 0){
+			top_pass[i] = true;
+			if(i != 3){
+				num_hadmiss += 1; 
+			}
+			if(gevnt_[i] > 1){
+				top_mult[i] = true;
+			}
+		}
+		tot_evnt += gevnt_[i];
+	}
+	
+	if(top_pass[0] && !top_pass[1] && !top_pass[2] && !top_pass[3] && !top_mult[0]){//Pmiss Only
+		Cross_hist[0]->Fill(0.0);
+		Cross_hist[1]->Fill(0.0,weight_);
+	}else if(!top_pass[0] && top_pass[1] && !top_pass[2] && !top_pass[3] && !top_mult[1]){//Pipmiss only
+		Cross_hist[0]->Fill(1.0);
+		Cross_hist[1]->Fill(1.0,weight_);
+	}else if(!top_pass[0] && !top_pass[1] && top_pass[2] && !top_pass[3] && !top_mult[2]){//Pimmiss only
+		Cross_hist[0]->Fill(2.0);
+		Cross_hist[1]->Fill(2.0,weight_);
+	}else if(!top_pass[0] && !top_pass[1] && !top_pass[2] && top_pass[3] && !top_mult[3]){//Zeromiss only
+		Cross_hist[0]->Fill(3.0);
+		Cross_hist[1]->Fill(3.0,weight_);
+	}else if(top_pass[0] && top_pass[1] && top_pass[2] && top_pass[3] && !top_mult[3]){//Zeromiss +3
+		Cross_hist[0]->Fill(4.0);
+		Cross_hist[1]->Fill(4.0,weight_);
+	}else if((num_hadmiss == 2) && top_pass[3] && !top_mult[3]){//Zeromiss +2
+		Cross_hist[0]->Fill(5.0);
+		Cross_hist[1]->Fill(5.0,weight_);
+	}else if((num_hadmiss == 1) && top_pass[3] && !top_mult[3]){//Zeromiss +1
+		Cross_hist[0]->Fill(6.0);
+		Cross_hist[1]->Fill(6.0,weight_);
+	}else if(top_pass[0] && top_pass[1]){//P + Pip
+		Cross_hist[0]->Fill(7.0);
+		Cross_hist[1]->Fill(7.0,weight_);
+	}else if(top_pass[0] && top_pass[2]){//P + Pip
+		Cross_hist[0]->Fill(8.0);
+		Cross_hist[1]->Fill(8.0,weight_);
+	}else if(top_pass[1] && top_pass[2]){//P + Pip
+		Cross_hist[0]->Fill(9.0);
+		Cross_hist[1]->Fill(9.0,weight_);
+	}else if(!top_pass[3] && (num_hadmiss == 3)){//P + Pip
+		Cross_hist[0]->Fill(10.0);
+		Cross_hist[1]->Fill(10.0,weight_);
+	}else if(top_mult[0]){//P + Pip
+		Cross_hist[0]->Fill(11.0);
+		Cross_hist[1]->Fill(11.0,weight_);
+	}else if(top_mult[1]){//P + Pip
+		Cross_hist[0]->Fill(12.0);
+		Cross_hist[1]->Fill(12.0,weight_);
+	}else if(top_mult[2]){//P + Pip
+		Cross_hist[0]->Fill(13.0);
+		Cross_hist[1]->Fill(13.0,weight_);
+	}else if(top_mult[3]){//P + Pip
+		Cross_hist[0]->Fill(14.0);
+		Cross_hist[1]->Fill(14.0,weight_);
+	}
+
+}
+
+void Histogram::Cross_Write(std::shared_ptr<Environment> envi_){
+	//char dir_name[100];
+	std::cout<<"Cross Plots: ";
+	TDirectory * Cross_plot = RootOutputFile->mkdir("Cross Plots");
+	Cross_plot->cd();
+	Cross_hist[0]->SetXTitle("Event Topology Mixing");
+	Cross_hist[0]->SetYTitle("Events");
+	Cross_hist[0]->Write();
+	Cross_hist[1]->SetXTitle("Event Topology Mixing");
+	Cross_hist[1]->SetYTitle("Events");
+	Cross_hist[1]->Write();
+	std::cout<<"Done" <<std::endl;
 }
 
 /*

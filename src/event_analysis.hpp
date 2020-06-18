@@ -33,12 +33,14 @@ private:
 	int _set = -1; //{0,1} -> {e16,e1f}
 	bool _sim = false;
 	bool _thrown = false;
+	bool _recon = false;
 
+	float _weight = 1.0;
 
 
 
 public:
-	Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> hist_, std::shared_ptr<Environment> envi_, int run_type_);
+	Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> hist_, std::shared_ptr<Environment> envi_, int run_type_, std::shared_ptr<forest> a_forest_, int thread_id_);
 
 
 	int Gevts();

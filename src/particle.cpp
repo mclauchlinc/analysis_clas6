@@ -58,6 +58,9 @@ void Particle::EID(std::shared_ptr<Branches> data_, std::shared_ptr<Environment>
 	bool _trigger_ = false;
 	int thr = 0; 
 	float Q2 = physics::Qsquared(_set, data_, _thrown);
+	if(_thrown){
+		hist_->Histogram::WQ2_Fill(envi_, 0, 0, W_, Q2, 1);
+	}
 	//Sanity Cuts
 	if(_idx == 0){
 		hist_->Histogram::Fid_Fill(envi_,0,_theta,_phi,0,0,0,W_,_p);
@@ -314,6 +317,7 @@ void Particle::PID(std::shared_ptr<Branches> data_, std::shared_ptr<Environment>
 			case ELECTRON:
 				_pid[0] = true;
 				_ided = true;
+				hist_->Histogram::WQ2_Fill(envi_, 0, 0, W_, physics::Qsquared(envi_->Environment::was_data_set(), data_, _thrown), 1);
 			break;
 			case PROTON:
 				_pid[1] = true;

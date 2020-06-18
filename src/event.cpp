@@ -9,13 +9,20 @@ void Event::COM_4Vec(){
 	_vec[1] = physics::COM_gp(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]);
 	_vec[2] = physics::COM_gp(2,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]);
 	_vec[3] = physics::COM_gp(3,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]);
+	_k1 = physics::COM_gp(4,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]);
+	_p1 = physics::COM_gp(5,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]);
+	_COM = true;
 }
 
 void Event::Vars(){
 	for(int i = 0; i<3; i++){
-		_alphab[i] = physics::alpha(i, _k1, _vec[0], _vec[1], _vec[2], _vec[3], true);
-		_thetab[i] = physics::Ev_Theta(i, _k1, _vec[0], _vec[1], _vec[2], _vec[3], true);
-		_MMb[i] = physics::Ev_MM(i, _k1, _vec[0], _vec[1], _vec[2], _vec[3], true);
+		if(_COM){
+			_alphab[i] = physics::alpha(i, _k1, _vec[0], _vec[1], _vec[2], _vec[3], true);
+			_thetab[i] = physics::Ev_Theta(i, _k1, _vec[0], _vec[1], _vec[2], _vec[3], true);
+			_MMb[i] = physics::Ev_MM(i, _k1, _vec[0], _vec[1], _vec[2], _vec[3], true);
+		}else{
+			std::cout<<"You need to get your 4-Momenta into center of mass" <<std::endl;
+		}
 	}
 }
 
@@ -26,6 +33,7 @@ void Event::Fill_Event(std::shared_ptr<Environment> envi_, std::shared_ptr<Histo
 		_W = W_;
 		_Q2 = Q2_;
 		_hel = hel_;
+		_set = p1.Particle::Get_set();
 		//std::cout<<"	Fill event p1" <<std::endl;
 		//std::cout<<"		Inside Event pt1 Fill for event Combo: " <<std::endl;
 		
@@ -211,24 +219,24 @@ if(top_ != 3){
 					_vec_lab[2] = physics::Make_4Vector(true,_p_lab[2],_theta_lab[2],_phi_lab[2],mpi);
 					_vec_lab[3] = physics::Make_4Vector(true,_p_lab[3],_theta_lab[3],_phi_lab[3],mpi);
 					_top[3] = true; 
-					hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),0,0,true);
-					hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[2],_vec_lab[3]),0,1,true);
+					hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),0,0,false);//The false refers to whether these will be used for fitting, which will only be done on events where there is one of each relevant particle measured
+					hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[2],_vec_lab[3]),0,1,false);//The false refers to whether these will be used for fitting, which will only be done on events where there is one of each relevant particle measured
 					_pass = Selection::Event_Selection(top_,_k1, _vec_lab[0], _vec_lab[1], _vec_lab[2], _vec_lab[3]);
 					p1.Particle::Fill_Par_Event(envi_,hist_,_W,top_,0,_pass); 
 					p2.Particle::Fill_Par_Event(envi_,hist_,_W,top_,1,_pass); 
 					p3.Particle::Fill_Par_Event(envi_,hist_,_W,top_,2,_pass); 
 					p4.Particle::Fill_Par_Event(envi_,hist_,_W,top_,3,_pass); 
 					if(_pass){
-						hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),1,0,true);
-						hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),1,1,true);
+						hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),1,0,false);//The false refers to whether these will be used for fitting, which will only be done on events where there is one of each relevant particle measured
+						hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),1,1,false);//The false refers to whether these will be used for fitting, which will only be done on events where there is one of each relevant particle measured
 						_vec[0] = physics::COM_gp(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]);
 						_vec[1] = physics::COM_gp(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]);
 						_vec[2] = physics::COM_gp(2,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]);
 						_vec[3] = physics::COM_gp(3,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]);
 
 					}else{
-						hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),2,0,true);
-						hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),2,1,true);
+						hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),2,0,false);//The false refers to whether these will be used for fitting, which will only be done on events where there is one of each relevant particle measured
+						hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),2,1,false);//The false refers to whether these will be used for fitting, which will only be done on events where there is one of each relevant particle measured
 					}
 				}
 			}else{
@@ -245,10 +253,21 @@ if(top_ != 3){
 	}
 }
 
-void Event::Fill_Event_Hists(std::shared_ptr<Environment> envi_, std::shared_ptr<Histogram> hist_){
+void Event::Fill_Event_Hists(std::shared_ptr<Environment> envi_, std::shared_ptr<Histogram> hist_, bool fit_){
 	for(int i = 0; i< 4; i++){//Over the different topologies
 		if(_top[i]){
 			hist_->Histogram::WQ2_Fill(envi_, i+1, 10, _W, _Q2, _thrown);
+			if(fit_ && !_thrown){
+				hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),0,0,true);//The false refers to whether these will be used for fitting, which will only be done on events where there is one of each relevant particle measured
+				hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[2],_vec_lab[3]),0,1,true);
+				if(_pass){
+					hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),1,0,true);//The false refers to whether these will be used for fitting, which will only be done on events where there is one of each relevant particle measured
+					hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[2],_vec_lab[3]),1,1,true);
+				}else{
+					hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),2,0,true);//The false refers to whether these will be used for fitting, which will only be done on events where there is one of each relevant particle measured
+					hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[2],_vec_lab[3]),2,1,true);
+				}
+			}
 			for(int j = 0; j< 3; j++){
 				hist_->Histogram::Friend_Fill(envi_, i+1, _W, _Q2, _MMb[j], _thetab[j], _alphab[j], _phi[j] , j, _weight);
 			}
@@ -263,6 +282,16 @@ void Event::Assign_Weight(float weight_){
 bool Event::Top(int i){
 	return _top[i];
 }
+
+int Event::Get_Top(){
+	int out = -1; 
+	for(int i = 0; i< 4; i++){
+		if(_top[i]){
+			out = i;
+		}
+	}
+	return out;
+}
 bool Event::Gevnt(){
 	return _pass; 
 }
@@ -274,7 +303,7 @@ bool Event::Part_Present(int i){
 }
 float Event::Get_P(int i, bool COM_ ){
 float _p_ = NAN;
-	if(COM_){
+	if(COM_ && _COM){
 		_p_ = _p[i];
 	}else{
 		_p_ = _p_lab[i];
@@ -283,7 +312,7 @@ float _p_ = NAN;
 }
 float Event::Get_Theta(int i, bool COM_ ){
 float _theta_ = NAN;
-	if(COM_){
+	if(COM_ && _COM){
 		_theta_ = _theta[i];
 	}else{
 		_theta_ = _theta_lab[i];
@@ -292,19 +321,92 @@ float _theta_ = NAN;
 }
 float Event::Get_Phi(int i, bool COM_ ){
 	float _phi_ = NAN;
-	if(COM_){
+	if(COM_ && _COM){
 		_phi_ = _phi[i];
 	}else{
 		_phi_ = _phi_lab[i];
 	}
 	return _phi_;
 } 
-TLorentzVector Event::Get_Beam(){
-	return _k1; 
+float Event::Get_Px(int i, bool COM_ ){
+	float px = NAN; 
+	if(COM_ && _COM){
+		px = _vec[i][0];
+	}else{
+		px = _vec_lab[i][0];
+	}
+	return px;
 }
+float Event::Get_Py(int i, bool COM_ ){
+	float py = NAN; 
+	if(COM_ && _COM){
+		py = _vec[i][1];
+	}else{
+		py = _vec_lab[i][1];
+	}
+	return py;
+}
+float Event::Get_Pz(int i, bool COM_ ){
+	float pz = NAN; 
+	if(COM_ && _COM){
+		pz = _vec[i][2];
+	}else{
+		pz = _vec_lab[i][2];
+	}
+	return pz;
+}
+float Event::Get_P0(int i, bool COM_ ){
+	float p0 = NAN; 
+	if(COM_ && _COM){
+		p0 = _vec[i][3];
+	}else{
+		p0 = _vec_lab[i][3];
+	}
+	return p0;
+}
+TLorentzVector Event::Get_Beam(bool COM_){
+	TLorentzVector k1;
+	if(COM_ && _COM){
+		k1 = _k1;
+	}else{
+		k1 = _k1_lab;
+	}
+	return k1; 
+}
+
+TLorentzVector Event::Get_Target(bool COM_ ){
+	TLorentzVector p1;
+	if(COM_ && _COM){
+		p1 = _p1;
+	}else{
+		p1 = p_mu;//Constants
+	}
+	return p1; 
+}
+
+float Event::Get_Beam_Comp(int i, bool COM_ ){
+	float p_part = NAN;
+	if(COM_ && _COM){
+		p_part = _k1[i];
+	}else{
+		p_part = _k1_lab[i];
+	}
+	return p_part;
+}
+
+float Event::Get_Target_Comp(int i, bool COM_ ){
+	float p_part = NAN;
+	if(COM_ && _COM){
+		p_part = _p1[i];
+	}else{
+		p_part = p_mu[i];//Constants
+	}
+	return p_part;
+}
+
 TLorentzVector Event::Get_4Vec(int i, bool COM_ ){
 	TLorentzVector _boopers_;
-	if(COM_){
+	if(COM_ && _COM){
 		_boopers_ = _vec[i];
 	} else{
 		_boopers_ = _vec_lab[i];
@@ -327,6 +429,28 @@ float Event::Get_Alphab(int i){
 	return _alphab[i];
 }
 
+bool Event::Get_COM(){
+	return _COM;
+}
+
+int Event::Get_PID(int i){
+	int pid = 0;
+	switch(i){
+		case 0: pid = ELECTRON; break;
+		case 1: pid = PROTON; break;
+		case 2: pid = PION; break;
+		case 3: pid = -PION; break;
+	}
+	return pid; 
+}
+
+int Event::Get_Set(){
+	return _set; //{1,0} -> {e16,e1f}
+}
+
+int Event::Get_Hel(){
+	return _hel;
+}
 //~Event()
 
 

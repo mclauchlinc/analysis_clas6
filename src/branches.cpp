@@ -132,7 +132,7 @@ void Branches::init() {
     _tree->SetBranchAddress("nphe", &_nphe);
     _tree->SetBranchAddress("q", &_q);*/
     if(_include_weights){
-      _tree->SetBranchAddress("sigma_total", &_weight);
+      _tree->SetBranchAddress("weight", &_weight);
     }
   }
 }

@@ -17,7 +17,6 @@ int main(int argc, char **argv){
 	//for threading
 	std::vector<std::vector<std::string>> infilenames(NUM_THREADS);
 	std::vector<std::vector<std::string>> infilenames2(NUM_THREADS);//For two lists of plate stuff
-	std::cout<<"this should say 1 for being true: " <<true <<std::endl;
 
 	int data_set = 0; //{e1-6,e1f, e1-6 sim, e1f sim, e16 empty, e1f empty} ->{1,2,3,4,5,6}
 	int _case = 0; //For file entry
@@ -159,8 +158,8 @@ int main(int argc, char **argv){
 		}
 	}
 	
-	//a_good_forest->forest::Grow_Forest();//Combine all those Thread specific trees and output a root file with all event selected events with four vectors 
-	//a_good_forest->forest::Write();//Write the TTree for the events
+	a_good_forest->forest::Grow_Forest();//Combine all those Thread specific trees and output a root file with all event selected events with four vectors 
+	a_good_forest->forest::Write();//Write the TTree for the events
 
 
 	//For each thread to see how many events each thread successfully analyized

@@ -21,6 +21,7 @@
 using TH2F_ptr = std::shared_ptr<TH2F>;
 using TH1F_ptr = std::shared_ptr<TH1F>;
 using THn_ptr = std::shared_ptr<THnSparseD>;
+//using TH1I_ptr = std::shared_ptr<TH1I>;
 
 
 class Histogram {
@@ -109,6 +110,7 @@ protected:
 	TH2F_ptr DT_hist[4][7][30][7][6][2]; //particle, cuts, W binning, sector, topology
 	TH1F_ptr CC_hist[6][18][11][4][6][2]; //Sector, segment, cut, side of detector, topology, anti
 	TH1F_ptr MM_hist[4][3][2][2];//topology, cut, squared v linear, fitting vs. not fitting plots
+	TH1F_ptr Cross_hist[2]; //Showing how many events counted in mulitiple topologies
 
 	bool Fid_made_hist[7][4][11][30][12][6][2];
 	bool Fid_fill_hist[7][4][11][30][12][6][2];
@@ -191,6 +193,10 @@ public:
 	int * Friend_binning(int top, float W_, float Q2_, float MM_, float theta_, float alpha_, float phi_ , int channel);
 	void Friend_Fill(std::shared_ptr<Environment> _envi, int top_, float W_, float Q2_, float MM_, float theta_, float alpha_, float phi_ , int chan_, float weight_);
 	void Friend_Write(std::shared_ptr<Environment> _envi);
+
+	void Cross_Make(std::shared_ptr<Environment> envi_);
+	void Cross_Fill(std::shared_ptr<Environment> envi_, int gevnt_[4], float weight_);
+	void Cross_Write(std::shared_ptr<Environment> envi_);
 
 	//void Event_Particle_Hist(std::shared_ptr<Environment> envi_, const Particle p1, float W_, int top_, int par_, bool pass_);
 

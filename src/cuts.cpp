@@ -173,14 +173,20 @@ float cuts::sf_high(Float_t p, int sidx, int r){
 	return sf_high_e16[sidx][0] + sf_high_e16[sidx][1]*p + sf_high_e16[sidx][2]*p*p + sf_high_e16[sidx][3]*p*p*p;
 }
 //Electron Sampling Fraction cut using the EC
-bool cuts::sf_cut(Float_t p, Float_t etot, Float_t cx, Float_t cy, int r)
+bool cuts::sf_cut(Float_t p, Float_t etot, Float_t cx, Float_t cy, int run, bool sim)
 {
 	bool pass_sf = kFALSE;
 	float s_f = sf(etot,p);
 	int sector = physics::get_sector(physics::get_phi(cx,cy));
 	int sidx = sector -1;
-	float low = sf_low( p, sidx, r);
-	float high = sf_high(p, sidx, r);
+	float low, high;
+	if(!sim){
+		low = sf_low( p, sidx, run);
+		high = sf_high(p, sidx, run);
+	}else{
+		low = 0.0;
+		high = 0.18;
+	}
 	if(s_f >= low && s_f <= high)
 	{
 		pass_sf = kTRUE;
@@ -325,7 +331,7 @@ bool cuts::e_ec(std::shared_ptr<Branches> data, std::shared_ptr<Environment> env
 }
 bool cuts::e_sf(std::shared_ptr<Branches> data, std::shared_ptr<Environment> envi, int idx_){
 	bool sf = false;
-	if(envi->was_eid_sf() && cuts::sf_cut(data->Branches::p(idx_),data->Branches::etot(idx_),data->Branches::cx(idx_),data->Branches::cy(idx_))){
+	if(envi->was_eid_sf() && cuts::sf_cut(data->Branches::p(idx_),data->Branches::etot(idx_),data->Branches::cx(idx_),data->Branches::cy(idx_),envi->Environment::was_data_set(),envi->Environment::was_sim())){
     	sf = true;
   	}
   	return sf; 
@@ -361,11 +367,11 @@ bool cuts::pim_e_sep(std::shared_ptr<Branches> data, std::shared_ptr<Environment
 		if(had == 2){
 			if(data->cc(par)>0){//If it has a registerd hit in the CC 
 				if(cuts::min_cc(data->Branches::cc_segm(par),data->Branches::cc_sect(par),data->Branches::nphe(par))){//Min CC Cut
-					if(cuts::sf_cut(data->Branches::p(par),data->Branches::etot(par),data->Branches::cx(par),data->Branches::cy(par))){//SF Cut
+					//if(cuts::sf_cut(data->Branches::p(par),data->Branches::etot(par),data->Branches::cx(par),data->Branches::cy(par))){//SF Cut
 						//if(cuts::fid_cut(h,data->Branches::p(h),data->Branches::cx(h),data->Branches::cy(h),data->Branches::cz(h))){//Electron Fiducial //I don't know that this should be necessary because it doesn't work towards e-pim separation 
 							pass = true;//Defined quantity for Event object  
 						//}
-					}
+					//}
 				}
 			}else{
 				pass = true;
