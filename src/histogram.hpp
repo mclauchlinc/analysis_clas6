@@ -183,6 +183,8 @@ public:
 	//void MM_Fill(std::shared_ptr<Environment> _envi, Particle _par);
 	void MM_Write(std::shared_ptr<Environment> _envi);
 
+
+
 	void Friend_Make(std::shared_ptr<Environment> _envi);
 	int Friend_W_binning(float W_);
 	int Friend_Q2_binning(float Q2_);

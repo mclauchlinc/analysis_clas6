@@ -212,8 +212,8 @@ bool cuts::MM_cut(int top_, float MM){
 			bot = pim_center - pim_sig; 
 		break;
 		case 3:
-			top = MM_zero_center2 + MM_zero_sigma2;
-			bot = MM_zero_center2 - MM_zero_sigma2; 
+			top = MM_zero_center + MM_zero_sigma;
+			bot = MM_zero_center - MM_zero_sigma; 
 		break;
 	}
 	if((MM > bot) && (MM < top)){

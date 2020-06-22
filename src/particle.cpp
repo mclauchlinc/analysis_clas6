@@ -58,9 +58,6 @@ void Particle::EID(std::shared_ptr<Branches> data_, std::shared_ptr<Environment>
 	bool _trigger_ = false;
 	int thr = 0; 
 	float Q2 = physics::Qsquared(_set, data_, _thrown);
-	if(_thrown){
-		hist_->Histogram::WQ2_Fill(envi_, 0, 0, W_, Q2, 1);
-	}
 	//Sanity Cuts
 	if(_idx == 0){
 		hist_->Histogram::Fid_Fill(envi_,0,_theta,_phi,0,0,0,W_,_p);
@@ -137,7 +134,7 @@ void Particle::EID(std::shared_ptr<Branches> data_, std::shared_ptr<Environment>
 			_min_ec_pass = false; 
 		}
 		//Combo cuts
-		if(_fid_pass && _sf_pass){
+		if(_fid_pass[0] && _sf_pass){
 			if(_trigger_){
 				hist_->Histogram::Fid_Fill(envi_,0,_theta,_phi,0,5,0,W_,_p);
 				hist_->Histogram::SF_Fill(envi_,0,_p,_etot,5,0,W_,physics::get_sector(_phi));
@@ -151,7 +148,7 @@ void Particle::EID(std::shared_ptr<Branches> data_, std::shared_ptr<Environment>
 				hist_->Histogram::CC_Fill(envi_,0,physics::get_sector(_phi),_cc_seg,_nphe,5,1);
 			}
 		}
-		if(_fid_pass && _cc_pass){
+		if(_fid_pass[0] && _cc_pass){
 			if(_trigger_){
 				hist_->Histogram::Fid_Fill(envi_,0,_theta,_phi,0,6,0,W_,_p);
 				hist_->Histogram::SF_Fill(envi_,0,_p,_etot,6,0,W_,physics::get_sector(_phi));

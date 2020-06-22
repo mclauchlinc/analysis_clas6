@@ -104,7 +104,7 @@ static const float MM_D_sigma = 0.08;
 
 //My Own MM cut parameters
 static const float MM_zero_center = 0.0;
-static const float MM_zero_sigma = 0.02;
+static const float MM_zero_sigma = 0.06325;
 static const float MM_zero_center2 = 0.0;
 static const float MM_zero_sigma2 = 0.004;
 
@@ -310,7 +310,7 @@ static std::unordered_map<std::string, int> filetype_map = 	{	{list1,type1},
 																{lists3,types3}};
 
 static const char * species[] = {"ele","pro","pip","pim"};//4
-static const char * eid_cut[] = {"pre","sanity","fid","sf","min_cc","fid+sf","fid+cc","sf+cc","eid","bank","event"}; //11
+static const char * eid_cut[] = {"pre","sanity","fid","sf","min_cc","fid+sf","fid+cc","sf+cc","eid","bank","event"}; //11"min_cc","min_ec","eid","bank","event"};//"fid+sf","fid+cc","sf+cc","eid","bank","event"}; //11
 static const char * cut_ver[] = {"cut","anticut"};
 static const char * hid_cut[] = {"pre","sanity","fid","dt","hid","bank","event"};//,"pWQ2"}; //7
 static const char * topologies[] = {"None","Pmiss","PIPmiss","PIMmiss","Zeromiss","ALLmiss"}; //6

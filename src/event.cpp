@@ -255,7 +255,7 @@ if(top_ != 3){
 
 void Event::Fill_Event_Hists(std::shared_ptr<Environment> envi_, std::shared_ptr<Histogram> hist_, bool fit_){
 	for(int i = 0; i< 4; i++){//Over the different topologies
-		if(_top[i]){
+		if(_top[i] && _pass){
 			hist_->Histogram::WQ2_Fill(envi_, i+1, 10, _W, _Q2, _thrown);
 			if(fit_ && !_thrown){
 				hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),0,0,true);//The false refers to whether these will be used for fitting, which will only be done on events where there is one of each relevant particle measured
@@ -268,7 +268,7 @@ void Event::Fill_Event_Hists(std::shared_ptr<Environment> envi_, std::shared_ptr
 					hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[2],_vec_lab[3]),2,1,true);
 				}
 			}
-			for(int j = 0; j< 3; j++){
+			for(int j = 0; j< 3; j++){//For the different kinematic expressions
 				hist_->Histogram::Friend_Fill(envi_, i+1, _W, _Q2, _MMb[j], _thetab[j], _alphab[j], _phi[j] , j, _weight);
 			}
 		}
