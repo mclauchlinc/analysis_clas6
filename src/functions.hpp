@@ -15,7 +15,7 @@ namespace fun {
 bool replace(std::string& str, const std::string& from, const std::string& to);
 
 std::shared_ptr<TFile> Name_File(std::string a_file_name);
-std::shared_ptr<TFile> Name_Tree_File(std::string a_file_name);
+std::shared_ptr<TFile> Name_Tree_File(std::string a_file_name, bool thrown_ = false);
 
 std::vector<std::string> read_file_list(std::string path, int thread_num);
 

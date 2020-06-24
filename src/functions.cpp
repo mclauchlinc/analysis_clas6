@@ -15,9 +15,14 @@ std::shared_ptr<TFile> fun::Name_File(std::string a_file_name)
 	return std::make_shared<TFile>(file_name.c_str(),"RECREATE");
 }
 
-std::shared_ptr<TFile> fun::Name_Tree_File(std::string a_file_name)
+std::shared_ptr<TFile> fun::Name_Tree_File(std::string a_file_name, bool thrown_)
 {
-	std::string file_name = "$name_evnt_tree.root";
+  std::string file_name;
+  if(thrown_){
+    file_name = "$name_thr_tree.root";
+  }else{
+    file_name = "$name_evnt_tree.root";
+  }
 	replace(file_name, "$name", a_file_name);
 	return std::make_shared<TFile>(file_name.c_str(),"RECREATE");
 }

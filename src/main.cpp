@@ -117,8 +117,10 @@ int main(int argc, char **argv){
 	auto hists = std::make_shared<Histogram>(envi,output_name);//Check on this
 
 	//Make relevant TTrees and Event Rootfile
-	auto a_good_forest = std::make_shared<forest>(1); 
-	a_good_forest->forest::mkfile(output_name);//Making the Tree File
+	auto a_good_forest = std::make_shared<forest>(1,envi->Environment::was_sim()); 
+	//a_good_forest->forest::mkfile(output_name);//Making the Tree File
+	//auto thrown_forest = std::make_shared<forest>(1); 
+	//thrown_forest->forest::mkfile(output_name,true);//Making the Tree File
 	std::future<bool> fut;
 
 	
@@ -158,8 +160,10 @@ int main(int argc, char **argv){
 		}
 	}
 	
-	a_good_forest->forest::Grow_Forest();//Combine all those Thread specific trees and output a root file with all event selected events with four vectors 
-	a_good_forest->forest::Write();//Write the TTree for the events
+	a_good_forest->forest::Grow_Write_Forest(output_name,envi->Environment::was_sim());//_Forest(envi->Environment::was_sim());//Combine all those Thread specific trees and output a root file with all event selected events with four vectors 
+	//a_good_forest->forest::Write(envi->Environment::was_sim());//Write the TTree for the events
+
+	
 
 
 	//For each thread to see how many events each thread successfully analyized
@@ -173,7 +177,7 @@ int main(int argc, char **argv){
 	std::cout<<std::endl <<"Total Number of Files: " <<envi->Environment::was_num_file() <<std::endl; 
 	
 
-	hists->Histogram::Write(envi);
+	hists->Histogram::Write(output_name,envi);
 
 	std::cout<<std::endl;
 	//Timer and Efficiency Counters

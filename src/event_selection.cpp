@@ -37,6 +37,12 @@ bool Selection::Event_Selection( int top_, TLorentzVector k_mu_, TLorentzVector 
 	return pass; 
 }
 
+bool Selection::Event_Selection( int top_, float MM_){
+	bool pass = false;
+	pass = cuts::MM_cut(top_,MM_);
+	return pass; 
+}
+
 /*
 bool Selection::Topology(bool top_pos[4], std::shared_ptr<Histogram> hist_, std::shared_ptr<Branches> data, TLorentzVector k0, TLorentzVector k1, TLorentzVector k2, TLorentzVector k3, int idx1, int idx2, int idx3){//For all particles detected topologies
 	bool pass = false; 

@@ -70,19 +70,21 @@ void Event::Fill_Event(std::shared_ptr<Environment> envi_, std::shared_ptr<Histo
 							_vec_lab[2] = physics::Make_4Vector(true,_p_lab[2],_theta_lab[2],_phi_lab[2],mpi);
 							_vec_lab[3] = physics::Make_4Vector(true,_p_lab[3],_theta_lab[3],_phi_lab[3],mpi);
 							_top[0] = true;
-							hist_->Histogram::MM_Fill(envi_,0,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[3]),0,0,true);
-							hist_->Histogram::MM_Fill(envi_,0,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[3]),0,1,true);
-							_pass = Selection::Event_Selection(top_,_k1, _vec_lab[0], _vec_lab[2], _vec_lab[3]);
+							_MM = physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[3]);
+							_MM2 = physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[3]);
+							hist_->Histogram::MM_Fill(envi_,0,_MM,0,0,false);
+							hist_->Histogram::MM_Fill(envi_,0,_MM,0,1,false);
+							_pass = Selection::Event_Selection(top_,_MM);//_k1, _vec_lab[0], _vec_lab[2], _vec_lab[3]);
 							p1.Particle::Fill_Par_Event(envi_,hist_,_W,top_,0,_pass); 
 							p2.Particle::Fill_Par_Event(envi_,hist_,_W,top_,2,_pass); 
 							p3.Particle::Fill_Par_Event(envi_,hist_,_W,top_,3,_pass); 
 							if(_pass){
 								_vec_lab[1] = _k1 + p_mu - _vec_lab[0] - _vec_lab[2] - _vec_lab[3];
-								hist_->Histogram::MM_Fill(envi_,0,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[3]),1,0,true);
-								hist_->Histogram::MM_Fill(envi_,0,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[3]),1,1,true);
+								hist_->Histogram::MM_Fill(envi_,0,_MM,1,0,false);
+								hist_->Histogram::MM_Fill(envi_,0,_MM2,1,1,false);
 							}else{
-								hist_->Histogram::MM_Fill(envi_,0,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[3]),2,0,true);
-								hist_->Histogram::MM_Fill(envi_,0,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[3]),2,1,true);
+								hist_->Histogram::MM_Fill(envi_,0,_MM,2,0,false);
+								hist_->Histogram::MM_Fill(envi_,0,_MM2,2,1,false);
 							}
 						}
 					break;
@@ -102,19 +104,21 @@ void Event::Fill_Event(std::shared_ptr<Environment> envi_, std::shared_ptr<Histo
 							_vec_lab[1] = physics::Make_4Vector(true,_p_lab[1],_theta_lab[1],_phi_lab[1],mp);
 							_vec_lab[3] = physics::Make_4Vector(true,_p_lab[3],_theta_lab[3],_phi_lab[3],mpi);
 							_top[1] = true;
-							hist_->Histogram::MM_Fill(envi_,1,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[3]),0,0,true);
-							hist_->Histogram::MM_Fill(envi_,1,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[3]),0,1,true);
-							_pass = Selection::Event_Selection(top_,_k1, _vec_lab[0], _vec_lab[1], _vec_lab[3]);
+							_MM = physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[3]);
+							_MM2 = physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[3]);
+							hist_->Histogram::MM_Fill(envi_,1,_MM,0,0,false);
+							hist_->Histogram::MM_Fill(envi_,1,_MM2,0,1,false);
+							_pass = Selection::Event_Selection(top_,_MM);//_k1, _vec_lab[0], _vec_lab[1], _vec_lab[3]);
 							p1.Particle::Fill_Par_Event(envi_,hist_,_W,top_,0,_pass); 
 							p2.Particle::Fill_Par_Event(envi_,hist_,_W,top_,1,_pass); 
 							p3.Particle::Fill_Par_Event(envi_,hist_,_W,top_,3,_pass);
 							if(_pass){
 								_vec_lab[2] = _k1 + p_mu - _vec_lab[0] - _vec_lab[1] - _vec_lab[3]; 
-								hist_->Histogram::MM_Fill(envi_,1,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[3]),1,0,true);
-								hist_->Histogram::MM_Fill(envi_,1,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[3]),1,1,true);
+								hist_->Histogram::MM_Fill(envi_,1,_MM,1,0,false);
+								hist_->Histogram::MM_Fill(envi_,1,_MM2,1,1,false);
 							}else{
-								hist_->Histogram::MM_Fill(envi_,1,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[3]),2,0,true);
-								hist_->Histogram::MM_Fill(envi_,1,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[3]),2,1,true);
+								hist_->Histogram::MM_Fill(envi_,1,_MM,2,0,false);
+								hist_->Histogram::MM_Fill(envi_,1,_MM2,2,1,false);
 							}
 						}
 					break;
@@ -147,11 +151,13 @@ void Event::Fill_Event(std::shared_ptr<Environment> envi_, std::shared_ptr<Histo
 							//std::cout<<"		Inside Event pt5e Fill for event Combo: " <<std::endl;
 							
 							_top[2] = true; //For some reason this misplaces the index for electrons
-							hist_->Histogram::MM_Fill(envi_,2,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2]),0,0,true);
-							hist_->Histogram::MM_Fill(envi_,2,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2]),0,1,true);
+							_MM = physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2]);
+							_MM2 = physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2]);
+							hist_->Histogram::MM_Fill(envi_,2,_MM,0,0,false);
+							hist_->Histogram::MM_Fill(envi_,2,_MM2,0,1,false);
 							//std::cout<<"		Inside Event pt6 Fill for event Combo: " <<std::endl;
 							
-							_pass = Selection::Event_Selection(top_,_k1, _vec_lab[0], _vec_lab[1], _vec_lab[2]);
+							_pass = Selection::Event_Selection(top_,_MM);//_k1, _vec_lab[0], _vec_lab[1], _vec_lab[2]);
 							p1.Particle::Fill_Par_Event(envi_,hist_,_W,top_,0,_pass); 
 							p2.Particle::Fill_Par_Event(envi_,hist_,_W,top_,1,_pass); 
 							p3.Particle::Fill_Par_Event(envi_,hist_,_W,top_,2,_pass);
@@ -159,13 +165,13 @@ void Event::Fill_Event(std::shared_ptr<Environment> envi_, std::shared_ptr<Histo
 							
 							if(_pass){
 								_vec_lab[3] = _k1 + p_mu - _vec_lab[0] - _vec_lab[1] - _vec_lab[2]; 
-								hist_->Histogram::MM_Fill(envi_,2,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2]),1,0,true);
-								hist_->Histogram::MM_Fill(envi_,2,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2]),1,1,true);
+								hist_->Histogram::MM_Fill(envi_,2,_MM,1,0,false);
+								hist_->Histogram::MM_Fill(envi_,2,_MM2,1,1,false);
 								//std::cout<<"		Inside Event pt8 Fill for event Combo: " <<std::endl;
 								
 							}else{
-								hist_->Histogram::MM_Fill(envi_,2,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2]),2,0,true);
-								hist_->Histogram::MM_Fill(envi_,2,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2]),2,1,true);
+								hist_->Histogram::MM_Fill(envi_,2,_MM,2,0,false);
+								hist_->Histogram::MM_Fill(envi_,2,_MM2,2,1,false);
 								//std::cout<<"		Inside Event pt9 Fill for event Combo: " <<std::endl;
 								//p1.Particle::Check_Particle();
 								//p2.Particle::Check_Particle();
@@ -194,6 +200,7 @@ if(top_ != 3){
 		_W = W_;
 		_Q2 = Q2_;
 		_hel = hel_;
+		_set = p1.Particle::Get_set();
 		//Check to make sure all particles were either simulated or not
 		if(p1.Particle::Is_Sim() == p2.Particle::Is_Sim() && p2.Particle::Is_Sim() == p3.Particle::Is_Sim()){
 			_sim = p1.Particle::Is_Sim();
@@ -219,24 +226,26 @@ if(top_ != 3){
 					_vec_lab[2] = physics::Make_4Vector(true,_p_lab[2],_theta_lab[2],_phi_lab[2],mpi);
 					_vec_lab[3] = physics::Make_4Vector(true,_p_lab[3],_theta_lab[3],_phi_lab[3],mpi);
 					_top[3] = true; 
-					hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),0,0,false);//The false refers to whether these will be used for fitting, which will only be done on events where there is one of each relevant particle measured
-					hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[2],_vec_lab[3]),0,1,false);//The false refers to whether these will be used for fitting, which will only be done on events where there is one of each relevant particle measured
-					_pass = Selection::Event_Selection(top_,_k1, _vec_lab[0], _vec_lab[1], _vec_lab[2], _vec_lab[3]);
+					_MM = physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]);
+					_MM2 = physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]);
+					hist_->Histogram::MM_Fill(envi_,3,_MM,0,0,false);//The false refers to whether these will be used for fitting, which will only be done on events where there is one of each relevant particle measured
+					hist_->Histogram::MM_Fill(envi_,3,_MM2,0,1,false);//The false refers to whether these will be used for fitting, which will only be done on events where there is one of each relevant particle measured
+					_pass = Selection::Event_Selection(top_,_MM);//_k1, _vec_lab[0], _vec_lab[1], _vec_lab[2], _vec_lab[3]);
 					p1.Particle::Fill_Par_Event(envi_,hist_,_W,top_,0,_pass); 
 					p2.Particle::Fill_Par_Event(envi_,hist_,_W,top_,1,_pass); 
 					p3.Particle::Fill_Par_Event(envi_,hist_,_W,top_,2,_pass); 
 					p4.Particle::Fill_Par_Event(envi_,hist_,_W,top_,3,_pass); 
 					if(_pass){
-						hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),1,0,false);//The false refers to whether these will be used for fitting, which will only be done on events where there is one of each relevant particle measured
-						hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),1,1,false);//The false refers to whether these will be used for fitting, which will only be done on events where there is one of each relevant particle measured
+						hist_->Histogram::MM_Fill(envi_,3,_MM,1,0,false);//The false refers to whether these will be used for fitting, which will only be done on events where there is one of each relevant particle measured
+						hist_->Histogram::MM_Fill(envi_,3,_MM2,1,1,false);//The false refers to whether these will be used for fitting, which will only be done on events where there is one of each relevant particle measured
 						_vec[0] = physics::COM_gp(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]);
 						_vec[1] = physics::COM_gp(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]);
 						_vec[2] = physics::COM_gp(2,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]);
 						_vec[3] = physics::COM_gp(3,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]);
 
 					}else{
-						hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),2,0,false);//The false refers to whether these will be used for fitting, which will only be done on events where there is one of each relevant particle measured
-						hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),2,1,false);//The false refers to whether these will be used for fitting, which will only be done on events where there is one of each relevant particle measured
+						hist_->Histogram::MM_Fill(envi_,3,_MM,2,0,false);//The false refers to whether these will be used for fitting, which will only be done on events where there is one of each relevant particle measured
+						hist_->Histogram::MM_Fill(envi_,3,_MM2,2,1,false);//The false refers to whether these will be used for fitting, which will only be done on events where there is one of each relevant particle measured
 					}
 				}
 			}else{
@@ -254,22 +263,37 @@ if(top_ != 3){
 }
 
 void Event::Fill_Event_Hists(std::shared_ptr<Environment> envi_, std::shared_ptr<Histogram> hist_, bool fit_){
+	//std::cout<<"Event 1\n";
 	for(int i = 0; i< 4; i++){//Over the different topologies
-		if(_top[i] && _pass){
-			hist_->Histogram::WQ2_Fill(envi_, i+1, 10, _W, _Q2, _thrown);
+		if(_top[i] ){//&& _pass){
+			//std::cout<<"Event 2\n";
+			hist_->Histogram::WQ2_Fill(envi_, i+1, 10, _W, _Q2, _weight, _thrown);
+			hist_->Histogram::WQ2_Fill(envi_, 5, 10, _W, _Q2, _weight, _thrown);
+			//std::cout<<"Event 3\n";
 			if(fit_ && !_thrown){
-				hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),0,0,true);//The false refers to whether these will be used for fitting, which will only be done on events where there is one of each relevant particle measured
-				hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[2],_vec_lab[3]),0,1,true);
+				//std::cout<<"Event 4\n";
+				hist_->Histogram::MM_Fill(envi_,i,_MM,0,0,true);//The false refers to whether these will be used for fitting, which will only be done on events where there is one of each relevant particle measured
+				//std::cout<<"Event 5\n";
+				hist_->Histogram::MM_Fill(envi_,i,_MM2,0,1,true);
+				//std::cout<<"Event 6\n";
 				if(_pass){
-					hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),1,0,true);//The false refers to whether these will be used for fitting, which will only be done on events where there is one of each relevant particle measured
-					hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[2],_vec_lab[3]),1,1,true);
+					//std::cout<<"Event 7\n";
+					hist_->Histogram::MM_Fill(envi_,i,_MM,1,0,true);//The false refers to whether these will be used for fitting, which will only be done on events where there is one of each relevant particle measured
+					//std::cout<<"Event 8\n";
+					hist_->Histogram::MM_Fill(envi_,i,_MM2,1,1,true);
+					//std::cout<<"Event 9\n";
 				}else{
-					hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(0,_k1,_vec_lab[0],_vec_lab[1],_vec_lab[2],_vec_lab[3]),2,0,true);//The false refers to whether these will be used for fitting, which will only be done on events where there is one of each relevant particle measured
-					hist_->Histogram::MM_Fill(envi_,3,physics::MM_event(1,_k1,_vec_lab[0],_vec_lab[2],_vec_lab[2],_vec_lab[3]),2,1,true);
+					//std::cout<<"Event 10\n";
+					hist_->Histogram::MM_Fill(envi_,i,_MM,2,0,true);//The false refers to whether these will be used for fitting, which will only be done on events where there is one of each relevant particle measured
+					//std::cout<<"Event 11\n";
+					hist_->Histogram::MM_Fill(envi_,i,_MM2,2,1,true);
+					//std::cout<<"Event 12\n";
 				}
 			}
 			for(int j = 0; j< 3; j++){//For the different kinematic expressions
+				//std::cout<<"Event 13\n";
 				hist_->Histogram::Friend_Fill(envi_, i+1, _W, _Q2, _MMb[j], _thetab[j], _alphab[j], _phi[j] , j, _weight);
+				//std::cout<<"Event 14\n";
 			}
 		}
 	}

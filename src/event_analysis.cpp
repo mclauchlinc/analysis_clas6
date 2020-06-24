@@ -6,33 +6,35 @@ Analysis::Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> h
 			_set = 1;
 			_sim = false;
 			_recon = true;
+			_pweight = 1.0;
 		break;
 		case 2:
 			_set = 0;
 			_sim = false;
 			_recon = true;
+			_pweight = 1.0;
 		break;
 		case 3:
 			_set = 1;
 			_sim = true;
-			_thrown = true;
 			_recon = true;
+			_pweight = data_->Branches::weight();
 		break;
 		case 4:
 			_set = 0;
 			_sim = true;
-			_thrown = true;
 			_recon = true;
+			_pweight = data_->Branches::weight();
 		break;
 		case 5:
 			_set = 1; 
 			_sim = true;
-			_thrown = true;
+			_pweight = data_->Branches::weight();
 		break;
 		case 6:
 			_set = 0;
 			_sim = true;
-			_thrown = true;
+			_pweight = data_->Branches::weight();
 		break;
 	}
 
@@ -45,7 +47,7 @@ Analysis::Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> h
 	}
 
 	//Not sure if I actually need this, because I think I'm doing everything already inside the events? 
-	if(_thrown){
+	if(_sim){
 		_W[1] = physics::WP(run_type_,data_,1);
 		_Q2[1] = physics::Qsquared(run_type_,data_,1);
 	}
@@ -58,32 +60,23 @@ Analysis::Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> h
 		//std::cout<<"Filling sim particles" <<std::endl;
 		//Particle Loop
 		Particle tPart[4]; 
-		Event tEvent[4];
+		Event tEvent;
 		for(int j = 0; j< 4; j++){
-			tPart[j].Particle::Fill_Particle(data_,j,_set,_sim,true);
+			tPart[j].Particle::Fill_Particle(data_,j,_set,_sim,_pweight,true);
 			tPart[j].Particle::PID(data_,envi_,hist_,_W[1]);
 			//tPart[j].Particle::Check_Particle();
 		}
 		//Topology Assignment and Particle Histogram Filling
+		//Really only need exclusive topology for thrown events
 		for(int k = 0; k< 4; k++){
 			if(tPart[k].Particle::Is_Elec()){
 				for(int l = 0; l < 4; l++){
-					if(l!= k && tPart[l].Particle::Is_Pip()){//Pro Miss
-						for(int m = 0; m< 4; m++){
-							if(m!=l && m!=k && tPart[m].Particle::Is_Pim()){
-								tEvent[0].Event::Fill_Event(envi_,hist_,0,_W[1],_Q2[1],tPart[k],tPart[l],tPart[m]);
-							}
-						}
-					}
-					if(l!=k && tPart[l].Particle::Is_Pro()){//
+					if(l!=k && tPart[l].Particle::Is_Pro()){
 						for(int n = 0; n< 4; n++){
-							if(n!=l && n!=k && tPart[n].Particle::Is_Pim()){//Pip Miss
-								tEvent[1].Event::Fill_Event(envi_,hist_,1,_W[1],_Q2[1],tPart[k],tPart[l],tPart[n]);
-							}else if(n!=l && n!=k && tPart[n].Particle::Is_Pip()){//Pim && Zero Miss
-								tEvent[2].Event::Fill_Event(envi_,hist_,2,_W[1],_Q2[1],tPart[k],tPart[l],tPart[n]);
+							if(n!=l && n!=k && tPart[n].Particle::Is_Pip()){
 								for(int o = 0; o<4; o++){
 									if(o!=l && o!=k && o!=n && tPart[o].Particle::Is_Pim()){//Zero Miss
-										tEvent[3].Event::Fill_Event(envi_,hist_,3,_W[1],_Q2[1],tPart[k],tPart[l],tPart[n],tPart[o]);
+										tEvent.Event::Fill_Event(envi_,hist_,3,_W[1],_Q2[1],tPart[k],tPart[l],tPart[n],tPart[o],0);
 									}
 								}
 							}
@@ -92,9 +85,10 @@ Analysis::Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> h
 				}
 			}
 		}
-		for(int x = 0; x<4; x++){
-			tEvent[x].Event::Assign_Weight(data_->Branches::weight()/4.0);
-		}
+		tEvent.Event::Assign_Weight(_pweight);
+		tEvent.Event::COM_4Vec();//Get COM four vectors
+		tEvent.Event::Vars();//Get theta, MM, alpha
+		a_forest_->forest::Fill_Thread_Tree(tEvent,1,thread_id_,true);
 		//*filling event Histogram here*
 	}
 
@@ -106,8 +100,10 @@ Analysis::Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> h
 		int mix = 0; 
 		Particle ePart[_npart]; 
 		for(int a = 0; a< _npart; a++){
-			ePart[a].Particle::Fill_Particle(data_,a,_set,_sim);
+			ePart[a].Particle::Fill_Particle(data_,a,_set,_sim,_pweight);
+			//std::cout<<"Particle Filled" <<std::endl;
 			ePart[a].Particle::PID(data_,envi_,hist_,_W[0]);
+			//std::cout<<"Particle IDed" <<std::endl;
 			//ePart[a].Particle::Check_Particle();
 		}
 		//Figure out how many possible events we have
@@ -146,7 +142,11 @@ Analysis::Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> h
 					if(ePart[g].Particle::Is_Pip()){//Pro Miss
 						for(int h = 1; h< _npart; h++){
 							if(h!=g && ePart[h].Particle::Is_Pim()){
+								//std::cout<<"Break 1\n";
+								eEvent[_evnt_idx_].Event::Assign_Weight(_pweight);
+								//std::cout<<"Break 2\n";
 								eEvent[_evnt_idx_].Event::Fill_Event(envi_,hist_,0,_W[0],_Q2[0],ePart[0],ePart[g],ePart[h]);
+								//std::cout<<"Break 3\n";
 								_evnt_idx_+=1;
 								_mtop[0]+=1;
 							}
@@ -155,16 +155,28 @@ Analysis::Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> h
 					if(ePart[g].Particle::Is_Pro()){//
 						for(int s = 1; s< _npart; s++){
 							if(s!=g && ePart[s].Particle::Is_Pim()){//Pip Miss
+								//std::cout<<"Break 4\n";
+								eEvent[_evnt_idx_].Event::Assign_Weight(_pweight);
+								//std::cout<<"Break 5\n";
 								eEvent[_evnt_idx_].Event::Fill_Event(envi_,hist_,1,_W[0],_Q2[0],ePart[0],ePart[g],ePart[s]);
+								//std::cout<<"Break 6\n";
 								_evnt_idx_+=1;
 								_mtop[1]+=1;
 							}else if(s!=g && ePart[s].Particle::Is_Pip()){//Pim
+								//std::cout<<"Break 7\n";
+								eEvent[_evnt_idx_].Event::Assign_Weight(_pweight);
+								//std::cout<<"Break 8\n";
 								eEvent[_evnt_idx_].Event::Fill_Event(envi_,hist_,2,_W[0],_Q2[0],ePart[0],ePart[g],ePart[s]);
+								//std::cout<<"Break 9\n";
 								_evnt_idx_+=1;
 								_mtop[2]+=1;
 								for(int u = 1; u<_npart; u++){
 									if(u!=g && u!=s && ePart[u].Particle::Is_Pim()){//Zero Miss
+										//std::cout<<"Break 10\n";
+										eEvent[_evnt_idx_].Event::Assign_Weight(_pweight);
+										//std::cout<<"Break 11\n";
 										eEvent[_evnt_idx_].Event::Fill_Event(envi_,hist_,3,_W[0],_Q2[0],ePart[0],ePart[g],ePart[s],ePart[u]);
+										//std::cout<<"Break 12\n";
 										_evnt_idx_+=1;
 										_mtop[3]+=1;
 									}
@@ -196,23 +208,32 @@ Analysis::Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> h
 			//Assign Event Weights
 			//std::cout<<"There were " <<_gevts <<" good events" <<std::endl;
 			for(int ev2 = 0; ev2 < _evnt_idx_; ev2++){
+				//std::cout<<"Break 13\n";
 				if(eEvent[ev2].Event::Gevnt()){
-					if(!_sim){
-						eEvent[ev2].Event::Assign_Weight(1.0/_gevts);
-					}else if(_sim){
-						eEvent[ev2].Event::Assign_Weight(data_->Branches::weight()/_gevts);
-					}
+					//if(!_sim){
+					//	std::cout<<"Break 14\n";
+						eEvent[ev2].Event::Assign_Weight(_pweight/_gevts);
+					//	std::cout<<"Break 15\n";
+					//}else if(_sim){
+					//	eEvent[ev2].Event::Assign_Weight(data_->Branches::weight()/_gevts);
+					//}
 					_weight = eEvent[ev2].Event::Get_Weight();
 					//std::cout<<"The Weight per event is: " <<eEvent[ev2].Event::Get_Weight() <<std::endl;
-					a_forest_->forest::Fill_Thread_Tree(eEvent[ev2],ev2,thread_id_);
+					//std::cout<<"Break 16\n";
+					a_forest_->forest::Fill_Thread_Tree(eEvent[ev2],ev2,thread_id_,false);
+					//std::cout<<"Break 17\n";
 				}
 				for(int w = 0; w < 4; w++){
 					if(eEvent[ev2].Event::Top(w)){
+						//std::cout<<"Break 18\n";
 						eEvent[ev2].Event::Fill_Event_Hists(envi_,hist_, (_mtop[w]==1) && eEvent[ev2].Event::Top(w));
+						//std::cout<<"Break 19\n";
 					}
 				}
 			}
+			//std::cout<<"Break 20\n";
 			hist_->Histogram::Cross_Fill(envi_,_ntop,_weight);
+			//std::cout<<"Break 21\n";
 		}	
 	}
 }
@@ -237,6 +258,6 @@ int Analysis::Get_set(){
 bool Analysis::Is_Sim(){
 	return _sim;
 }
-bool Analysis::Is_Thrown(){
-	return _thrown;
+bool Analysis::Is_Recon(){
+	return _recon;
 }

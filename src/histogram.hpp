@@ -104,13 +104,13 @@ protected:
 	double YM_res[3] = {0.06,0.06,0.06};
 
 	 //Making the Histograms
-	TH2F_ptr WQ2_hist[11][6][2];//electron cuts, topologies (including pre), Recon vs. Raw (for data this should always be "Recon")
-	TH2F_ptr Fid_hist[7][4][11][30][12][6][2];//sector, species, cut, W binning, p binning, topology, anti
-	TH2F_ptr SF_hist[10][30][7][6][2];//cuts, W Binning, Sector, topology
-	TH2F_ptr DT_hist[4][7][30][7][6][2]; //particle, cuts, W binning, sector, topology
-	TH1F_ptr CC_hist[6][18][11][4][6][2]; //Sector, segment, cut, side of detector, topology, anti
-	TH1F_ptr MM_hist[4][3][2][2];//topology, cut, squared v linear, fitting vs. not fitting plots
-	TH1F_ptr Cross_hist[2]; //Showing how many events counted in mulitiple topologies
+	TH2F_ptr WQ2_hist[11][6][2][2];//electron cuts, topologies (including pre), Recon vs. thrown, weight (for data this should always be "Recon")
+	TH2F_ptr Fid_hist[7][4][11][30][12][6][2];//sector, species, cut, W binning, p binning, topology, anti, weight
+	TH2F_ptr SF_hist[10][30][7][6][2];//cuts, W Binning, Sector, topology, anti, weight
+	TH2F_ptr DT_hist[4][7][30][7][6][2]; //particle, cuts, W binning, sector, topology, anti, weight
+	TH1F_ptr CC_hist[6][18][11][4][6][2]; //Sector, segment, cut, side of detector, topology, anti, weight
+	TH1F_ptr MM_hist[4][3][2][2];//topology, cut, squared v linear, fitting vs. not fitting plots, weight
+	TH1F_ptr Cross_hist[2]; //Showing how many events counted in mulitiple topologies,weight
 
 	bool Fid_made_hist[7][4][11][30][12][6][2];
 	bool Fid_fill_hist[7][4][11][30][12][6][2];
@@ -125,7 +125,7 @@ protected:
 	bool DT_dir_hist[4][7][30][7][6][2];
 	bool DT_dir_made[4][8][2][8][6];
 
-	bool WQ2_made_hist[11][6][2];
+	bool WQ2_made_hist[11][6][2][2];
 	bool WQ2_dir_made[11][6][2];
 
 	THn_ptr Friend[3];//This will be the 7 dimensional histogram from which I can project out different pieces
@@ -143,18 +143,20 @@ protected:
 	float _phi_min = 0.0; 
 	float _phi_max = 360.0;
 
+	THn_ptr Acceptance; 
+	Int_t _Accepance_bins[7] = {5,29,5,14,10,10,10}; //topology, W, Q2, MM, Theta, Alpha, Phi
 
 
 public:
 	Histogram(std::shared_ptr<Environment> _envi, const std::string& output_file);
 	//~Histogram();
-	void Write(std::shared_ptr<Environment> _envi);
+	void Write(const std::string& output_file, std::shared_ptr<Environment> _envi);
 	//W Qsquared plots
 	int W_binning(float W_);
 	int p_binning(float p_);
 	char Part_cut(int species, int cut);
 	void WQ2_Make(std::shared_ptr<Environment> _envi);
-	void WQ2_Fill(std::shared_ptr<Environment> _envi, int top, int cut, float W_, float Q2_, int thr = 0);
+	void WQ2_Fill(std::shared_ptr<Environment> _envi, int top, int cut, float W_, float Q2_, float weight_, int thr = 0);
 	void WQ2_Write(std::shared_ptr<Environment> _envi);
 	//Fiducial Cuts
 	void Fid_Make(std::shared_ptr<Environment> _envi );
@@ -195,10 +197,15 @@ public:
 	int * Friend_binning(int top, float W_, float Q2_, float MM_, float theta_, float alpha_, float phi_ , int channel);
 	void Friend_Fill(std::shared_ptr<Environment> _envi, int top_, float W_, float Q2_, float MM_, float theta_, float alpha_, float phi_ , int chan_, float weight_);
 	void Friend_Write(std::shared_ptr<Environment> _envi);
+	float Friend_bin_reverse(int var_, int bin_, int channel_);
 
 	void Cross_Make(std::shared_ptr<Environment> envi_);
 	void Cross_Fill(std::shared_ptr<Environment> envi_, int gevnt_[4], float weight_);
 	void Cross_Write(std::shared_ptr<Environment> envi_);
+
+	void Acceptance_Make(std::shared_ptr<Environment> envi_);
+	//void Thrown_Make(std::shared_ptr<Environment> envi_);
+	void Acceptance_Fill(std::shared_ptr<Environment> _envi, int top_, float W_, float Q2_, float MM_, float theta_, float alpha_, float phi_ , int chan_, float weight_);
 
 	//void Event_Particle_Hist(std::shared_ptr<Environment> envi_, const Particle p1, float W_, int top_, int par_, bool pass_);
 

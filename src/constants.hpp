@@ -8,7 +8,7 @@
 //static int num_mixed_p_pip = 0; 
 
 static const int MAX_PARTS = 100; 
-static const int NUM_THREADS = 4;
+static const int NUM_THREADS = 2;
 
 static const float c_special = 29.9792458; //speed of light in cm/ns
 static const float c_convert = 10000000; //Convert c_special to m/s
@@ -243,6 +243,9 @@ const float Q2bin_start = 2.0;
 const float pbin_res = 0.5;//Range: 0-6.0
 const float pbin_start = 0.5;
 
+//For cross sections
+static const Int_t xc_bins[7]= {5,29,5,14,10,10,10};
+
 
 //Fun names for file lists
 static const std::string list1 = "one";
@@ -321,6 +324,7 @@ static const char * basic_cut[] = {"pre","cut","anti"};
 static const char * MM_sq[] = {"linear","squared"};
 static const char * par_cut[4][11] = {{"pre","sanity","fid","sf","min_cc","fid+sf","fid+cc","sf+cc","eid","bank","event"},{"pre","sanity","fid","dt","hid","bank","event"},{"pre","sanity","fid","dt","hid","bank","event"},{"pre","sanity","fid","dt","hid","bank","event"}};
 static const char * fit_q[] = {"4fit","4show"};
-static const char * thrown[] = {"recon","thrown"};//For reconstructed vs. thrown events
+static const char * throw_stat[] = {"recon","thrown"};//For reconstructed vs. thrown events
+static const char * w_stat[] = {"nweight","weight"};
 
 #endif

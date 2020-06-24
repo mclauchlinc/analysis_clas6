@@ -4,7 +4,7 @@
 #include "physics.hpp"
 #include "Branches.hpp"
 #include "cuts.hpp"
-#include "event_class.hpp"
+//#include "event_class.hpp"
 #include "histogram.hpp"
 #include "physics.hpp"
 
@@ -14,6 +14,7 @@ private:
 	int _set = -1; //{1,0} -> {e16,e1f}
 	bool _sim = false;
 	bool _thrown = false;
+	float _weight = NAN;
 
 	float _p = NAN;//In lab frame
 	int _q = 0; 
@@ -40,7 +41,7 @@ private:
 
 public:
 	Particle();
-	void Fill_Particle(std::shared_ptr<Branches> data_, int par_idx_, int set_, bool sim_, bool thrown_ = false);
+	void Fill_Particle(std::shared_ptr<Branches> data_, int par_idx_, int set_, bool sim_, float _weight, bool thrown_ = false);
 
 
 	void EID(std::shared_ptr<Branches> data_, std::shared_ptr<Environment> envi_, std::shared_ptr<Histogram> hist_, float W_);//Electron ID

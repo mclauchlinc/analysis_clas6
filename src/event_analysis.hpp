@@ -32,10 +32,10 @@ private:
 
 	int _set = -1; //{0,1} -> {e16,e1f}
 	bool _sim = false;
-	bool _thrown = false;
 	bool _recon = false;
 
 	float _weight = 1.0;
+	float _pweight = 1.0;
 
 
 
@@ -50,7 +50,7 @@ public:
 	float Get_Q2(int i);
 	int Get_set();
 	bool Is_Sim();
-	bool Is_Thrown();
+	bool Is_Recon();
 
 
 

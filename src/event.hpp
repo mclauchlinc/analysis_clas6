@@ -22,6 +22,8 @@ private:
 	int _hel = 0;
 	bool _COM = false;
 	int _set = -1; 
+	float _MM = NAN;
+	float _MM2 = NAN;
 
 	bool _part[4] = {false,false,false,false}; //Which particles are present?
 

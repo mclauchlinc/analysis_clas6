@@ -5,90 +5,110 @@ Particle::Particle(){
 
 }
 
-void Particle::Fill_Particle(std::shared_ptr<Branches> data_, int par_idx_, int set_, bool sim_, bool thrown_){
+void Particle::Fill_Particle(std::shared_ptr<Branches> data_, int par_idx_, int set_, bool sim_, float weight_, bool thrown_){
 	float m = -99; 
 	_idx = par_idx_;
 	_set = set_;
 	_sim = sim_;
 	_thrown = thrown_;
-	if(data_->Branches::dc(_idx) > 0 && data_->Branches::sc(_idx) > 0){//These are things necessary for all events
-		for(int i = 0; i< 4; i++){
-			switch(i){
-				case 0:
-					m = me; 
-				break;
-				case 1: 
-					m = mp; 
-				break; 
-				case 2: 
-					m = mpi; 
-				break;
-				case 3: 
-					m = mpi; 
-				break;
-			}
-			_dt[i] = physics::delta_t(i,data_,_idx);
-		}
-		_p = data_->Branches::p(_idx);
-		_theta = physics::get_theta(_idx,data_);
-		_phi = physics::get_phi(_idx,data_);
-		_sf = data_->Branches::etot(_idx)/data_->Branches::p(_idx);
-		_q = data_->Branches::q(_idx);
-		//std::cout<<"	Particle " <<_idx <<" has charge of " <<_q <<std::endl;
-	}else if(_thrown){
+	_weight = weight_;
+	if(_thrown){
 		_p = data_->Branches::mcp(_idx);
 		_theta = data_->Branches::mctheta(_idx);
 		_phi = data_->Branches::mcphi(_idx);
-	}
-	if(!_sim && data_->Branches::cc(_idx) > 0){
-		_cc_seg = data_->Branches::cc_segm(_idx);
-		_nphe = data_->Branches::nphe(_idx);
-		//std::cout<<"		Has a CC value " <<std::endl;
-		if(_idx == 0){
-			//std::cout<<"		Here is the cc_segm for this particle: " <<_cc_seg <<std::endl;
+	}else{
+		if(data_->Branches::dc(_idx) > 0 && data_->Branches::sc(_idx) > 0 ){//These are things necessary for all events
+			for(int i = 0; i< 4; i++){
+				switch(i){
+					case 0:
+						m = me; 
+					break;
+					case 1: 
+						m = mp; 
+					break; 
+					case 2: 
+						m = mpi; 
+					break;
+					case 3: 
+						m = mpi; 
+					break;
+				}
+				_dt[i] = physics::delta_t(i,data_,_idx);
+			}
+			_p = data_->Branches::p(_idx);
+			_theta = physics::get_theta(_idx,data_);
+			_phi = physics::get_phi(_idx,data_);
+			_sf = data_->Branches::etot(_idx)/data_->Branches::p(_idx);
+			_q = data_->Branches::q(_idx);
+			//std::cout<<"	Particle " <<_idx <<" has charge of " <<_q <<std::endl;
 		}
-	}
-	if(data_->Branches::ec(_idx)>0){
-		_etot = data_->Branches::etot(_idx);
-	}
+		if(!_sim && data_->Branches::cc(_idx) > 0){
+			_cc_seg = data_->Branches::cc_segm(_idx);
+			_nphe = data_->Branches::nphe(_idx);
+			//std::cout<<"		Has a CC value " <<std::endl;
+			if(_idx == 0){
+				//std::cout<<"		Here is the cc_segm for this particle: " <<_cc_seg <<std::endl;
+			}
+		}
+		if(data_->Branches::ec(_idx)>0){
+			_etot = data_->Branches::etot(_idx);
+		}
+	} 
 }
 
 
 void Particle::EID(std::shared_ptr<Branches> data_, std::shared_ptr<Environment> envi_, std::shared_ptr<Histogram> hist_, float W_){
 	bool _trigger_ = false;
-	int thr = 0; 
 	float Q2 = physics::Qsquared(_set, data_, _thrown);
+	//std::cout<<"eid0" <<std::endl;
 	//Sanity Cuts
 	if(_idx == 0){
+		//std::cout<<"eid1" <<std::endl;
 		hist_->Histogram::Fid_Fill(envi_,0,_theta,_phi,0,0,0,W_,_p);
+		//std::cout<<"eid2" <<std::endl;
 		hist_->Histogram::SF_Fill(envi_,0,_p,_etot,0,0,W_,physics::get_sector(_phi));
+		//std::cout<<"eid3" <<std::endl;
 		hist_->Histogram::CC_Fill(envi_,0,physics::get_sector(_phi),_cc_seg,_nphe,0,0);
-		hist_->Histogram::WQ2_Fill(envi_, 0, 0, W_, Q2, thr);
+		//std::cout<<"eid4" <<std::endl;
+		hist_->Histogram::WQ2_Fill(envi_, 0, 0, W_, Q2, _weight);
+		//std::cout<<"eid5" <<std::endl;
 		_trigger_ = true;
 	}
 	if(cuts::e_sanity(data_,envi_,_idx)){
 		_sanity_pass[0] = true;
 		if(_trigger_){
+			//std::cout<<"eid6" <<std::endl;
 			hist_->Histogram::Fid_Fill(envi_,0,_theta,_phi,0,1,0,W_,_p);
+			//std::cout<<"eid7" <<std::endl;
 			hist_->Histogram::SF_Fill(envi_,0,_p,_etot,1,0,W_,physics::get_sector(_phi));
+			//std::cout<<"eid8" <<std::endl;
 			hist_->Histogram::CC_Fill(envi_,0,physics::get_sector(_phi),_cc_seg,_nphe,1,0);
-			hist_->Histogram::WQ2_Fill(envi_, 0, 1, W_, Q2, thr);
+			//std::cout<<"eid9" <<std::endl;
+			hist_->Histogram::WQ2_Fill(envi_, 0, 1, W_, Q2, _weight);
+			//std::cout<<"eid10" <<std::endl;
 		}
 		//Fiducial Cuts
 		if(cuts::e_fid(data_,envi_,_idx)){
 			_fid_pass[0] = true; 
 			if(_trigger_){
 				hist_->Histogram::Fid_Fill(envi_,0,_theta,_phi,0,2,0,W_,_p);
+				//std::cout<<"eid11" <<std::endl;
 				hist_->Histogram::SF_Fill(envi_,0,_p,_etot,2,0,W_,physics::get_sector(_phi));
+				//std::cout<<"eid12" <<std::endl;
 				hist_->Histogram::CC_Fill(envi_,0,physics::get_sector(_phi),_cc_seg,_nphe,2,0);
-				hist_->Histogram::WQ2_Fill(envi_, 0, 2, W_, Q2, thr);
+				//std::cout<<"eid13" <<std::endl;
+				hist_->Histogram::WQ2_Fill(envi_, 0, 2, W_, Q2, _weight);
+				//std::cout<<"eid14" <<std::endl;
 			}
 		}else{
 			_fid_pass[0] = false;
 			if(_trigger_){
 				hist_->Histogram::Fid_Fill(envi_,0,_theta,_phi,0,2,1,W_,_p);
+				//std::cout<<"eid15" <<std::endl;
 				hist_->Histogram::SF_Fill(envi_,0,_p,_etot,2,1,W_,physics::get_sector(_phi));
+				//std::cout<<"eid16" <<std::endl;
 				hist_->Histogram::CC_Fill(envi_,0,physics::get_sector(_phi),_cc_seg,_nphe,2,1);
+				//std::cout<<"eid17" <<std::endl;
 
 			}
 		}
@@ -97,17 +117,24 @@ void Particle::EID(std::shared_ptr<Branches> data_, std::shared_ptr<Environment>
 			_sf_pass = true;
 			if(_trigger_){
 				hist_->Histogram::Fid_Fill(envi_,0,_theta,_phi,0,3,0,W_,_p);
+				//std::cout<<"eid18" <<std::endl;
 				hist_->Histogram::SF_Fill(envi_,0,_p,_etot,3,0,W_,physics::get_sector(_phi));
+				//std::cout<<"eid19" <<std::endl;
 				hist_->Histogram::CC_Fill(envi_,0,physics::get_sector(_phi),_cc_seg,_nphe,3,0);
-				hist_->Histogram::WQ2_Fill(envi_, 0, 3, W_, Q2, thr);
+				//std::cout<<"eid20" <<std::endl;
+				hist_->Histogram::WQ2_Fill(envi_, 0, 3, W_, Q2, _weight);
+				//std::cout<<"eid21" <<std::endl;
 			}
 		}
 		else{
 			_sf_pass = false;
 			if(_trigger_){
 				hist_->Histogram::Fid_Fill(envi_,0,_theta,_phi,0,3,1,W_,_p);
+				//std::cout<<"eid22" <<std::endl;
 				hist_->Histogram::SF_Fill(envi_,0,_p,_etot,3,1,W_,physics::get_sector(_phi));
+				//std::cout<<"eid23" <<std::endl;
 				hist_->Histogram::CC_Fill(envi_,0,physics::get_sector(_phi),_cc_seg,_nphe,3,1);
+				//std::cout<<"eid24" <<std::endl;
 			}
 		}
 		//Min CC cuts
@@ -115,16 +142,23 @@ void Particle::EID(std::shared_ptr<Branches> data_, std::shared_ptr<Environment>
 			_cc_pass = true; 
 			if(_trigger_){
 				hist_->Histogram::Fid_Fill(envi_,0,_theta,_phi,0,4,0,W_,_p);
+				//std::cout<<"eid25" <<std::endl;
 				hist_->Histogram::SF_Fill(envi_,0,_p,_etot,4,0,W_,physics::get_sector(_phi));
+				//std::cout<<"eid26" <<std::endl;
 				hist_->Histogram::CC_Fill(envi_,0,physics::get_sector(_phi),_cc_seg,_nphe,4,0);
-				hist_->Histogram::WQ2_Fill(envi_, 0, 4, W_, Q2, thr);
+				//std::cout<<"eid27" <<std::endl;
+				hist_->Histogram::WQ2_Fill(envi_, 0, 4, W_, Q2, _weight);
+				//std::cout<<"eid28" <<std::endl;
 			}
 		}else{
 			_cc_pass = false; 
 			if(_trigger_){
 				hist_->Histogram::Fid_Fill(envi_,0,_theta,_phi,0,4,1,W_,_p);
+				//std::cout<<"eid29" <<std::endl;
 				hist_->Histogram::SF_Fill(envi_,0,_p,_etot,4,1,W_,physics::get_sector(_phi));
+				//std::cout<<"eid30" <<std::endl;
 				hist_->Histogram::CC_Fill(envi_,0,physics::get_sector(_phi),_cc_seg,_nphe,4,1);
+				//std::cout<<"eid31" <<std::endl;
 			}
 		}
 		//Min EC cuts
@@ -137,50 +171,74 @@ void Particle::EID(std::shared_ptr<Branches> data_, std::shared_ptr<Environment>
 		if(_fid_pass[0] && _sf_pass){
 			if(_trigger_){
 				hist_->Histogram::Fid_Fill(envi_,0,_theta,_phi,0,5,0,W_,_p);
+				//std::cout<<"eid32" <<std::endl;
 				hist_->Histogram::SF_Fill(envi_,0,_p,_etot,5,0,W_,physics::get_sector(_phi));
+				//std::cout<<"eid33" <<std::endl;
 				hist_->Histogram::CC_Fill(envi_,0,physics::get_sector(_phi),_cc_seg,_nphe,5,0);
-				hist_->Histogram::WQ2_Fill(envi_, 0, 5, W_, Q2, thr);
+				//std::cout<<"eid34" <<std::endl;
+				hist_->Histogram::WQ2_Fill(envi_, 0, 5, W_, Q2, _weight);
+				//std::cout<<"eid35" <<std::endl;
 			}
 		}else{
 			if(_trigger_){
 				hist_->Histogram::Fid_Fill(envi_,0,_theta,_phi,0,5,1,W_,_p);
+				//std::cout<<"eid36" <<std::endl;
 				hist_->Histogram::SF_Fill(envi_,0,_p,_etot,5,1,W_,physics::get_sector(_phi));
+				//std::cout<<"eid37" <<std::endl;
 				hist_->Histogram::CC_Fill(envi_,0,physics::get_sector(_phi),_cc_seg,_nphe,5,1);
+				//std::cout<<"eid38" <<std::endl;
 			}
 		}
 		if(_fid_pass[0] && _cc_pass){
 			if(_trigger_){
 				hist_->Histogram::Fid_Fill(envi_,0,_theta,_phi,0,6,0,W_,_p);
+				//std::cout<<"eid39" <<std::endl;
 				hist_->Histogram::SF_Fill(envi_,0,_p,_etot,6,0,W_,physics::get_sector(_phi));
+				//std::cout<<"eid40" <<std::endl;
 				hist_->Histogram::CC_Fill(envi_,0,physics::get_sector(_phi),_cc_seg,_nphe,6,0);
-				hist_->Histogram::WQ2_Fill(envi_, 0, 6, W_, Q2, thr);
+				//std::cout<<"eid40" <<std::endl;
+				hist_->Histogram::WQ2_Fill(envi_, 0, 6, W_, Q2, _weight);
+				//std::cout<<"eid42" <<std::endl;
 			}
 		}else{
 			if(_trigger_){
 				hist_->Histogram::Fid_Fill(envi_,0,_theta,_phi,0,6,1,W_,_p);
+				//std::cout<<"eid43" <<std::endl;
 				hist_->Histogram::SF_Fill(envi_,0,_p,_etot,6,1,W_,physics::get_sector(_phi));
+				//std::cout<<"eid44" <<std::endl;
 				hist_->Histogram::CC_Fill(envi_,0,physics::get_sector(_phi),_cc_seg,_nphe,6,1);
+				//std::cout<<"eid45" <<std::endl;
 			}
 		}
 		if(_sf_pass && _cc_pass){
 			if(_trigger_){
 				hist_->Histogram::Fid_Fill(envi_,0,_theta,_phi,0,7,0,W_,_p);
+				//std::cout<<"eid46" <<std::endl;
 				hist_->Histogram::SF_Fill(envi_,0,_p,_etot,7,0,W_,physics::get_sector(_phi));
+				//std::cout<<"eid47" <<std::endl;
 				hist_->Histogram::CC_Fill(envi_,0,physics::get_sector(_phi),_cc_seg,_nphe,7,0);
-				hist_->Histogram::WQ2_Fill(envi_, 0, 7, W_, Q2, thr);
+				//std::cout<<"eid48" <<std::endl;
+				hist_->Histogram::WQ2_Fill(envi_, 0, 7, W_, Q2, _weight);
+				//std::cout<<"eid49" <<std::endl;
 			}
 		}else{
 			if(_trigger_){
 				hist_->Histogram::Fid_Fill(envi_,0,_theta,_phi,0,7,1,W_,_p);
+				//std::cout<<"eid50" <<std::endl;
 				hist_->Histogram::SF_Fill(envi_,0,_p,_etot,7,1,W_,physics::get_sector(_phi));
+				//std::cout<<"eid51" <<std::endl;
 				hist_->Histogram::CC_Fill(envi_,0,physics::get_sector(_phi),_cc_seg,_nphe,7,1);
+				//std::cout<<"eid52" <<std::endl;
 			}
 		}
 	} else{
 		if(_trigger_){
 			hist_->Histogram::Fid_Fill(envi_,0,_theta,_phi,0,1,1,W_,_p);
+			//std::cout<<"eid53" <<std::endl;
 			hist_->Histogram::SF_Fill(envi_,0,_p,_etot,1,1,W_,physics::get_sector(_phi));
+			//std::cout<<"eid54" <<std::endl;
 			hist_->Histogram::CC_Fill(envi_,0,physics::get_sector(_phi),_cc_seg,_nphe,1,1);
+			//std::cout<<"eid55" <<std::endl;
 		}
 	}
 	//Full EID pass
@@ -189,31 +247,43 @@ void Particle::EID(std::shared_ptr<Branches> data_, std::shared_ptr<Environment>
 		_ided = true;
 		if(_trigger_){
 			hist_->Histogram::Fid_Fill(envi_,0,_theta,_phi,0,8,0,W_,_p);
+			//std::cout<<"eid56" <<std::endl;
 			hist_->Histogram::SF_Fill(envi_,0,_p,_etot,8,0,W_,physics::get_sector(_phi));
+			//std::cout<<"eid57" <<std::endl;
 			hist_->Histogram::CC_Fill(envi_,0,physics::get_sector(_phi),_cc_seg,_nphe,8,0); 
-			hist_->Histogram::WQ2_Fill(envi_, 0, 8, W_, Q2, thr);
+			//std::cout<<"eid58" <<std::endl;
+			hist_->Histogram::WQ2_Fill(envi_, 0, 8, W_, Q2, _weight);
 		}
 	}else{
 		_pid[0] = false;
 		if(_trigger_){
 			hist_->Histogram::Fid_Fill(envi_,0,_theta,_phi,0,8,1,W_,_p);
+			//std::cout<<"eid59" <<std::endl;
 			hist_->Histogram::SF_Fill(envi_,0,_p,_etot,8,1,W_,physics::get_sector(_phi));
+			//std::cout<<"eid60" <<std::endl;
 			hist_->Histogram::CC_Fill(envi_,0,physics::get_sector(_phi),_cc_seg,_nphe,8,1);
+			//std::cout<<"eid61" <<std::endl;
 		}
 	}
 	//Bank ID
 	if(data_->Branches::id(_idx) == ELECTRON && _idx == 0){
 		if(_trigger_){
 			hist_->Histogram::Fid_Fill(envi_,0,_theta,_phi,0,9,0,W_,_p);
+			//std::cout<<"eid62" <<std::endl;
 			hist_->Histogram::SF_Fill(envi_,0,_p,_etot,9,0,W_,physics::get_sector(_phi));
+			//std::cout<<"eid63" <<std::endl;
 			hist_->Histogram::CC_Fill(envi_,0,physics::get_sector(_phi),_cc_seg,_nphe,9,0);
-			hist_->Histogram::WQ2_Fill(envi_, 0, 9, W_, Q2, thr);
+			//std::cout<<"eid64" <<std::endl;
+			hist_->Histogram::WQ2_Fill(envi_, 0, 9, W_, Q2, _weight);
 		}
 	}else{
 		if(_trigger_){
 			hist_->Histogram::Fid_Fill(envi_,0,_theta,_phi,0,9,1,W_,_p);
+			//std::cout<<"eid65" <<std::endl;
 			hist_->Histogram::SF_Fill(envi_,0,_p,_etot,9,1,W_,physics::get_sector(_phi));
+			//std::cout<<"eid66" <<std::endl;
 			hist_->Histogram::CC_Fill(envi_,0,physics::get_sector(_phi),_cc_seg,_nphe,9,1);
+			//std::cout<<"eid67" <<std::endl;
 		}
 	}
 }
@@ -314,7 +384,7 @@ void Particle::PID(std::shared_ptr<Branches> data_, std::shared_ptr<Environment>
 			case ELECTRON:
 				_pid[0] = true;
 				_ided = true;
-				hist_->Histogram::WQ2_Fill(envi_, 0, 0, W_, physics::Qsquared(envi_->Environment::was_data_set(), data_, _thrown), 1);
+				hist_->Histogram::WQ2_Fill(envi_, 0, 0, W_, physics::Qsquared(envi_->Environment::was_data_set(), data_, _thrown),1.0, 1);
 			break;
 			case PROTON:
 				_pid[1] = true;
