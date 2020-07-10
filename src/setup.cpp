@@ -1,6 +1,11 @@
 #include "setup.hpp"
 
-void Setup::set_envi(std::shared_ptr<Environment> setup, int run_type){
+void Setup::set_envi(std::shared_ptr<Environment> setup, int run_type, int fit){
+	if(fit >= 0){
+		setup->Environment::env_fitting(true,fit);
+	}else{
+		setup->Environment::env_fitting(false,fit);
+	}
 	switch(run_type%2){
 		case 1:
 			setup->Environment::env_data_set(1); //Which data set? {1,2}->{e16,e1f}

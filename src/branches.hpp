@@ -57,7 +57,7 @@ class Branches {
   float _dc_vy[MAX_PARTS];    //[dc_part]
   float _dc_vz[MAX_PARTS];    //[dc_part]
   float _dc_vr[MAX_PARTS];    //[dc_part]
-  float _dc_xsc[MAX_PARTS];   //[dc_part]
+  float _dc_xsc[MAX_PARTS];   //[dc_part]//x y z of SC as determined by DC
   float _dc_ysc[MAX_PARTS];   //[dc_part]
   float _dc_zsc[MAX_PARTS];   //[dc_part]
   float _dc_cxsc[MAX_PARTS];  //[dc_part]
@@ -75,7 +75,7 @@ class Branches {
   float _ec_eo[MAX_PARTS];  //[ec_part]
   float _ec_t[MAX_PARTS];   //[ec_part]
   float _ec_r[MAX_PARTS];   //[ec_part]
-  float _ech_x[MAX_PARTS];  //[ec_part]
+  float _ech_x[MAX_PARTS];  //[ec_part] //x y z of EC determined from cross hatched hits of different layers
   float _ech_y[MAX_PARTS];  //[ec_part]
   float _ech_z[MAX_PARTS];  //[ec_part]
   float _ec_m2[MAX_PARTS];  //[ec_part]
@@ -97,8 +97,8 @@ class Branches {
   int _cc_segm[MAX_PARTS];  //[cc_part]
   int _nphe[MAX_PARTS];     //[cc_part]
   float _cc_t[MAX_PARTS];   //[cc_part]
-  float _cc_r[MAX_PARTS];   //[cc_part]
-  float _cc_c2[MAX_PARTS];  //[cc_part]
+  float _cc_r[MAX_PARTS];   //[cc_part]// distance from vertex for hit in CC
+  float _cc_c2[MAX_PARTS];  //[cc_part]// Cos squared for angle out towards CC
   ////////////
   int _nprt;
   int _pidpart[MAX_PARTS];    //[nprt]

@@ -99,4 +99,35 @@ bool fun::no_pro_pip_match(int idx1, int idx2[20]){//Designed to check to see if
   return pass; 
 }
 
+bool fun::hist_fitting(int species_, int cut_, int Wbin_, int pbin_, int fit_){
+  bool pass = false; 
+  //std::cout<<fit_;
+  if(fit_ >= 0){
+    if(fit_ == 1){
+      if(species_==0){
+        if(cut_ == 5 || cut_ == 6 || cut_ == 7){
+          pass = true;
+        }
+      }else{
+        if(cut_== 2 || cut_ == 3){
+          pass = true;
+        }
+      }
+    }else{
+      pass = true;
+    }
+  }else if(fit_==-1 && Wbin_== 0 && pbin_ == 0){
+    if(species_==0){
+        if(cut_ != 5 && cut_ != 6 && cut_ != 7){
+          pass = true;
+        }
+      }else{
+        if(cut_!= 2 && cut_ != 3){
+          pass = true;
+        }
+      }
+  }
+  return pass; 
+}
+
 

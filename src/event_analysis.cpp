@@ -88,7 +88,8 @@ Analysis::Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> h
 		tEvent.Event::Assign_Weight(_pweight);
 		tEvent.Event::COM_4Vec();//Get COM four vectors
 		tEvent.Event::Vars();//Get theta, MM, alpha
-		a_forest_->forest::Fill_Thread_Tree(tEvent,1,thread_id_,true);
+		//Disable TTree things for now
+		//a_forest_->forest::Fill_Thread_Tree(tEvent,1,thread_id_,true);
 		//*filling event Histogram here*
 	}
 
@@ -220,7 +221,8 @@ Analysis::Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> h
 					_weight = eEvent[ev2].Event::Get_Weight();
 					//std::cout<<"The Weight per event is: " <<eEvent[ev2].Event::Get_Weight() <<std::endl;
 					//std::cout<<"Break 16\n";
-					a_forest_->forest::Fill_Thread_Tree(eEvent[ev2],ev2,thread_id_,false);
+					//Disable TTree things for now
+					//a_forest_->forest::Fill_Thread_Tree(eEvent[ev2],ev2,thread_id_,false);
 					//std::cout<<"Break 17\n";
 				}
 				for(int w = 0; w < 4; w++){

@@ -702,5 +702,46 @@ float physics::Ev_MM(int top, TLorentzVector k0, TLorentzVector p1, TLorentzVect
 	return event_MM;
 }
 
+//Specficially for XY for the SC detector
+//These rotate everything from "Sector 1" to their proper places
+float physics::X_Rotate(float x_, float y_, int sec_){
+	float new_x = NAN;
+	if(sec_ == 1){
+		new_x = x_;
+	}else{
+		new_x = x_*TMath::Cos(TMath::Pi()*(sec_-1.0)/3.0) - y_*TMath::Sin(TMath::Pi()*(sec_-1.0)/3.0);
+	}
+	return new_x;	
+}
+
+float physics::Y_Rotate(float x_, float y_, int sec_){
+	float new_y = NAN;
+	if(sec_ == 1){
+		new_y = y_;
+	}else{
+		new_y = x_*TMath::Sin(TMath::Pi()*(sec_-1.0)/3.0) + y_*TMath::Cos(TMath::Pi()*(sec_-1.0)/3.0);
+	}
+	return new_y;
+}
+
+float physics::CCX_Rotate(float x_, float y_, int sec_){
+	float new_x = NAN;
+	if(sec_ == 1){
+		new_x = x_;
+	}else{
+		new_x = x_*TMath::Cos(-TMath::Pi()*(sec_-1.0)/3.0) - y_*TMath::Sin(-TMath::Pi()*(sec_-1.0)/3.0);
+	}
+	return new_x;	
+}
+
+float physics::CCY_Rotate(float x_, float y_, int sec_){
+	float new_y = NAN;
+	if(sec_ == 1){
+		new_y = y_;
+	}else{
+		new_y = x_*TMath::Sin(-TMath::Pi()*(sec_-1.0)/3.0) + y_*TMath::Cos(-TMath::Pi()*(sec_-1.0)/3.0);
+	}
+	return new_y;
+}
 
 

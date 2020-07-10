@@ -12,6 +12,7 @@ Histogram::Histogram(std::shared_ptr<Environment> _envi, const std::string& outp
 	Histogram::MM_Make(_envi);
 	Histogram::Friend_Make(_envi);
 	Histogram::Cross_Make(_envi);
+	Histogram::XY_Make(_envi);
 }
 
 //Histogram::~Histogram() { this->Write(); }
@@ -27,6 +28,7 @@ void Histogram::Write(const std::string& output_file, std::shared_ptr<Environmen
 	Histogram::DT_Write( _envi);
 	Histogram::CC_Write( _envi);
 	Histogram::MM_Write( _envi);
+	Histogram::XY_Write(_envi);
 	Friend_Write(_envi);
 	Histogram::Cross_Write(_envi);
 	RootOutputFile->Close();
@@ -51,7 +53,7 @@ int Histogram::W_binning(float W_){
 int Histogram::p_binning(float p_){
   int j = 0;
   float top, bot; 
-  for(int i = 1; i < 12; i++){
+  for(int i = 1; i < 26; i++){//Changed from 12 to 26 7/7/20
     top = pbin_start + i*pbin_res;//constants.hpp
     bot = top - pbin_res; 
     if(p_ < top && p_ >= bot){
@@ -79,7 +81,7 @@ char Histogram::Part_cut(int species, int cut){
 }
 
 void Histogram::WQ2_Make(std::shared_ptr<Environment> _envi ){
-	if(_envi->was_WQ2_plot()){
+	if(_envi->was_WQ2_plot() && _envi->was_fit_type()!=1){
 		std::vector<long> space_dims(4);
 		space_dims[0] = 11; //Electron Cuts
 		space_dims[1] = 6; //Topologies
@@ -116,7 +118,7 @@ void Histogram::WQ2_Make(std::shared_ptr<Environment> _envi ){
 }
 //hist_->Histogram::WQ2_Fill(envi_, 0, 0, W_, Q2, 1.0,thr);
 void Histogram::WQ2_Fill(std::shared_ptr<Environment> _envi, int top, int cut, float W_, float Q2_, float weight_, int thr){
-	if(_envi->was_WQ2_plot()){
+	if(_envi->was_WQ2_plot() && _envi->was_fit_type()!=1){
 		if(WQ2_made_hist[cut][top][thr][0]){
 			WQ2_hist[cut][top][thr][0]->Fill(W_,Q2_,1.0);
 		}else{
@@ -131,7 +133,7 @@ void Histogram::WQ2_Fill(std::shared_ptr<Environment> _envi, int top, int cut, f
 }
 
 void Histogram::WQ2_Write(std::shared_ptr<Environment> _envi){
-	if(_envi->was_WQ2_plot()){
+	if(_envi->was_WQ2_plot() && _envi->was_fit_type()!=1){
 		std::cout<<"WQ2 Plots: "; 
 		char dir_name[100];
 		TDirectory* dir_WQ2 = RootOutputFile->mkdir("W vs. Q2");
@@ -193,7 +195,7 @@ void Histogram::Fid_Make(std::shared_ptr<Environment> _envi){
 	space_dims[1] = 4; //species
 	space_dims[2] = 11;//cuts
 	space_dims[3] = 30;//W Binning
-	space_dims[4] = 12;//Momentum binning
+	space_dims[4] = 26;//Momentum binning
 	space_dims[5] = 6; //Topology
 	space_dims[6] = 2; //Cut vs. anti-cut
 
@@ -206,7 +208,7 @@ void Histogram::Fid_Make(std::shared_ptr<Environment> _envi){
 	//std::cout<<std::endl <<"Here we are. Making Fiducial histograms" <<std::endl;
 
 	while(cart.GetNextCombination()){
-		if(_envi->was_fid_plot(cart[1])){
+		if(_envi->was_fid_plot(cart[1]) && fun::hist_fitting(cart[1],cart[2],cart[3],cart[4],_envi->was_fit_type())){
 			//std::cout<<"In the loop: " <<cart[0] <<" " <<cart[1] <<" " <<cart[2] <<" " <<cart[3] <<" " <<cart[4] <<" " <<cart[5] <<" Histogram Number: " <<num_hist <<std::endl;
 			if(cart[1] == 0){ //Dealing with the different numbers of cuts for electrons vs. hadrons
 				//fid_cuts = eid_cut;
@@ -275,10 +277,10 @@ void Histogram::Fid_Fill(std::shared_ptr<Environment> _envi,int top, float theta
 	//std::cout<< std::endl <<"We are inside the Fid Fill function ";
 	//std::cout<< std::endl <<"top: " <<top <<" theta: " <<theta <<" phi: " <<phi <<" part: " <<part <<" cut: " <<cut <<" cva: " <<cutvanti <<" W: " <<W_ <<" p: " <<p_ <<std::endl; 
 	//std::cout<< std::endl <<"filling: " <<physics::get_sector(phi) <<" " <<part <<" " <<cut <<" " <<0 <<" " <<Histogram::p_binning(p_) <<" " <<top <<" " <<cutvanti <<std::endl;
-	if(_envi->was_fid_plot(part)){
+	if(_envi->was_fid_plot(part) && fun::hist_fitting(part,cut,0,0,_envi->was_fit_type())){
 		float phic = physics::phi_center(phi);
 		//std::cout<<"Filling p binning" <<std::endl;
-		if(p_binning(p_) != 0 && top==0){ //All W with p binning
+		if(p_binning(p_) != 0 && top==0 && _envi->was_fitting()){ //All W with p binning
 			Fid_fill_hist[physics::get_sector(phi)][part][cut][0][Histogram::p_binning(p_)][0][cutvanti]=true;
 			if(Fid_made_hist[physics::get_sector(phi)][part][cut][0][Histogram::p_binning(p_)][0][cutvanti]){
 				Fid_hist[0][part][cut][0][Histogram::p_binning(p_)][0][cutvanti]->Fill(phic,theta);//All Sectors
@@ -289,7 +291,7 @@ void Histogram::Fid_Fill(std::shared_ptr<Environment> _envi,int top, float theta
 			}
 		}
 		//std::cout<<"Filling W binning" <<std::endl;
-		if(W_binning(W_) != 0 && top==0){ //All p with W binning
+		if(W_binning(W_) != 0 && top==0 && _envi->was_fitting()){ //All p with W binning
 			Fid_fill_hist[physics::get_sector(phi)][part][cut][Histogram::W_binning(W_)][0][0][cutvanti]=true;
 			if(Fid_made_hist[physics::get_sector(phi)][part][cut][Histogram::W_binning(W_)][0][0][cutvanti]){
 				Fid_hist[0][part][cut][Histogram::W_binning(W_)][0][0][cutvanti]->Fill(phic,theta);//All sectors
@@ -381,7 +383,7 @@ void Histogram::Fid_Write(std::shared_ptr<Environment> _envi){
 		space_dims[1] = 4; //species
 		space_dims[2] = 11;//cuts
 		space_dims[3] = 30;//W Binning
-		space_dims[4] = 12;//Momentum binning
+		space_dims[4] = 26;//Momentum binning
 		space_dims[5] = 6; //Topology
 		space_dims[6] = 2;//Cut vs anti cut
 
@@ -396,7 +398,7 @@ void Histogram::Fid_Write(std::shared_ptr<Environment> _envi){
 		bool s_dep = false; 
 
 		while(cart.GetNextCombination()){
-			if(_envi->was_fid_plot(cart[1])){
+			if(_envi->was_fid_plot(cart[1]) && fun::hist_fitting(cart[1],cart[2],cart[3],cart[4],_envi->was_fit_type())){
 				par_fid[cart[1]]->cd();
 				//Just making sure we aren't looking in places that don't exist 
 				if(cart[1] == 0){ //Dealing with the different numbers of cuts for electrons vs. hadrons
@@ -489,7 +491,7 @@ void Histogram::SF_Make(std::shared_ptr<Environment> _envi){
 		CartesianGenerator cart(space_dims);
 
 		while(cart.GetNextCombination()){
-			if((cart[0] == 10 && cart[3] != 0) || (cart[0] != 10 && cart[3] == 0) ){//Topology only matters for event selection cut
+			if((cart[0] == 10 && cart[3] != 0) || (cart[0] != 10 && cart[3] == 0) && fun::hist_fitting(0,cart[0],cart[1],0,_envi->was_fit_type())){//Topology only matters for event selection cut
 				if(cart[1] == 0 ){ //All W 
 					sprintf(hname,"SF_%s_%s_%s_W:ALL_%s",eid_cut[cart[0]],cut_ver[cart[4]],sec_list[cart[2]],topologies[cart[3]]);
 					SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]] = std::make_shared<TH2F>(hname,hname, SFxres, SFxmin, SFxmax, SFyres, SFymin, SFymax);
@@ -508,7 +510,7 @@ void Histogram::SF_Make(std::shared_ptr<Environment> _envi){
 }
 
 void Histogram::SF_Fill(std::shared_ptr<Environment> _envi,int top, float p, float en, int cut, int cva, float W_, int sec){
-	if(_envi->was_sf_plot()){
+	if(_envi->was_sf_plot() && fun::hist_fitting(0,cut,Histogram::W_binning(W_),0,_envi->was_fit_type())){
 		SF_hist[cut][Histogram::W_binning(W_)][sec][top][cva]->Fill(p,en/p);
 		SF_hist[cut][Histogram::W_binning(W_)][0][top][cva]->Fill(p,en/p);
 	}
@@ -561,41 +563,43 @@ void Histogram::SF_Write(std::shared_ptr<Environment> _envi){
 			sf_dir[cart[0]]->cd();
 			//std::cout<<"    Now In: " <<cart[0] /*<<" " <<"0" <<" " <<"0" <<" " <<"0"*/<<std::endl ; 
 			//Want just cuts, so all Sectors, W, and use Combined Topology
-			if(cart[2]==0 && cart[1]==0 && ((cart[0]!=10 && cart[3]==0)||(cart[0]==10 && cart[3]==5))){
-				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetXTitle("Momentum (GeV)");
-				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetYTitle("Sampling Fraction");
-				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetOption("COLZ");
-				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->Write();
-			}
-			//W binning
-			if(cart[2]==0 && cart[1]!=0 && ((cart[0]!=10 && cart[3]==0)||(cart[0]==10 && cart[3]==5))){
-				//std::cout<<"    Try In: " <<cart[0] <<" " <<"1" <<" " <<"0" <<" " <<"0"<<std::endl ;
-				sf_dir_w[cart[0]]->cd();
-				//std::cout<<"    Now In: " <<cart[0] <<" " <<"1" <<" " <<"0" <<" " <<"0"<<std::endl ; 
-				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetXTitle("Momentum (GeV)");
-				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetYTitle("Sampling Fraction");
-				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetOption("COLZ");
-				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->Write();
-			}
-			//Sector Binning
-			if(cart[2]!=0 && cart[1]==0 && ((cart[0]!=10 && cart[3]==0)||(cart[0]==10 && cart[3]==5))){
-				//std::cout<<"    Try In: " <<cart[0] <<" " <<"0" <<" " <<cart[2]+1 <<" " <<"0"<<std::endl ; 
-				sf_dir_sec[cart[0]][cart[2]]->cd();
-				//std::cout<<"    Now In: " <<cart[0] <<" " <<"0" <<" " <<cart[2]+1 <<" " <<"0"<<std::endl ; 
-				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetXTitle("Momentum (GeV)");
-				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetYTitle("Sampling Fraction");
-				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetOption("COLZ");
-				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->Write();
-			}
-			//Topology Binning
-			if(cart[2]==0 && cart[1]==0 && (cart[0]==10 && cart[3]!=0)){
-				//std::cout<<"    Now In: " <<cart[0] <<" " <<"0" <<" " <<"0" <<" " <<cart[3]<<std::endl ;
-				sf_dir_top[cart[0]][cart[3]]->cd();
-				//std::cout<<"    Now In: " <<cart[0] <<" " <<"0" <<" " <<"0" <<" " <<cart[3]<<std::endl ; 
-				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetXTitle("Momentum (GeV)");
-				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetYTitle("Sampling Fraction");
-				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetOption("COLZ");
-				SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->Write();
+			if(fun::hist_fitting(0,cart[0],cart[1],0,_envi->was_fit_type())){
+				if(cart[2]==0 && cart[1]==0 && ((cart[0]!=10 && cart[3]==0)||(cart[0]==10 && cart[3]==5))){
+					SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetXTitle("Momentum (GeV)");
+					SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetYTitle("Sampling Fraction");
+					SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetOption("COLZ");
+					SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->Write();
+				}
+				//W binning
+				if(cart[2]==0 && cart[1]!=0 && ((cart[0]!=10 && cart[3]==0)||(cart[0]==10 && cart[3]==5))){
+					//std::cout<<"    Try In: " <<cart[0] <<" " <<"1" <<" " <<"0" <<" " <<"0"<<std::endl ;
+					sf_dir_w[cart[0]]->cd();
+					//std::cout<<"    Now In: " <<cart[0] <<" " <<"1" <<" " <<"0" <<" " <<"0"<<std::endl ; 
+					SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetXTitle("Momentum (GeV)");
+					SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetYTitle("Sampling Fraction");
+					SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetOption("COLZ");
+					SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->Write();
+				}
+				//Sector Binning
+				if(cart[2]!=0 && cart[1]==0 && ((cart[0]!=10 && cart[3]==0)||(cart[0]==10 && cart[3]==5))){
+					//std::cout<<"    Try In: " <<cart[0] <<" " <<"0" <<" " <<cart[2]+1 <<" " <<"0"<<std::endl ; 
+					sf_dir_sec[cart[0]][cart[2]]->cd();
+					//std::cout<<"    Now In: " <<cart[0] <<" " <<"0" <<" " <<cart[2]+1 <<" " <<"0"<<std::endl ; 
+					SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetXTitle("Momentum (GeV)");
+					SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetYTitle("Sampling Fraction");
+					SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetOption("COLZ");
+					SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->Write();
+				}
+				//Topology Binning
+				if(cart[2]==0 && cart[1]==0 && (cart[0]==10 && cart[3]!=0)){
+					//std::cout<<"    Now In: " <<cart[0] <<" " <<"0" <<" " <<"0" <<" " <<cart[3]<<std::endl ;
+					sf_dir_top[cart[0]][cart[3]]->cd();
+					//std::cout<<"    Now In: " <<cart[0] <<" " <<"0" <<" " <<"0" <<" " <<cart[3]<<std::endl ; 
+					SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetXTitle("Momentum (GeV)");
+					SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetYTitle("Sampling Fraction");
+					SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->SetOption("COLZ");
+					SF_hist[cart[0]][cart[1]][cart[2]][cart[3]][cart[4]]->Write();
+				}
 			}
 		}
 		std::cout<<"Done" <<std::endl;
@@ -620,7 +624,7 @@ void Histogram::DT_Make(std::shared_ptr<Environment> _envi){
 	CartesianGenerator cart(space_dims);
 
 	while(cart.GetNextCombination()){
-		if(_envi->was_dt_plot(cart[0])){
+		if(_envi->was_dt_plot(cart[0]) && fun::hist_fitting(cart[0],cart[1],cart[2],0,_envi->was_fit_type())){
 			if((cart[1] == 6 && cart[4]!=0) || (cart[1]!=6 && cart[4] ==0)){
 				if(cart[2] == 0){
 					sprintf(hname,"%s_DeltaT_%s_%s_%s_W:ALL_%s",species[cart[0]],hid_cut[cart[1]],cut_ver[cart[5]],sec_list[cart[3]],topologies[cart[4]]);
@@ -641,7 +645,7 @@ void Histogram::DT_Make(std::shared_ptr<Environment> _envi){
 }
 
 void Histogram::DT_Fill(std::shared_ptr<Environment> _envi,int top, int part, float p, float d, float t, float d0, float t0, int cut, int anti, float W_, int sec){
-	if(_envi->was_dt_plot(part)){
+	if(_envi->was_dt_plot(part) && fun::hist_fitting(part,cut,Histogram::W_binning(W_),0,_envi->was_fit_type())){
 		float dt = physics::delta_t(part, p, d, t, d0, t0);
 		if(sec < 7){//If sector dependent
 			if(cut!=6){//No event selection in the W variance. 
@@ -669,7 +673,7 @@ void Histogram::DT_Fill(std::shared_ptr<Environment> _envi,int top, int part, fl
 			
 void Histogram::DT_Fill(std::shared_ptr<Environment> _envi,int top, int part, float p, float dt, int cut, int anti, float W_, int sec){
 	//std::cout<<"Filling DT Plot" <<std::endl;
-	if(_envi->was_dt_plot(part)){
+	if(_envi->was_dt_plot(part) && fun::hist_fitting(part,cut,Histogram::W_binning(W_),0,_envi->was_fit_type())){
 		if(sec < 7){
 			if(cut!=6){//No event selection in the W variance. 
 				if(DT_made_hist[part][cut][Histogram::W_binning(W_)][0][top][anti]){
@@ -756,7 +760,7 @@ void Histogram::DT_Write(std::shared_ptr<Environment> _envi){
 
 		CartesianGenerator cart(space_dims);
 		while(cart.GetNextCombination()){
-			if(_envi->was_dt_plot(cart[0])){
+			if(_envi->was_dt_plot(cart[0]) && fun::hist_fitting(cart[0],cart[1],cart[2],0,_envi->was_fit_type())){
 				if(DT_dir_made[0][0][0][0][0]){
 					par_dt[cart[0]][0][0][0][0]->cd();//Main folder for particles
 					if(DT_dir_made[cart[0]][cart[1]+1][0][0][0]){
@@ -1053,7 +1057,7 @@ void Histogram::MM_Write(std::shared_ptr<Environment> _envi){
 					for(int j = 1; j <3; j++){//linear vs squared
 						MM_dir[i][j][p]->cd();
 						for( int k = 0 ; k<3; k++){//Cuts
-							sprintf(dir_name,"MM %s %s %s %s",topologies[i+1],MM_sq[j-1],basic_cut[k],fit_q[p]);
+							sprintf(dir_name,"MM %s (GeV %s)",MM_sq[j-1],MM_sq[j-1]);
 							MM_hist[i][k][j-1][p]->SetXTitle(dir_name);
 							MM_hist[i][k][j-1][p]->SetYTitle("Events");
 							MM_hist[i][k][j-1][p]->Write();
@@ -1067,13 +1071,60 @@ void Histogram::MM_Write(std::shared_ptr<Environment> _envi){
 
 }
 
+void Histogram::XY_Make(std::shared_ptr<Environment> envi_){
+	char hname[100];
+	std::vector<long> space_dims(3);
+	space_dims[0] = 3;  //Detectors {CC,SC,EC}
+	space_dims[1] = 2;  //Simulation {Recon,Thrown}
+	space_dims[2] = 4; //species
+
+	CartesianGenerator cart(space_dims);
+
+	while(cart.GetNextCombination()){
+		if(cart[1]==0){
+			sprintf(hname,"XY_%s_%s",detectors[cart[0]+1],species[cart[2]]);
+			XY_hist[cart[0]][cart[1]][cart[2]]= std::make_shared<TH2F>(hname,hname,XYres,-XYmax[cart[0]],XYmax[cart[0]],XYres,-XYmax[cart[0]],XYmax[cart[0]]);
+		}else if(envi_->was_sim() && cart[0]==0){
+			sprintf(hname,"XY_%s_Thrown",species[cart[2]]);
+			XY_hist[cart[0]][cart[1]][cart[2]]= std::make_shared<TH2F>(hname,hname,XYres,-XYmax[cart[0]],XYmax[cart[0]],XYres,-XYmax[cart[0]],XYmax[cart[0]]);
+		}
+	}
+}
+
+void Histogram::XY_Fill(std::shared_ptr<Environment> envi_, int species_, float x_, float y_, int detector_ , bool thrown_){
+	//{1,2,3} -> {cc,sc,ed}
+	if(thrown_ && envi_->was_sim()){
+		XY_hist[0][1][species_]->Fill(x_,y_);
+	}else if(!thrown_){
+		XY_hist[detector_][0][species_]->Fill(x_,y_);
+	}
+}
+
+void Histogram::XY_Write(std::shared_ptr<Environment> envi_){
+	char dir_name[100];
+	TDirectory * XY_plot = RootOutputFile->mkdir("XY plots");
+	XY_plot->cd();
+	for(int l = 0; l < 4; l++){
+		for(int k = 0; k<3; k++){
+			XY_hist[k][0][l]->SetXTitle("X Position (mm)");//Check what these actual units are...
+			XY_hist[k][0][l]->SetYTitle("Y Position (mm)");
+			XY_hist[k][0][l]->Write();
+		}
+		if(envi_->was_sim()){
+			XY_hist[0][1][l]->SetXTitle("X Position (mm)");//Check what these actual units are...
+			XY_hist[0][1][l]->SetYTitle("Y Position (mm)");
+			XY_hist[0][1][l]->Write();
+		}
+	}
+}
+
 void Histogram::Friend_Make(std::shared_ptr<Environment> _envi){
 	//If we decide we want to fill this stuff
 	if(_envi->was_Friend_plot()){
 		char hname[100];
 		sprintf(hname,"2#pi_off_proton_#Delta^{++}");
-		Double_t xmin1[7] = {-0.5,_W_min,_Q2_min,_MM_min[0],_theta_min,_alpha_min,_phi_min};
-		Double_t xmax1[7] = {4.5,_W_max,_Q2_max,_MM_max[0],_theta_max,_alpha_max,_phi_max};
+		Double_t xmin1[7] = {0.5,_W_min,_Q2_min,_MM_min[0],_theta_min,_alpha_min,_phi_min};
+		Double_t xmax1[7] = {5.5,_W_max,_Q2_max,_MM_max[0],_theta_max,_alpha_max,_phi_max};
 		Double_t xmin2[7] = {-0.5,_W_min,_Q2_min,_MM_min[1],_theta_min,_alpha_min,_phi_min};
 		Double_t xmax2[7] = {5.5,_W_max,_Q2_max,_MM_max[1],_theta_max,_alpha_max,_phi_max};
 		Double_t xmin3[7] = {-0.5,_W_min,_Q2_min,_MM_min[2],_theta_min,_alpha_min,_phi_min};

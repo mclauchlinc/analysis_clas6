@@ -16,37 +16,37 @@ Branches::Branches(std::shared_ptr<TChain> tree, int run_type) {
 }
 
 void Branches::init() {
-  _tree->SetBranchAddress("npart", &_npart);
+  _tree->SetBranchAddress("npart", &_npart);//Number of particles
   _tree->SetBranchAddress("evstat", &_evstat);
   _tree->SetBranchAddress("intt", &_intt);
   _tree->SetBranchAddress("evntid", &_evntid);
   _tree->SetBranchAddress("evtype", &_evtype);
   _tree->SetBranchAddress("evntclas", &_evntclas);
   _tree->SetBranchAddress("evthel", &_evthel);
-  _tree->SetBranchAddress("evntclas2", &_evntclas2);
+  _tree->SetBranchAddress("evntclas2", &_evntclas2);//Helicity Info
   _tree->SetBranchAddress("q_l", &_q_l);
   _tree->SetBranchAddress("t_l", &_t_l);
   _tree->SetBranchAddress("tr_time", &_tr_time);
   _tree->SetBranchAddress("rf_time1", &_rf_time1);
   _tree->SetBranchAddress("rf_time2", &_rf_time2);
-  _tree->SetBranchAddress("gpart", &_gpart);
-  _tree->SetBranchAddress("id", &_id);
+  _tree->SetBranchAddress("gpart", &_gpart);//How many good particles
+  _tree->SetBranchAddress("id", &_id);//Particle ID 
   _tree->SetBranchAddress("stat", &_stat);
-  _tree->SetBranchAddress("dc", &_dc);
-  _tree->SetBranchAddress("cc", &_cc);
-  _tree->SetBranchAddress("sc", &_sc);
-  _tree->SetBranchAddress("ec", &_ec);
+  _tree->SetBranchAddress("dc", &_dc);//Registered hit in DC (also DC index)
+  _tree->SetBranchAddress("cc", &_cc);//Registered hit in CC (also CC index)
+  _tree->SetBranchAddress("sc", &_sc);//Registered hit in SC (also SC index)
+  _tree->SetBranchAddress("ec", &_ec);//Registered hit in EC (also EC index)
   _tree->SetBranchAddress("lec", &_lec);
   _tree->SetBranchAddress("ccst", &_ccst);
-  _tree->SetBranchAddress("p", &_p);
-  _tree->SetBranchAddress("q", &_q);
-  _tree->SetBranchAddress("b", &_b);
-  _tree->SetBranchAddress("cx", &_cx);
-  _tree->SetBranchAddress("cy", &_cy);
-  _tree->SetBranchAddress("cz", &_cz);
-  _tree->SetBranchAddress("vx", &_vx);
-  _tree->SetBranchAddress("vy", &_vy);
-  _tree->SetBranchAddress("vz", &_vz);
+  _tree->SetBranchAddress("p", &_p);//momentum
+  _tree->SetBranchAddress("q", &_q);//charge (assume 1 e)
+  _tree->SetBranchAddress("b", &_b);//Beta
+  _tree->SetBranchAddress("cx", &_cx);//Cosine of x
+  _tree->SetBranchAddress("cy", &_cy);//Cosine of y
+  _tree->SetBranchAddress("cz", &_cz);//Cosine of z
+  _tree->SetBranchAddress("vx", &_vx);//Vertex x
+  _tree->SetBranchAddress("vy", &_vy);//Vertex y
+  _tree->SetBranchAddress("vz", &_vz);//Vertex z
   _tree->SetBranchAddress("dc_part", &_dc_part);
   _tree->SetBranchAddress("dc_sect", &_dc_sect);
   _tree->SetBranchAddress("dc_trk", &_dc_trk);
@@ -55,9 +55,9 @@ void Branches::init() {
   _tree->SetBranchAddress("dc_vy", &_dc_vy);
   _tree->SetBranchAddress("dc_vz", &_dc_vz);
   _tree->SetBranchAddress("dc_vr", &_dc_vr);
-  _tree->SetBranchAddress("dc_xsc", &_dc_xsc);
-  _tree->SetBranchAddress("dc_ysc", &_dc_ysc);
-  _tree->SetBranchAddress("dc_zsc", &_dc_zsc);
+  _tree->SetBranchAddress("dc_xsc", &_dc_xsc);//X position of SC hit as determined by DC
+  _tree->SetBranchAddress("dc_ysc", &_dc_ysc);//y position of SC hit as determined by DC
+  _tree->SetBranchAddress("dc_zsc", &_dc_zsc);//z position of SC hit as determined by DC
   _tree->SetBranchAddress("dc_cxsc", &_dc_cxsc);
   _tree->SetBranchAddress("dc_cysc", &_dc_cysc);
   _tree->SetBranchAddress("dc_czsc", &_dc_czsc);
@@ -68,14 +68,14 @@ void Branches::init() {
   _tree->SetBranchAddress("ec_whol", &_ec_whol);
   _tree->SetBranchAddress("ec_inst", &_ec_inst);
   _tree->SetBranchAddress("ec_oust", &_ec_oust);
-  _tree->SetBranchAddress("etot", &_etot);
+  _tree->SetBranchAddress("etot", &_etot);//Total energy deposited in EC
   _tree->SetBranchAddress("ec_ei", &_ec_ei);
   _tree->SetBranchAddress("ec_eo", &_ec_eo);
-  _tree->SetBranchAddress("ec_t", &_ec_t);
-  _tree->SetBranchAddress("ec_r", &_ec_r);
-  _tree->SetBranchAddress("ech_x", &_ech_x);
-  _tree->SetBranchAddress("ech_y", &_ech_y);
-  _tree->SetBranchAddress("ech_z", &_ech_z);
+  _tree->SetBranchAddress("ec_t", &_ec_t);//Time it took to get from vertex to EC
+  _tree->SetBranchAddress("ec_r", &_ec_r);//Path length from vertex to hit in EC
+  _tree->SetBranchAddress("ech_x", &_ech_x);//X position of EC hit
+  _tree->SetBranchAddress("ech_y", &_ech_y);//Y position of EC hit
+  _tree->SetBranchAddress("ech_z", &_ech_z);//Z position of EC hit
   _tree->SetBranchAddress("ec_m2", &_ec_m2);
   _tree->SetBranchAddress("ec_m3", &_ec_m3);
   _tree->SetBranchAddress("ec_m4", &_ec_m4);
@@ -86,14 +86,14 @@ void Branches::init() {
   _tree->SetBranchAddress("sc_pd", &_sc_pd);
   _tree->SetBranchAddress("sc_stat", &_sc_stat);
   _tree->SetBranchAddress("edep", &_edep);
-  _tree->SetBranchAddress("sc_t", &_sc_t);
-  _tree->SetBranchAddress("sc_r", &_sc_r);
+  _tree->SetBranchAddress("sc_t", &_sc_t);//Time it took to get from vertex to SC
+  _tree->SetBranchAddress("sc_r", &_sc_r);//Path length from vertex to SC
   _tree->SetBranchAddress("sc_c2", &_sc_c2);
   _tree->SetBranchAddress("cc_part", &_cc_part);
-  _tree->SetBranchAddress("cc_sect", &_cc_sect);
+  _tree->SetBranchAddress("cc_sect", &_cc_sect);//CC Sector
   _tree->SetBranchAddress("cc_hit", &_cc_hit);
-  _tree->SetBranchAddress("cc_segm", &_cc_segm);
-  _tree->SetBranchAddress("nphe", &_nphe);
+  _tree->SetBranchAddress("cc_segm", &_cc_segm);//CC segment
+  _tree->SetBranchAddress("nphe", &_nphe);//Number photo electrons produced in CC
   _tree->SetBranchAddress("cc_t", &_cc_t);
   _tree->SetBranchAddress("cc_r", &_cc_r);
   _tree->SetBranchAddress("cc_c2", &_cc_c2);
@@ -114,10 +114,10 @@ void Branches::init() {
     _tree->SetBranchAddress("pypart", &_pypart);
     _tree->SetBranchAddress("pzpart", &_pzpart);
     _tree->SetBranchAddress("qpart", &_qpart);
-     _tree->SetBranchAddress("mcp", &_mcp);
-    _tree->SetBranchAddress("mctheta", &_mctheta);
-    _tree->SetBranchAddress("mcphi", &_mcphi);
-    _tree->SetBranchAddress("mcid", &_mcid);
+     _tree->SetBranchAddress("mcp", &_mcp);//Thrown momentum
+    _tree->SetBranchAddress("mctheta", &_mctheta);//Thrown theta (lab)
+    _tree->SetBranchAddress("mcphi", &_mcphi);//Thrown phi (lab)
+    _tree->SetBranchAddress("mcid", &_mcid);//Thrown particle ID
     /*_tree->SetBranchAddress("sc", &_sc);
     _tree->SetBranchAddress("sc_r", &_sc_r);
     _tree->SetBranchAddress("sc_t" , &_sc_t);

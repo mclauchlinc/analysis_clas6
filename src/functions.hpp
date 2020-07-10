@@ -27,6 +27,8 @@ char* appendCharToCharArray(char* array, char a);
 
 bool no_pro_pip_match(int idx1, int idx2[20]);
 
+bool hist_fitting(int species_, int cut_, int Wbin_, int pbin_, int fit_);
+
 }
 
 #endif

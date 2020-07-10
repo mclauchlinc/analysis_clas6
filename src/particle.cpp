@@ -40,6 +40,9 @@ void Particle::Fill_Particle(std::shared_ptr<Branches> data_, int par_idx_, int 
 			_phi = physics::get_phi(_idx,data_);
 			_sf = data_->Branches::etot(_idx)/data_->Branches::p(_idx);
 			_q = data_->Branches::q(_idx);
+			//Get X-Y positions for hits in SC. These need to be rotated into their proper sector since all are listed as if being in sector 1
+			_x[1] = physics::X_Rotate(data_->Branches::dc_xsc(_idx),data_->Branches::dc_ysc(_idx),physics::get_sector(_phi));
+			_y[1] = physics::Y_Rotate(data_->Branches::dc_xsc(_idx),data_->Branches::dc_ysc(_idx),physics::get_sector(_phi));
 			//std::cout<<"	Particle " <<_idx <<" has charge of " <<_q <<std::endl;
 		}
 		if(!_sim && data_->Branches::cc(_idx) > 0){
@@ -48,10 +51,17 @@ void Particle::Fill_Particle(std::shared_ptr<Branches> data_, int par_idx_, int 
 			//std::cout<<"		Has a CC value " <<std::endl;
 			if(_idx == 0){
 				//std::cout<<"		Here is the cc_segm for this particle: " <<_cc_seg <<std::endl;
+				_x[0] = detect::cc_x(data_,_idx);
+				_y[0] = detect::cc_y(data_,_idx);
 			}
+			//Here's where I'd do stuff to get the x and y coordinates out of the CC hit
+		//	_x[0] = detect::cc_x(data_,_idx);
+			//_x[0] = detect::cc_y(data_,_idx);
 		}
 		if(data_->Branches::ec(_idx)>0){
 			_etot = data_->Branches::etot(_idx);
+			_x[2] = data_->Branches::ech_x(_idx);
+			_y[2] = data_->Branches::ech_y(_idx);
 		}
 	} 
 }
@@ -414,6 +424,14 @@ void Particle::PID(std::shared_ptr<Branches> data_, std::shared_ptr<Environment>
 		_id_crisis = true;
 	}else{
 		_id_crisis = false;
+	}
+	//Other histograms to fill
+	for(int j = 0; j<4; j++){
+		for(int i = 0; i<3; i++){
+			if(!isnan(_x[i]) && !isnan(_y[i]) && _sanity_pass[j]){
+				hist_->XY_Fill(envi_,j,_x[i],_y[i],i,_thrown);
+			}
+		}
 	}
 }
 

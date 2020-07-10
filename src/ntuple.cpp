@@ -30,7 +30,7 @@ forest::forest(int is_alive, bool sim_){
 	//Int_t _run_type= 0;//{1,2,3,4}->{e16,e1f,e16sim,e1f sim} 
 	//The individual thread trees that will be merged
 	for(int thread_id = 0; thread_id < NUM_THREADS; thread_id++){
-		sprintf(tree_name,"k%d",thread_id);
+		sprintf(tree_name,"r10",thread_id);//Changed from %d to have different indexed pieces
 		_a_tree[thread_id] = new TTree(tree_name,"Tree to hold Thread Event Fourvectors");//
 		//_a_tree[thread_id]->Branch("EventBranch",&the_eventb,"evntb/I:apartb/I:pxb/F:pyb/F:pzb/F:p0b/F:pidb/I:helb/I:topb/I");
 		_a_tree[thread_id]->Branch("evnt",&(_evntb[thread_id][0]),"evnt/I");
@@ -77,7 +77,7 @@ forest::forest(int is_alive, bool sim_){
 		//Int_t _run_type= 0;//{1,2,3,4}->{e16,e1f,e16sim,e1f sim} 
 		//The individual thread trees that will be merged
 		for(int thread_id = 0; thread_id < NUM_THREADS; thread_id++){
-			sprintf(tree_name,"u%d",thread_id);
+			sprintf(tree_name,"t10",thread_id);
 			_athrown_tree[thread_id] = new TTree(tree_name,"Tree to hold Thread Event Fourvectors");//
 			//_athrown_tree[thread_id]->Branch("EventBranch",&the_eventb,"evntb/I:apartb/I:pxb/F:pyb/F:pzb/F:p0b/F:pidb/I:helb/I:topb/I");
 			_athrown_tree[thread_id]->Branch("evnt",&(_evntb[thread_id][1]),"evnt/I");
@@ -403,8 +403,10 @@ void forest::Grow_Write_Forest(std::string tree_file_name, bool thrown_){
 		_almanac2->cd();
 		for(int j = 0; j<NUM_THREADS ; j++){
 			//thr_forest->TList::Add(_athrown_tree[j]);
+			std::cout<<"	Growing Thrown Forest\n";
 			thr_forest.TList::Add(_athrown_tree[j]);
 		}
+		std::cout<<"	Growing Thrown Tree\n";
 		_thrown_tree = TTree::MergeTrees(&thr_forest,"");
 		//_new_tree2 = TTree::MergeTrees(_thr_forest);
 		std::cout<<"	Thrown Forest Grown\n";

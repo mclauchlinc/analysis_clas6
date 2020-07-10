@@ -11,7 +11,7 @@
 
 
 namespace Setup{
-void set_envi(std::shared_ptr<Environment> setup, int run_type);
+void set_envi(std::shared_ptr<Environment> setup, int run_type, int fit = 0);
 
 void make_envi_file(const std::string& output_name, std::shared_ptr<Environment> envi);
 }

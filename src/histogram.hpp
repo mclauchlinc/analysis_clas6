@@ -105,16 +105,19 @@ protected:
 
 	 //Making the Histograms
 	TH2F_ptr WQ2_hist[11][6][2][2];//electron cuts, topologies (including pre), Recon vs. thrown, weight (for data this should always be "Recon")
-	TH2F_ptr Fid_hist[7][4][11][30][12][6][2];//sector, species, cut, W binning, p binning, topology, anti, weight
+	TH2F_ptr Fid_hist[7][4][11][30][26][6][2];//sector, species, cut, W binning, p binning, topology, anti, weight
 	TH2F_ptr SF_hist[10][30][7][6][2];//cuts, W Binning, Sector, topology, anti, weight
 	TH2F_ptr DT_hist[4][7][30][7][6][2]; //particle, cuts, W binning, sector, topology, anti, weight
 	TH1F_ptr CC_hist[6][18][11][4][6][2]; //Sector, segment, cut, side of detector, topology, anti, weight
 	TH1F_ptr MM_hist[4][3][2][2];//topology, cut, squared v linear, fitting vs. not fitting plots, weight
 	TH1F_ptr Cross_hist[2]; //Showing how many events counted in mulitiple topologies,weight
 
-	bool Fid_made_hist[7][4][11][30][12][6][2];
-	bool Fid_fill_hist[7][4][11][30][12][6][2];
-	bool Fid_write_hist[7][4][11][30][12][6][2];
+	//Checking Detector Hits
+	TH2F_ptr XY_hist[3][2][4];//Show distribution of hits in detector systems {detector systems},{sim/thrown},species
+
+	bool Fid_made_hist[7][4][11][30][26][6][2];
+	bool Fid_fill_hist[7][4][11][30][26][6][2];
+	bool Fid_write_hist[7][4][11][30][26][6][2];
 
 	bool CC_made_hist[6][18][11][4][6][2];
 	bool CC_fill_hist[6][18][11][4][6][2];
@@ -184,6 +187,10 @@ public:
 	void MM_Fill(std::shared_ptr<Environment> _envi, int top, float mm, int cut, int square, bool fit);
 	//void MM_Fill(std::shared_ptr<Environment> _envi, Particle _par);
 	void MM_Write(std::shared_ptr<Environment> _envi);
+
+	void XY_Make(std::shared_ptr<Environment> envi_);
+	void XY_Fill(std::shared_ptr<Environment> envi_, int species_, float x_, float y_, int detector_ , bool thrown_);
+	void XY_Write(std::shared_ptr<Environment> envi_);
 
 
 

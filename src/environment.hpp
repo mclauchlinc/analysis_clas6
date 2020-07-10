@@ -65,6 +65,9 @@ class Environment {
   bool _p_dep_plot = false; //Is there momentum dependence in the relevant plots?
   bool _W_dep_plot = false; //Is there W dependence in the relevant plots? 
   bool _friend_plot = false; //Are we going to fill the multidimensional histogram? 
+  //Fitting vs. Not Fitting
+  bool _fitting = false;
+  int _fit = -2; 
   
 
  public:
@@ -123,6 +126,7 @@ class Environment {
   void env_p_dep_plot(bool p_dep_plot_); //Is there momentum dependence in the relevant plots?
   void env_W_dep_plot(bool W_dep_plot_); //Is there W dependence in the relevant plots? 
   void env_Friend_plot(bool friend_plot);
+  void env_fitting(bool fitting_, int fit_=0);
 
   int was_data_set();
   bool was_dc_hit(); //Was a hit on the DC required?
@@ -177,6 +181,9 @@ class Environment {
   bool was_p_dep_plot(); //Is there momentum dependence in the relevant plots?
   bool was_W_dep_plot(); //Is there W dependence in the relevant plots? 
   bool was_Friend_plot();
+  //Fitting
+  bool was_fitting();
+  int was_fit_type();
 
   //void copy_envi(Environment cop_envi);
 };

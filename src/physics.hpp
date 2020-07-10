@@ -70,7 +70,11 @@ namespace physics{
 	float Ev_Theta(int top, TLorentzVector k0, TLorentzVector p1, TLorentzVector p2, TLorentzVector p3, TLorentzVector p4, bool COM);
 	float Ev_MM(int top, TLorentzVector k0, TLorentzVector p1, TLorentzVector p2, TLorentzVector p3, TLorentzVector p4, bool COM);
 
-
+	//XY Detector stuff
+	float X_Rotate(float x_, float y_, int sec_);
+	float Y_Rotate(float x_, float y_, int sec_);
+	float CCX_Rotate(float x_, float y_, int sec_);
+	float CCY_Rotate(float x_, float y_, int sec_);
 	
 
 

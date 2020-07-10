@@ -23,6 +23,7 @@ int main(int argc, char **argv){
 	int plate_stat = 0;//Status of the half wave plate
 	bool hel_runs = false;
 	int sim_status = 0; //{1,-1}->{data,sim}
+	int fit = 0; //{1,0,-1}->{fitting,everything,not fitting}
 
 	//Make the environment tracker
 	auto envi = std::make_shared<Environment>();
@@ -71,8 +72,44 @@ int main(int argc, char **argv){
        	data_set = filetype_map[comp];
        	Setup::set_envi(envi,data_set); //setup.hpp
 	}
+	//For new added entering of parameters
+	if(argc ==5){
+        comp = argv[1]; 
+        file_num = std::atoi(argv[2]); 
+        fit = std::atoi(argv[3]);
+        output_name = argv[4]; 
+        std::cout<<"Fit specified Argument assignment complete" <<std::endl;
+       	//Should make a mapping of input paths to data types
+       	_case = 1; 
+       	if(argv[1]!=list3h){
+       		for(int i = 0; i <NUM_THREADS; i++){
+	       		infilenames[i] = fun::read_file_list(filepath_map[argv[1]],i);//constants.hpp for map, functions.hpp for function
+	       	}
+	        if(argv[1] == list3p){
+	        	std::cout<<"Half Wave Plate In" <<std::endl;
+	       		plate_stat = 1; 
+	        }else if(argv[1] == list3n){
+	        	std::cout<<"Half Wave Plate Out" <<std::endl;
+	       		plate_stat = -1; 
+	        }else{
+	        	std::cout<<"Pretend Wave Plate In" <<std::endl;
+	       		plate_stat = 1; 
+	        }
+       	}else{
+       		comp = list3p;
+       		hel_runs = true;
+       		std::cout<<"Looking at Both Plates" <<std::endl;
+       		for(int i = 0; i <NUM_THREADS; i++){
+	       		infilenames[i] = fun::read_file_list(filepath_map[list3p],i);//constants.hpp for map, functions.hpp for function
+	       		infilenames2[i] = fun::read_file_list(filepath_map[list3n],i);//constants.hpp for map, functions.hpp for function
+	       		plate_stat = 1;
+	       	}
+       	}
+       	data_set = filetype_map[comp];
+       	Setup::set_envi(envi,data_set,fit); //setup.hpp
+	}
 	//Case 2
-	if(argc >4){
+	if(argc >5){
 		output_name = argv[1];
 		data_set = std::atoi(argv[2]);
 		sim_status = std::atoi(argv[3]);
@@ -160,8 +197,9 @@ int main(int argc, char **argv){
 		}
 	}
 	
-	a_good_forest->forest::Grow_Write_Forest(output_name,envi->Environment::was_sim());//_Forest(envi->Environment::was_sim());//Combine all those Thread specific trees and output a root file with all event selected events with four vectors 
-	//a_good_forest->forest::Write(envi->Environment::was_sim());//Write the TTree for the events
+	//Currently running into weird issues with this, so disable for now
+	//a_good_forest->forest::Grow_Write_Forest(output_name,envi->Environment::was_sim());//_Forest(envi->Environment::was_sim());//Combine all those Thread specific trees and output a root file with all event selected events with four vectors 
+	
 
 	
 

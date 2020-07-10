@@ -8,13 +8,13 @@
 //static int num_mixed_p_pip = 0; 
 
 static const int MAX_PARTS = 100; 
-static const int NUM_THREADS = 2;
+static const int NUM_THREADS = 4;
 
 static const float c_special = 29.9792458; //speed of light in cm/ns
 static const float c_convert = 10000000; //Convert c_special to m/s
 
 //Beam energies in GeV
-static const float energy_e16 = 5.7696;
+static const float energy_e16 = 5.754;//5.7696;5.754
 //3_14 was 5.754, but led to bad results: updated to 5.759 after reading Paremuzyan's thesis 
 //Check 4.794 GeV for e16
 static const float energy_e1f = 5.499;
@@ -64,7 +64,7 @@ static const float y_beam = -0.345;
 static const float c1e = 12.0;
 static const float c2e = 18.5;
 static const float c3e = 0.25;
-static const float c4e = 15.0;
+static const float c4e = 15.0;//24.3;//15.0; //Replaced with arbitrary number to open the fiducial cut a bit
 static const float factor_e = 0.416667;
 static const float p_shift_e = 0.14;
 static const float a0xh[6] = {24.0,24.0,23.0,23.5,24.5,24.5};
@@ -153,6 +153,15 @@ const Float_t p_min_e1f = 0.64;
 const Float_t ec_min_e1f_exp[6] = {0.058,0.064,0.060,0.056,0.058,0.056}; 
 const Float_t ec_min_e1f_sim[6] = {0.063,0.063,0.063,0.063,0.063,0.063}; 
 
+const float XYmax[3] = {545.0,545.0,545.0};
+const int XYres = 350;
+
+//CC Projection Plane
+const float Acc = -0.000785;
+const float Bcc = 0.0;
+const float Ccc = -0.00168;
+const float Dcc = 1.0;
+
 /*
 //Binning
 //Plot Formation Constants
@@ -240,7 +249,7 @@ const float Wbin_start = 1.4;//The starting of W bins
 const float Q2bin_res = 0.5;//6 steps
 const float Q2bin_start = 2.0; 
 
-const float pbin_res = 0.5;//Range: 0-6.0
+const float pbin_res = 0.18;//Range: 0-5.0
 const float pbin_start = 0.5;
 
 //For cross sections
@@ -326,5 +335,6 @@ static const char * par_cut[4][11] = {{"pre","sanity","fid","sf","min_cc","fid+s
 static const char * fit_q[] = {"4fit","4show"};
 static const char * throw_stat[] = {"recon","thrown"};//For reconstructed vs. thrown events
 static const char * w_stat[] = {"nweight","weight"};
+static const char * detectors[] = {"dc","cc","sc","ec"};
 
 #endif

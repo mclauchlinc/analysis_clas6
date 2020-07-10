@@ -38,6 +38,9 @@ private:
 	bool _pid[4] = {false,false,false,false};
 	bool _ided = false; 
 
+	float _x[3] = {NAN,NAN,NAN};//cc,sc,ec 
+	float _y[3] = {NAN,NAN,NAN};//cc,sc,ec
+
 
 public:
 	Particle();

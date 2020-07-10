@@ -207,6 +207,11 @@ void Environment::env_W_dep_plot(bool W_dep_plot_) //Is there W dependence in th
 void Environment::env_Friend_plot(bool friend_plot){
 	_friend_plot = friend_plot;
 }
+
+void Environment::env_fitting(bool fitting_, int fit_){
+	_fitting = fitting_;
+	_fit = fit_;
+}
 //Switch to the Was 
 
 int Environment::was_data_set(){
@@ -416,6 +421,14 @@ bool Environment::was_W_dep_plot() //Is there W dependence in the relevant plots
 bool Environment::was_Friend_plot()
 {
 	return _friend_plot;
+}
+
+bool Environment::was_fitting(){
+	return _fitting;
+}
+
+int Environment::was_fit_type(){
+	return _fit;
 }
 /*
 void copy_envi(Environment *cop_envi){
