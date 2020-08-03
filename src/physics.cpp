@@ -111,7 +111,7 @@ float physics::beta_calc(float m, std::shared_ptr<Branches> data, int i){
 
 float physics::MM_event(int set, int squared, TLorentzVector k1_mu, TLorentzVector k2_mu, TLorentzVector k3_mu, TLorentzVector k4_mu){
 	TLorentzVector k_mu = physics::Set_k_mu(set);
-	float MM = -99; 
+	float MM = NAN; 
 	if(squared == 0 ){
 		MM = (k_mu + p_mu - k1_mu - k2_mu - k3_mu - k4_mu).Mag();
 	} else{

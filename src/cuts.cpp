@@ -184,8 +184,8 @@ bool cuts::sf_cut(Float_t p, Float_t etot, Float_t cx, Float_t cy, int run, bool
 		low = sf_low( p, sidx, run);
 		high = sf_high(p, sidx, run);
 	}else{
-		low = 0.0;
-		high = 0.18;
+		low = 0.2;//Modified on 8/3/20 in accordance with Arjun's simulation files
+		high = 0.3;
 	}
 	if(s_f >= low && s_f <= high)
 	{

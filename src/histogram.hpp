@@ -113,7 +113,8 @@ protected:
 	TH1F_ptr Cross_hist[2]; //Showing how many events counted in mulitiple topologies,weight
 
 	//Checking Detector Hits
-	TH2F_ptr XY_hist[3][2][4];//Show distribution of hits in detector systems {detector systems},{sim/thrown},species
+	TH2F_ptr XY_hist[3][2][4];//Show distribution of hits in detector systems {detector systems},{recon/thrown},species
+	TH2F_ptr Fid_Det_hist[3][4][7];//{cc,sc,ec},{species},{all,sector}{recon/thrown}
 
 	bool Fid_made_hist[7][4][11][30][26][6][2];
 	bool Fid_fill_hist[7][4][11][30][26][6][2];
@@ -192,6 +193,9 @@ public:
 	void XY_Fill(std::shared_ptr<Environment> envi_, int species_, float x_, float y_, int detector_ , bool thrown_);
 	void XY_Write(std::shared_ptr<Environment> envi_);
 
+	void Fid_Det_Make(std::shared_ptr<Environment> envi_);
+	void Fid_Det_Fill(std::shared_ptr<Environment> envi_, int species_, float theta_, float phi_, int sector_, int detector_);
+	void Fid_Det_Write(std::shared_ptr<Environment> envi_);
 
 
 	void Friend_Make(std::shared_ptr<Environment> _envi);

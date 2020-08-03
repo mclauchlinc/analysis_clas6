@@ -13,6 +13,7 @@ Histogram::Histogram(std::shared_ptr<Environment> _envi, const std::string& outp
 	Histogram::Friend_Make(_envi);
 	Histogram::Cross_Make(_envi);
 	Histogram::XY_Make(_envi);
+	Histogram::Fid_Det_Make(_envi);
 }
 
 //Histogram::~Histogram() { this->Write(); }
@@ -29,6 +30,7 @@ void Histogram::Write(const std::string& output_file, std::shared_ptr<Environmen
 	Histogram::CC_Write( _envi);
 	Histogram::MM_Write( _envi);
 	Histogram::XY_Write(_envi);
+	Histogram::Fid_Det_Write(_envi);
 	Friend_Write(_envi);
 	Histogram::Cross_Write(_envi);
 	RootOutputFile->Close();
@@ -1117,6 +1119,66 @@ void Histogram::XY_Write(std::shared_ptr<Environment> envi_){
 		}
 	}
 }
+
+void Histogram::Fid_Det_Make(std::shared_ptr<Environment> envi_){
+	char hname[100];
+	std::vector<long> space_dims(3);//[3][4][7][2]
+	space_dims[0] = 3;  //Detectors {CC,SC,EC}
+	space_dims[1] = 4;  //Species
+	space_dims[2] = 7; //All, Sector
+
+	CartesianGenerator cart(space_dims);
+
+	while(cart.GetNextCombination()){
+		if(cart[2]==0){
+			if(envi_->was_sim()){
+				sprintf(hname,"%sFid_%s_Sector:All_Sim",detectors[cart[0]+1],species[cart[1]]);
+				Fid_Det_hist[cart[0]][cart[1]][cart[2]]= std::make_shared<TH2F>(hname,hname,FIDxres, FIDxmin, FIDxmax, FIDyres, FIDymin, FIDymax);
+			}else{
+				sprintf(hname,"%sFid_%s_Sector:All",detectors[cart[0]+1],species[cart[1]]);
+				Fid_Det_hist[cart[0]][cart[1]][cart[2]]= std::make_shared<TH2F>(hname,hname,FIDxres, FIDxmin, FIDxmax, FIDyres, FIDymin, FIDymax);
+			}
+		}else{
+			if(envi_->was_sim()){
+				sprintf(hname,"%sFid_%s_Sector:%d_Sim",detectors[cart[0]+1],species[cart[1]],cart[2]);
+				Fid_Det_hist[cart[0]][cart[1]][cart[2]]= std::make_shared<TH2F>(hname,hname,FIDxres, FIDxmin, FIDxmax, FIDyres, FIDymin, FIDymax);
+			}else{
+				sprintf(hname,"%sFid_%s_Sector:%d",detectors[cart[0]+1],species[cart[1]],cart[2]);
+				Fid_Det_hist[cart[0]][cart[1]][cart[2]]= std::make_shared<TH2F>(hname,hname,FIDxres, FIDxmin, FIDxmax, FIDyres, FIDymin, FIDymax);
+			}
+		}
+		
+	}
+}
+
+void Histogram::Fid_Det_Fill(std::shared_ptr<Environment> envi_, int species_, float theta_, float phi_, int sector_, int detector_){
+	Fid_Det_hist[detector_][species_][sector_]->Fill(phi_,theta_);
+	Fid_Det_hist[detector_][species_][0]->Fill(phi_,theta_);
+}
+
+void Histogram::Fid_Det_Write(std::shared_ptr<Environment> envi_){
+	char dir_name[100];
+	TDirectory * FidD_plot = RootOutputFile->mkdir("Fid Detector plots");
+	FidD_plot->cd();
+	TDirectory * FidD_dir[4][4];
+	for(int spe = 0; spe < 4; spe++){
+		FidD_dir[spe][0] = FidD_plot->mkdir(species[spe]);
+		FidD_dir[spe][0]->cd();
+		for(int det = 0; det < 3; det++){
+			sprintf(dir_name,"Det_%s_%s",detectors[det+1],species[spe]);
+			FidD_dir[spe][det+1] = FidD_dir[spe][0]->mkdir(dir_name);
+			FidD_dir[spe][det+1]->cd();
+			for(int sec = 0; sec < 7; sec++){
+			Fid_Det_hist[det][spe][sec]->SetXTitle("Phi (deg)");
+			Fid_Det_hist[det][spe][sec]->SetYTitle("Theta (deg)");
+			Fid_Det_hist[det][spe][sec]->Write();
+			}
+		}
+	}
+}
+
+
+
 
 void Histogram::Friend_Make(std::shared_ptr<Environment> _envi){
 	//If we decide we want to fill this stuff

@@ -40,6 +40,8 @@ private:
 
 	float _x[3] = {NAN,NAN,NAN};//cc,sc,ec 
 	float _y[3] = {NAN,NAN,NAN};//cc,sc,ec
+	float _dtheta[3] = {NAN,NAN,NAN};
+	float _dphi[3] = {NAN,NAN,NAN};
 
 
 public:

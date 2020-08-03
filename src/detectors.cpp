@@ -119,4 +119,28 @@ float detect::cc_y(std::shared_ptr<Branches> data_, int idx_){
 }
 
 
+//SC functions
+float detect::sc_theta(std::shared_ptr<Branches> data_, int idx_){
+	return physics::get_theta(data_->Branches::dc_czsc(idx_)); 
+}
+
+float detect::sc_phi(std::shared_ptr<Branches> data_, int idx_){
+	return physics::get_phi(data_->dc_xsc(idx_),data_->dc_ysc(idx_));
+}
+
+
+//EC functions
+float detect::ec_theta(std::shared_ptr<Branches> data_, int idx_){
+	TVector3 _p_(data_->Branches::ech_x(idx_),data_->Branches::ech_y(idx_),data_->Branches::ech_z(idx_));
+	float pmag = physics::Vec3_Mag(_p_);
+	return physics::get_theta(data_->Branches::ech_z(idx_)/pmag); 
+}
+
+float detect::ec_phi(std::shared_ptr<Branches> data_, int idx_){
+	float _phi_ = physics::get_phi(data_->ech_x(idx_),data_->ech_y(idx_));
+	return physics::phi_center(_phi_);
+}
+
+
+
 

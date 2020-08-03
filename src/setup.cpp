@@ -20,7 +20,7 @@ void Setup::set_envi(std::shared_ptr<Environment> setup, int run_type, int fit){
 	if(run_type >= 3){
 		setup->Environment::env_sim(true);
 	}
-	if(run_type < 5){//Everything running on normal banks
+	if(run_type < 5 || run_type == 7){//Everything running on normal banks
 		setup->Environment::env_dc_hit(true); //Was a hit on the DC required?
 		if(run_type < 3){//Only for experiment do we work with the CC
 			setup->Environment::env_cc_hit(true);  //Was a hit on the CC required for electrons?
@@ -108,7 +108,7 @@ void Setup::set_envi(std::shared_ptr<Environment> setup, int run_type, int fit){
 	  	setup->Environment::env_p_dep_plot(true); //Is there momentum dependence in the relevant plots?
 	  	setup->Environment::env_W_dep_plot(true); //Is there W dependence in the relevant plots? 
 	  	setup->Environment::env_Friend_plot(true);//Construct the multi dimensional histogram and fill it
-  	}else if(run_type >= 5){
+  	}else if(run_type >= 5 && run_type!=7){
   		setup->Environment::env_npart(4); //Number of particles allowed in an event (-1 means no limits)
   		setup->Environment::env_Qmin(Q2minAna); //Lower range of Q squared allowed
 		setup->Environment::env_Qmax(Q2maxAna); //Upper range of Q squared allowed

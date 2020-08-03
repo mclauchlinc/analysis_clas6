@@ -269,6 +269,8 @@ static const std::string lists2 = "sim_pre";
 static const std::string lists3n = "sim_gsim_ngpp_nmcdata";
 static const std::string lists3y = "sim_gsim_ngpp_mcdata";
 static const std::string lists3 = "sim_e16";
+static const std::string lists32 = "sim_e16_2";
+static const std::string lists_ar = "sim_e16_arjun";
 
 //Paths for file names
 static const std::string path1 = "/home/mclauchlinc/Desktop/analysis/nick_convert_e16.txt";
@@ -282,6 +284,8 @@ static const std::string paths2 = "/Users/cmc/Desktop/analysis/simulation/sim_e1
 static const std::string paths3n = "/Users/cmc/Desktop/analysis/analysis_clas6/Path_Files/gsim_no_gpp_nmcdata.txt";
 static const std::string paths3y = "/Users/cmc/Desktop/analysis/analysis_clas6/Path_Files/gsim_no_gpp_mcdata.txt";
 static const std::string paths3 = "/Users/cmc/Desktop/analysis/analysis_clas6/Path_Files/sim_e16_fix.txt";
+static const std::string paths32 = "/Users/cmc/Desktop/analysis/analysis_clas6/Path_Files/sim_e16_2.txt";
+static const std::string paths_ar = "/Users/cmc/Desktop/analysis/analysis_clas6/Path_Files/arjun_sim_e16.txt";
 
 //Run type for file lists {e16,e1f,e16sim,e1fsim} -> {1,2,3,4}
 static const int type1 = 1;
@@ -295,6 +299,8 @@ static const int types2 = 5;
 static const int types3n = 5; 
 static const int types3y = 5; 
 static const int types3 = 3; 
+static const int types32 = 3; 
+static const int types_ar = 7;//Arjun's simulation seems to have no weights in place...?
 
 //Map of file lists to run type
 static std::unordered_map<std::string, std::string> filepath_map = 	{	{list1,path1},
@@ -307,7 +313,9 @@ static std::unordered_map<std::string, std::string> filepath_map = 	{	{list1,pat
 																		{lists2,paths2},
 																		{lists3n,paths3n},
 																		{lists3y,paths3y},
-																		{lists3,paths3}};
+																		{lists3,paths3},
+																		{lists32,paths32},
+																		{lists_ar,paths_ar}};
 
 static std::unordered_map<std::string, int> filetype_map = 	{	{list1,type1},
 																{list2,type2},
@@ -319,7 +327,9 @@ static std::unordered_map<std::string, int> filetype_map = 	{	{list1,type1},
 																{lists2,types2},
 																{lists3n,types3n},
 																{lists3y,types3y},
-																{lists3,types3}};
+																{lists3,types3},
+																{lists32,types32},
+																{lists_ar,types_ar}};
 
 static const char * species[] = {"ele","pro","pip","pim"};//4
 static const char * eid_cut[] = {"pre","sanity","fid","sf","min_cc","fid+sf","fid+cc","sf+cc","eid","bank","event"}; //11"min_cc","min_ec","eid","bank","event"};//"fid+sf","fid+cc","sf+cc","eid","bank","event"}; //11

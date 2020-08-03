@@ -26,6 +26,14 @@ namespace detect{
 	float cc_x(std::shared_ptr<Branches> data_, int idx_);
 	float cc_y(std::shared_ptr<Branches> data_, int idx_);
 
+	//SC functions
+	float sc_theta(std::shared_ptr<Branches> data_, int idx_);
+	float sc_phi(std::shared_ptr<Branches> data_, int idx_);
+
+	//EC functions
+	float ec_theta(std::shared_ptr<Branches> data_, int idx_);
+	float ec_phi(std::shared_ptr<Branches> data_, int idx_);
+
 }
 
 

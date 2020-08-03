@@ -36,6 +36,11 @@ Analysis::Analysis(std::shared_ptr<Branches> data_, std::shared_ptr<Histogram> h
 			_sim = true;
 			_pweight = data_->Branches::weight();
 		break;
+		case 7://This is for Arjun simulation where there appears to be no weight...?
+			_set = 1; 
+			_sim = true;
+			_recon = true;
+			_pweight = 1.0;
 	}
 
 	if(_sim){
