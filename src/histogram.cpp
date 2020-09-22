@@ -38,6 +38,36 @@ void Histogram::Write(const std::string& output_file, std::shared_ptr<Environmen
 }
 
 
+void Histogram::Print(const std::string& output_dir, std::shared_ptr<Environment> envi_){
+	int _check_ = -1;
+	
+	//if(envi_->was_print()>0){
+		std::string _curr_dir_ = fun::get_current_dir();
+		std::string _out_dir_ = "$curr/$name/Plots";
+		std::cout<<"Printing Plots \n 	Making Image File: ";
+		//HistImageFile = fun::Name_Image_File(output_dir);
+		std::cout<<"Making Plot Directory:";
+		fun::replace(_out_dir_, "$curr", _curr_dir_);
+		fun::replace(_out_dir_, "$name", output_dir);
+		_check_ = fun::Make_Dir(_out_dir_);
+		//chdir(_out_dir_.c_str());
+		//std::cout<<" Done \n 	Printing Histograms";
+	//}
+	//if(_check_ == 0){
+		//std::cout<<"Pass the check?";
+		Histogram::WQ2_Print(output_dir, envi_);
+		//Histogram::Fid_Print(const std::string& output_dir, envi_);
+		//Histogram::SF_Print(const std::string& output_dir, envi_);
+		//Histogram::DT_Print(const std::string& output_dir, envi_);
+		//Histogram::CC_Print(const std::string& output_dir, envi_);
+		//Histogram::MM_Print(const std::string& output_dir, envi_);
+		//Histogram::XY_Print(const std::string& output_dir,envi_);
+		//Histogram::Fid_Det_Print(const std::string& output_dir,envi_);
+		//Friend_Print(const std::string& output_dir,envi_);
+		//Histogram::Cross_Print(const std::string& output_dir,envi_);
+	//}	
+}
+
 //W Qsquared plots
 int Histogram::W_binning(float W_){
   int j = 0;
@@ -185,6 +215,33 @@ void Histogram::WQ2_Write(std::shared_ptr<Environment> _envi){
 		dir_WQ2->Close();
 		std::cout<<"Done" <<std::endl;
 	}
+}
+
+void Histogram::WQ2_Print(const std::string& output_dir, std::shared_ptr<Environment> envi_){
+	Double_t w = 600;
+	Double_t h = 1200;
+	std::string _curr_dir_ = fun::get_current_dir();
+	std::string print_name = "$curr/$name/Plots/WQ2.png";
+	//std::string print_name = "/Users/cmc/Desktop/analysis/analysis_clas6/bin/$name/Plots/WQ2.png";// = "WQ2.png"; 
+	//if(envi_->was_print() > 0){
+		fun::replace(print_name, "$curr", _curr_dir_);
+		fun::replace(print_name,"$name",output_dir);
+		//sprintf(print_name,"/Users/cmc/Desktop/analysis/analysis_clas6/bin/%s/WQ2.png",output_dir.c_str());//Users/cmc/Desktop/analysis/analysis_clas6/bin/turst/
+		//TDirectory * iWQ2 = HistImageFile->mkdir("WQ2 images");
+		//iWQ2->cd();
+
+		def = new TCanvas("cwq","cwq",w,h);
+		def->Divide(1,2);
+		def->cd(1);
+		WQ2_hist[0][0][0][0]->Draw("colz");
+		def->cd(2);
+		WQ2_hist[1][0][0][0]->Draw("colz");
+		
+		def->SaveAs(print_name.c_str());
+		//def->SaveAs("WQ2.png");
+		delete def;
+
+	//}
 }
 
 //Fiducial Cuts

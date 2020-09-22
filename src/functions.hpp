@@ -10,11 +10,18 @@
 #include <string>
 #include "branches.hpp"
 #include "environment.hpp"
+#include "histogram.hpp"
+#include <sys/stat.h>
+#include <unistd.h>
+#include <filesystem>
 
 namespace fun {
+bool IsPathExist(const std::string &s);
+
 bool replace(std::string& str, const std::string& from, const std::string& to);
 
 std::shared_ptr<TFile> Name_File(std::string a_file_name);
+std::shared_ptr<TFile> Name_Image_File(std::string a_file_name);
 std::shared_ptr<TFile> Name_Tree_File(std::string a_file_name, bool thrown_ = false);
 
 std::vector<std::string> read_file_list(std::string path, int thread_num);
@@ -29,6 +36,9 @@ bool no_pro_pip_match(int idx1, int idx2[20]);
 
 bool hist_fitting(int species_, int cut_, int Wbin_, int pbin_, int fit_);
 
+int Make_Dir(std::string a_dir_name);
+
+std::string get_current_dir();
 }
 
 #endif

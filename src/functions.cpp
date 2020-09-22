@@ -1,5 +1,10 @@
 #include "functions.hpp"
 
+bool fun::IsPathExist(const std::string &s){
+  struct stat buffer;
+  return (stat (s.c_str(), &buffer) == 0);
+}
+
 bool fun::replace(std::string& str, const std::string& from, const std::string& to) {
     size_t start_pos = str.find(from);
     if(start_pos == std::string::npos)
@@ -10,20 +15,29 @@ bool fun::replace(std::string& str, const std::string& from, const std::string& 
 
 std::shared_ptr<TFile> fun::Name_File(std::string a_file_name)
 {
-	std::string file_name = "$name.root";
+	std::string file_name = "/Users/cmc/Desktop/analysis/analysis_clas6/bin/$name/$name.root";
 	replace(file_name, "$name", a_file_name);
+  replace(file_name, "$name", a_file_name);
 	return std::make_shared<TFile>(file_name.c_str(),"RECREATE");
+}
+
+std::shared_ptr<TFile> fun::Name_Image_File(std::string a_file_name)
+{
+  std::string file_name = "$name_pics.root";
+  replace(file_name, "$name", a_file_name);
+  return std::make_shared<TFile>(file_name.c_str(),"RECREATE");
 }
 
 std::shared_ptr<TFile> fun::Name_Tree_File(std::string a_file_name, bool thrown_)
 {
   std::string file_name;
   if(thrown_){
-    file_name = "$name_thr_tree.root";
+    file_name = "/Users/cmc/Desktop/analysis/analysis_clas6/bin/$name/$name_thr_tree.root";
   }else{
-    file_name = "$name_evnt_tree.root";
+    file_name = "/Users/cmc/Desktop/analysis/analysis_clas6/bin/$name/$name_evnt_tree.root";
   }
 	replace(file_name, "$name", a_file_name);
+  replace(file_name, "$name", a_file_name);
 	return std::make_shared<TFile>(file_name.c_str(),"RECREATE");
 }
 
@@ -129,5 +143,22 @@ bool fun::hist_fitting(int species_, int cut_, int Wbin_, int pbin_, int fit_){
   }
   return pass; 
 }
+
+int fun::Make_Dir(std::string a_dir_name)
+{
+  std::string dir_name = "$name";
+  if(fun::IsPathExist(a_dir_name)){
+    return 0;
+  }else{
+    replace(dir_name, "$name", a_dir_name.c_str());
+    return mkdir(dir_name.c_str(),0777);
+  }
+}
+
+std::string fun::get_current_dir(){
+   return std::filesystem::current_path().string();
+}
+
+
 
 

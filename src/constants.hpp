@@ -271,6 +271,12 @@ static const std::string lists3y = "sim_gsim_ngpp_mcdata";
 static const std::string lists3 = "sim_e16";
 static const std::string lists32 = "sim_e16_2";
 static const std::string lists_ar = "sim_e16_arjun";
+static const std::string list_ts = "sim_test_e16";
+static const std::string list_ts_gpp = "sim_test_e16_gpp";
+static const std::string list_ts_gsim = "sim_test_e16_gsim";
+static const std::string list_ts_gsim_1 = "sim_test_e16_gim_1";
+static const std::string list_ar_a1c = "recook_arjun_a1c";//Recooked arjun simulated data for e1-6 with a1c cooking
+static const std::string list_ar_ana = "recook_arjun_ana";//Recooked arjun simulated data for e1-6 with user_ana cooking
 
 //Paths for file names
 static const std::string path1 = "/home/mclauchlinc/Desktop/analysis/nick_convert_e16.txt";
@@ -286,6 +292,12 @@ static const std::string paths3y = "/Users/cmc/Desktop/analysis/analysis_clas6/P
 static const std::string paths3 = "/Users/cmc/Desktop/analysis/analysis_clas6/Path_Files/sim_e16_fix.txt";
 static const std::string paths32 = "/Users/cmc/Desktop/analysis/analysis_clas6/Path_Files/sim_e16_2.txt";
 static const std::string paths_ar = "/Users/cmc/Desktop/analysis/analysis_clas6/Path_Files/arjun_sim_e16.txt";
+static const std::string path_ts = "/Users/cmc/Desktop/analysis/analysis_clas6/Path_Files/test_sim_e16.txt";
+static const std::string path_ts_gpp = "/Users/cmc/Desktop/analysis/analysis_clas6/Path_Files/gpp_test_sim_e16.txt";
+static const std::string path_ts_gsim = "/Users/cmc/Desktop/analysis/analysis_clas6/Path_Files/gsim_test_sim_e16.txt";
+static const std::string path_ts_gsim_1 = "/Users/cmc/Desktop/analysis/analysis_clas6/Path_Files/gsim_test_e16_1.txt";
+static const std::string paths_ar_a1c = "/Users/cmc/Desktop/analysis/analysis_clas6/Path_Files/arjun_recooked_gsim_a1c.txt";
+static const std::string paths_ar_ana = "/Users/cmc/Desktop/analysis/analysis_clas6/Path_Files/arjun_recooked_gsim_ana.txt";
 
 //Run type for file lists {e16,e1f,e16sim,e1fsim} -> {1,2,3,4}
 static const int type1 = 1;
@@ -301,6 +313,10 @@ static const int types3y = 5;
 static const int types3 = 3; 
 static const int types32 = 3; 
 static const int types_ar = 7;//Arjun's simulation seems to have no weights in place...?
+static const int type_ts = 7;
+static const int type_ts_gpp = 7;
+static const int type_ts_gsim = 7;
+static const int type_ts_gsim_1 = 7;
 
 //Map of file lists to run type
 static std::unordered_map<std::string, std::string> filepath_map = 	{	{list1,path1},
@@ -315,7 +331,13 @@ static std::unordered_map<std::string, std::string> filepath_map = 	{	{list1,pat
 																		{lists3y,paths3y},
 																		{lists3,paths3},
 																		{lists32,paths32},
-																		{lists_ar,paths_ar}};
+																		{lists_ar,paths_ar},
+																		{list_ts,path_ts},
+																		{list_ts_gpp,path_ts_gpp},
+																		{list_ts_gsim,path_ts_gsim},
+																		{list_ts_gsim_1,path_ts_gsim_1},
+																		{list_ar_a1c,paths_ar_a1c},
+																		{list_ar_ana,paths_ar_ana}};
 
 static std::unordered_map<std::string, int> filetype_map = 	{	{list1,type1},
 																{list2,type2},
@@ -329,7 +351,13 @@ static std::unordered_map<std::string, int> filetype_map = 	{	{list1,type1},
 																{lists3y,types3y},
 																{lists3,types3},
 																{lists32,types32},
-																{lists_ar,types_ar}};
+																{lists_ar,types_ar},
+																{list_ts,type_ts},
+																{list_ts_gpp,type_ts_gpp},
+																{list_ts_gsim,type_ts_gsim},
+																{list_ts_gsim_1,type_ts_gsim_1},
+																{list_ar_a1c,types_ar},
+																{list_ar_ana,types_ar}};
 
 static const char * species[] = {"ele","pro","pip","pim"};//4
 static const char * eid_cut[] = {"pre","sanity","fid","sf","min_cc","fid+sf","fid+cc","sf+cc","eid","bank","event"}; //11"min_cc","min_ec","eid","bank","event"};//"fid+sf","fid+cc","sf+cc","eid","bank","event"}; //11

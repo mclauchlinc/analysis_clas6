@@ -13,6 +13,7 @@
 #include "environment.hpp"
 #include "setup.hpp"
 #include "event_analysis.hpp"
+#include <unistd.h>
 
 std::string comp; //Variable for choosing which data set will be used
 char* output_name;//Variable for the output file name. This is reassigned through input parameters

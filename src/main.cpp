@@ -140,8 +140,18 @@ int main(int argc, char **argv){
 			envi->Environment::env_sim(true);
 		}
 	}*/
+	//Make output directory
+	std::string out_dir = "cd /Users/cmc/Desktop/analysis/analysis_clas6/bin/$name";
+	chdir("cd /Users/cmc/Desktop/analysis/analysis_clas6/bin");
+	int check = fun::Make_Dir(output_name);//mkdir(output_dir,0777);
+	fun::replace(out_dir, "$name", output_name);
+	//chdir(out_dir.c_str());
+
+
 	//Output a file listing the inputs for the environment
 	Setup::make_envi_file(output_name,envi);
+
+
 
 	// Make a set of threads (Futures are special threads which return a value)
   	std::future<size_t> threads[NUM_THREADS];
@@ -216,6 +226,7 @@ int main(int argc, char **argv){
 	
 
 	hists->Histogram::Write(output_name,envi);
+	//hists->Histogram::Print(output_name,envi);
 
 	std::cout<<std::endl;
 	//Timer and Efficiency Counters

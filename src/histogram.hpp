@@ -13,6 +13,11 @@
 #include "detectors.hpp"
 #include "environment.hpp"
 #include "THnSparse.h"
+#include <sys/stat.h>
+#include <stdio.h>
+#include <stdlib.h>
+//#include <unistd.h>//to allow us to use chdir
+//#include "TImage.h"
 //#include "particle.hpp"
 //#include "variables.h"
 //#include "CartesianGenerator.hh"
@@ -21,13 +26,18 @@
 using TH2F_ptr = std::shared_ptr<TH2F>;
 using TH1F_ptr = std::shared_ptr<TH1F>;
 using THn_ptr = std::shared_ptr<THnSparseD>;
+
+//Canvas information
+//const Double_t WQ2_cw = 1200;
+//const Double_t WQ2_ch = 600;
 //using TH1I_ptr = std::shared_ptr<TH1I>;
 
 
 class Histogram {
 protected:
 	std::shared_ptr<TFile> RootOutputFile;
-	TCanvas* def; 
+	std::shared_ptr<TFile> HistImageFile;
+	TCanvas* def;
 
 	//Plot Formation Constants
 	//W Q2
@@ -155,6 +165,7 @@ public:
 	Histogram(std::shared_ptr<Environment> _envi, const std::string& output_file);
 	//~Histogram();
 	void Write(const std::string& output_file, std::shared_ptr<Environment> _envi);
+	void Print(const std::string& output_dir, std::shared_ptr<Environment> envi_);
 	//W Qsquared plots
 	int W_binning(float W_);
 	int p_binning(float p_);
@@ -162,22 +173,26 @@ public:
 	void WQ2_Make(std::shared_ptr<Environment> _envi);
 	void WQ2_Fill(std::shared_ptr<Environment> _envi, int top, int cut, float W_, float Q2_, float weight_, int thr = 0);
 	void WQ2_Write(std::shared_ptr<Environment> _envi);
+	void WQ2_Print(const std::string& output_dir, std::shared_ptr<Environment> envi_);
 	//Fiducial Cuts
 	void Fid_Make(std::shared_ptr<Environment> _envi );
 	void Fid_Fill(std::shared_ptr<Environment> _envi, int top, float theta, float phi, int part, int cut, int cutvanti, float W_, float p);
 	//void Fid_Fill(std::shared_ptr<Environment> _envi, Particle par_, float W_);
 	void Fid_Write(std::shared_ptr<Environment> _envi);
+	//void Fid_Print(std::shared_ptr<Environment> _envi);
 	//Sampling Fraction Cuts
 	void SF_Make(std::shared_ptr<Environment> _envi );
 	void SF_Fill(std::shared_ptr<Environment> _envi, int top, float p, float en, int cut, int cva, float W_, int sec);
 	//void SF_Fill(std::shared_ptr<Environment> _envi, Particle par_, float W_);
 	void SF_Write(std::shared_ptr<Environment> _envi);
+	//void SF_Print(std::shared_ptr<Environment> _envi);
 	//Delta T Cuts
 	void DT_Make(std::shared_ptr<Environment> _envi );
 	void DT_Fill(std::shared_ptr<Environment> _envi, int top, int part, float p, float d, float t, float d0, float t0, int cut, int anti, float W_, int sec);
 	void DT_Fill(std::shared_ptr<Environment> _envi, int top, int part, float p, float dt, int cut, int anti, float W_, int sec);
 	//void DT_Fill(std::shared_ptr<Environment> _envi, Particle par_, float W_);
 	void DT_Write(std::shared_ptr<Environment> _envi);
+	//void DT_Print(std::shared_ptr<Environment> _envi);
 	//Min CC Cuts
 	void CC_Make(std::shared_ptr<Environment> _envi );
 	void CC_Fill(std::shared_ptr<Environment> _envi, int top, int sec, int segm, int nphe, int cut, int anti);

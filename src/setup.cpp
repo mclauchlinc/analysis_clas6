@@ -124,7 +124,10 @@ void Setup::set_envi(std::shared_ptr<Environment> setup, int run_type, int fit){
 }
 
 void Setup::make_envi_file(const std::string& output_name, std::shared_ptr<Environment> envi){
-	std::string envi_name = "$name_envi.txt";
+	std::string curr_dir = fun::get_current_dir();
+	std::string envi_name = "$curr/$name/$name_envi.txt";
+	fun::replace(envi_name, "$curr", curr_dir);
+	fun::replace(envi_name, "$name", output_name);
 	fun::replace(envi_name, "$name", output_name);
 	std::cout<<"	envi file name: " <<envi_name <<std::endl;
 	std::ofstream envi_f;
